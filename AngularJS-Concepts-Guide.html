@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AngularJS (1.x) - Complete Learning Guide</title>
+<link rel="stylesheet" href="assets/guide.css">
+<style>
+:root{--accent:#c3002f;--accent-soft:#fde7ec}
+body.dark{--accent:#ff6b8a;--accent-soft:#3a1822}
+.hero{background:linear-gradient(135deg,#5c0017,#c3002f 55%,#dd5a2f)}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="brand"><h1>AngularJS 1.x</h1><small>Basics &rarr; Scope &amp; DI &rarr; Routing &rarr; Storage &rarr; Build tools &rarr; Interview prep</small></div>
+  <div class="search"><input id="search" type="search" placeholder="Search concepts ( press / )" autocomplete="off"><div id="search-results"></div></div>
+  <nav id="nav"></nav>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    <button id="menu-btn" type="button">Menu</button>
+    <div class="prog"><i id="progress"></i></div>
+    <button id="expand-all" type="button">Expand all</button>
+    <button id="collapse-all" type="button">Collapse all</button>
+    <button id="theme-btn" type="button">Dark / Light</button>
+  </div>
+
+  <main id="content">
+
+  <div class="hero" id="top">
+    <h1>AngularJS (1.x) &ndash; The Complete Learning Guide</h1>
+    <p>From "what is a module?" to scope and the digest cycle, dependency injection, directives and components, <b>routing</b> (ngRoute and ui-router), every practical way to <b>store data</b> in the browser, and the <b>build tools</b> used to ship an AngularJS app (npm, Gulp, Webpack, Karma). Written for people who maintain or interview on legacy AngularJS code.</p>
+    <div class="chips"><span>AngularJS 1.8.x</span><span>Modules &middot; DI</span><span>Scope &amp; digest</span><span>ngRoute &middot; ui-router</span><span>localStorage &middot; cookies &middot; IndexedDB</span><span>Gulp &middot; Webpack &middot; Karma</span><span>Interview Q&amp;A + quiz</span></div>
+  </div>
+
+  <section class="topic" id="how-to-use" data-nav="How to use this guide" data-group="Start here">
+    <h2>How to use this guide</h2>
+    <div class="grid3">
+      <div class="card"><h4>1. Learn in order</h4><p>Sidebar items are tagged <span class="badge b">Basic</span> <span class="badge i">Mid</span> <span class="badge a">Adv</span>. Top to bottom is a beginner-to-advanced path.</p></div>
+      <div class="card"><h4>2. Use the labs</h4><p>Dashed boxes are live labs: a digest-cycle simulator, a route matcher and a working browser-storage playground. Predict first, then run.</p></div>
+      <div class="card"><h4>3. Revise</h4><p>Press <span class="kbd">/</span> to search. Use <i>Expand all</i> for folded details. Finish with the quiz and the filterable interview Q&amp;A.</p></div>
+    </div>
+    <h3>Roadmap</h3>
+    <div class="diagram"><div class="dtitle">Beginner &rarr; Advanced progression</div>
+      <div class="flow">
+        <div class="node ok">Stage 1<small>Modules, expressions, binding,<br>controllers, directives, forms</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Stage 2<small>Scope, digest cycle, DI,<br>services, $http, promises</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Stage 3<small>Custom directives,<br>components, events</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Stage 4<small>Routing: ngRoute,<br>ui-router, html5Mode</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Stage 5<small>Storage: web storage,<br>cookies, IndexedDB, caches</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">Stage 6<small>Build tools, testing,<br>performance, migration</small></div>
+      </div>
+    </div>
+    <div class="warn"><b>AngularJS vs Angular</b>This guide is about <b>AngularJS 1.x</b> (the original framework, JavaScript, <code>$scope</code>, <code>ng-controller</code>). <b>Angular</b> (2+) is a different, TypeScript-based framework with its own CLI. AngularJS reached <b>end of life on 31 December 2021</b> (last release 1.8.3): no more security fixes from the Angular team. It is still widely found in enterprise code, so knowing it matters &ndash; but plan a migration for anything new (see the migration chapter).</div>
+    <div class="note"><b>Running the code</b>Create an <code>index.html</code>, add the AngularJS script from npm (<code>npm i angular@1.8.3</code>) or a CDN, and open it in a browser. Snippets are plain ES5-style JavaScript, which is how AngularJS code is traditionally written; the build-tools part shows how to use ES6/modules.</div>
+  </section>
+
+  <div class="part-title">Part 1 &mdash; AngularJS fundamentals</div>
+
+  <!-- =============== What is AngularJS =============== -->
+  <section class="topic" id="what-is" data-nav="What is AngularJS?" data-group="1 · Fundamentals" data-level="b">
+    <h2>What is AngularJS? <span class="badge b">Basic</span></h2>
+    <p><b>AngularJS</b> is a client-side JavaScript framework (Google, first released 2010) for building single-page applications (SPAs). You extend HTML with new attributes (<b>directives</b>), bind your page to JavaScript data (<b>two-way data binding</b>) and organise logic into <b>modules, controllers and services</b> wired together by <b>dependency injection</b>.</p>
+    <div class="why"><b>Why did it exist?</b>In 2010, building rich pages meant hand-written jQuery: finding elements, copying values to and from the DOM, and keeping both in sync. AngularJS made the data the single source of truth: change the model and the view updates; type in the view and the model updates. That removed huge amounts of glue code and gave teams structure, testability and a standard way to build SPAs.</div>
+    <h3>Key characteristics</h3>
+    <ul>
+      <li><b>MVC / MVVM style</b> &ndash; Model (plain JS objects on <code>$scope</code>), View (HTML template), Controller / ViewModel (functions that prepare the model).</li>
+      <li><b>Declarative templates</b> &ndash; HTML plus <code>{{ expressions }}</code> and directives such as <code>ng-repeat</code>.</li>
+      <li><b>Two-way data binding</b> &ndash; implemented by <i>dirty checking</i> in the <b>digest cycle</b>.</li>
+      <li><b>Dependency injection</b> built in &ndash; services are requested by name and supplied by the injector.</li>
+      <li><b>Directives</b> &ndash; teach HTML new tricks; reusable UI building blocks.</li>
+      <li><b>Testability</b> &ndash; DI plus <code>angular-mocks</code> make unit tests straightforward.</li>
+    </ul>
+    <h3>Architecture at a glance</h3>
+    <div class="diagram"><div class="dtitle">How the pieces fit together</div>
+      <div class="layers">
+        <div class="layer">View (HTML template)<small>{{ expressions }} &middot; directives &middot; filters &middot; forms</small></div><div class="down">&harr; two-way binding via $scope</div>
+        <div class="layer l2">Controllers / Components<small>Prepare the model, handle user actions. Should contain no DOM code.</small></div><div class="down">&darr; injected</div>
+        <div class="layer l3">Services (factory / service / provider)<small>Business logic, shared state, $http calls, storage wrappers. Singletons.</small></div><div class="down">&darr; HTTP / storage</div>
+        <div class="layer l4">Back-end API &middot; localStorage &middot; cookies &middot; IndexedDB</div>
+      </div>
+    </div>
+    <h3>The smallest AngularJS app</h3>
+    <pre data-lang="html" data-file="index.html">&lt;!DOCTYPE html&gt;
+&lt;html ng-app="demoApp"&gt;                          &lt;!-- 1. ng-app marks the root: AngularJS compiles everything inside --&gt;
+&lt;head&gt;
+  &lt;script src="node_modules/angular/angular.min.js"&gt;&lt;/script&gt;
+  &lt;script src="app.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body ng-controller="HelloCtrl as vm"&gt;           &lt;!-- 2. attach a controller to this part of the DOM --&gt;
+  &lt;input ng-model="vm.name" placeholder="Your name"&gt;   &lt;!-- 3. two-way binding --&gt;
+  &lt;h1&gt;Hello, {{ vm.name || 'stranger' }}!&lt;/h1&gt;       &lt;!-- 4. expression: updates as you type --&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+    <pre data-lang="js" data-file="app.js">angular.module('demoApp', [])
+  .controller('HelloCtrl', function () {
+    var vm = this;          // "controller as" syntax: no $scope needed
+    vm.name = 'Ada';
+  });</pre>
+    <h3>What happens on page load?</h3>
+    <div class="seq" data-title="AngularJS bootstrap sequence">
+<script type="text/seq">
+participants: Browser | angular.js | Injector | Compiler | $rootScope
+Browser -> angular.js : DOMContentLoaded
+angular.js -> angular.js : find element with ng-app
+angular.js -> Injector : create injector for module 'demoApp'
+Injector -> Injector : run config blocks, then run blocks
+angular.js -> Compiler : $compile(document) walks the DOM
+Compiler -> Compiler : collect directives, build link functions
+Compiler -> $rootScope : link: create scopes, register watchers
+$rootScope -> Browser : first $digest renders {{ }} values
+note $rootScope : app is live and waiting for events
+</script>
+    </div>
+    <details><summary>AngularJS vs Angular (2+) vs React &ndash; quick comparison</summary><div class="dbody">
+      <div class="tblwrap"><table><tr><th>Aspect</th><th>AngularJS 1.x</th><th>Angular 2+</th><th>React</th></tr>
+      <tr><td>Language</td><td>JavaScript (ES5 style)</td><td>TypeScript</td><td>JavaScript / TypeScript (JSX)</td></tr>
+      <tr><td>Architecture</td><td>MVC/MVVM with <code>$scope</code></td><td>Components + modules</td><td>Component library</td></tr>
+      <tr><td>Change detection</td><td>Digest cycle (dirty checking)</td><td>Zone.js / signals, unidirectional</td><td>Virtual DOM diffing</td></tr>
+      <tr><td>Binding</td><td>Two-way by default</td><td>One-way default, <code>[(ngModel)]</code> for two-way</td><td>One-way</td></tr>
+      <tr><td>Tooling</td><td>Manual (npm, Gulp, Webpack...)</td><td>Angular CLI</td><td>Vite / CRA / Next.js</td></tr>
+      <tr><td>Status</td><td>End of life since Dec 2021</td><td>Actively maintained</td><td>Actively maintained</td></tr></table></div></div></details>
+  </section>
+
+  <!-- =============== Modules & bootstrapping =============== -->
+  <section class="topic" id="modules" data-nav="Modules and bootstrapping" data-group="1 · Fundamentals" data-level="b">
+    <h2>Modules and bootstrapping <span class="badge b">Basic</span></h2>
+    <p>A <b>module</b> is a named container for the parts of your app: controllers, services, directives, filters, configuration. Modules declare their dependencies on other modules, so AngularJS can load everything in the right order.</p>
+    <div class="why"><b>Why modules?</b>They stop everything living in the global scope, make features self-contained (a <code>users</code> module, an <code>orders</code> module), and let tests load only what they need.</div>
+    <pre data-lang="js" data-file="app.module.js">// SETTER: the second argument (the dependency array) CREATES the module
+angular.module('shop', ['ngRoute', 'ngCookies', 'shop.products']);
+
+// GETTER: no second argument -> retrieve the existing module
+angular.module('shop')
+  .config(function ($routeProvider) { /* runs once, before the app starts */ })
+  .run(function ($rootScope) { /* runs once, after injector is created */ });
+
+// Feature module
+angular.module('shop.products', [])
+  .controller('ProductListCtrl', ProductListCtrl)
+  .factory('ProductService', ProductService);</pre>
+    <div class="warn"><b>Classic bug</b><code>angular.module('shop', [])</code> called a second time <i>re-creates</i> the module and silently wipes everything registered earlier. Use the one-argument getter form everywhere except the very first declaration.</div>
+    <h3>config vs run blocks</h3>
+    <div class="tblwrap"><table><tr><th></th><th><code>config()</code></th><th><code>run()</code></th></tr>
+      <tr><td>When</td><td>During provider registration, before any service is instantiated</td><td>After the injector is created, when the app is ready (like <code>main</code>)</td></tr>
+      <tr><td>Can inject</td><td><b>Providers</b> (<code>$routeProvider</code>, <code>$httpProvider</code>) and <b>constants</b></td><td><b>Instances</b> (<code>$rootScope</code>, services, <code>$http</code>) and constants</td></tr>
+      <tr><td>Typical use</td><td>Routes, interceptors, <code>$compileProvider</code> flags, html5Mode</td><td>Auth checks on route change, initialising globals, warming caches</td></tr></table></div>
+    <h3>Ways to bootstrap</h3>
+    <pre data-lang="html" data-file="bootstrap.html">&lt;!-- Automatic: first ng-app found --&gt;
+&lt;html ng-app="shop" ng-strict-di&gt;
+
+&lt;!-- Manual: needed for async startup (fetch config first), multiple apps or hybrid migration --&gt;
+&lt;script&gt;
+  angular.element(document).ready(function () {
+    fetch('/config.json').then(r =&gt; r.json()).then(function (cfg) {
+      angular.module('shop').constant('APP_CONFIG', cfg);
+      angular.bootstrap(document.getElementById('app'), ['shop'], { strictDi: true });
+    });
+  });
+&lt;/script&gt;</pre>
+    <div class="tip"><b>Always enable strictDi</b><code>ng-strict-di</code> makes AngularJS throw if you use implicit (parameter-name) injection. That catches code which would break after minification (see the DI chapter).</div>
+  </section>
+
+  <!-- =============== Expressions & binding =============== -->
+  <section class="topic" id="binding" data-nav="Expressions and data binding" data-group="1 · Fundamentals" data-level="b">
+    <h2>Expressions and data binding <span class="badge b">Basic</span></h2>
+    <p>An AngularJS <b>expression</b> is a small JavaScript-like snippet written in <code>{{ }}</code> or in a directive attribute. It is evaluated against the current <b>scope</b>, never against <code>window</code>.</p>
+    <pre data-lang="html" data-file="expressions.html">&lt;p&gt;{{ 1 + 2 }}&lt;/p&gt;                          &lt;!-- 3 --&gt;
+&lt;p&gt;{{ user.name | uppercase }}&lt;/p&gt;             &lt;!-- property + filter --&gt;
+&lt;p&gt;{{ items.length &gt; 0 ? 'has items' : 'empty' }}&lt;/p&gt;
+&lt;p&gt;{{ undefinedVar.deep.prop }}&lt;/p&gt;             &lt;!-- renders empty, no TypeError (forgiving) --&gt;</pre>
+    <div class="tblwrap"><table><tr><th>Expressions CAN</th><th>Expressions CANNOT</th></tr>
+      <tr><td>Use scope properties, literals, operators, function calls on scope, filters, ternary</td><td>Use <code>if/for/while</code>, <code>throw</code>, <code>new</code>, regular expressions, or reference <code>window</code>/<code>document</code>/<code>Math</code></td></tr>
+      <tr><td>Fail silently on <code>null</code>/<code>undefined</code></td><td>Contain statements separated by <code>;</code> (except in event directives such as <code>ng-click</code>)</td></tr></table></div>
+    <h3>Kinds of binding</h3>
+    <div class="tblwrap"><table><tr><th>Syntax</th><th>Direction</th><th>Notes</th></tr>
+      <tr><td><code>{{ value }}</code> / <code>ng-bind="value"</code></td><td>Model &rarr; View</td><td><code>ng-bind</code> avoids flashing raw <code>{{ }}</code> before compile (or use <code>ng-cloak</code>).</td></tr>
+      <tr><td><code>ng-model="value"</code></td><td>Model &harr; View (two-way)</td><td>Works on <code>input</code>, <code>select</code>, <code>textarea</code> and custom controls.</td></tr>
+      <tr><td><code>{{ ::value }}</code></td><td>One-time (1.3+)</td><td>Watcher is removed after the value stabilises; big performance win for static data.</td></tr>
+      <tr><td><code>ng-click="fn()"</code></td><td>View &rarr; Model (events)</td><td>Runs the expression, then triggers a digest.</td></tr>
+      <tr><td><code>ng-bind-html</code></td><td>Model &rarr; View (HTML)</td><td>Needs <code>ngSanitize</code> or an explicit <code>$sce</code> trust.</td></tr></table></div>
+    <h3>The dot rule (prototypal scope inheritance)</h3>
+    <p>Child scopes (created by <code>ng-repeat</code>, <code>ng-if</code>, <code>ng-controller</code>...) <b>prototypally inherit</b> from the parent. Binding a <i>primitive</i> in a child writes a new property on the child and hides the parent&rsquo;s value.</p>
+    <pre data-lang="html" data-file="dot-rule.html">&lt;!-- BAD: ng-if creates a child scope, typing creates child.name; parent.name never changes --&gt;
+&lt;div ng-if="show"&gt;&lt;input ng-model="name"&gt;&lt;/div&gt;
+&lt;p&gt;{{ name }}&lt;/p&gt;
+
+&lt;!-- GOOD: bind to a property of an object ("always have a dot in your ng-model") --&gt;
+&lt;div ng-if="show"&gt;&lt;input ng-model="form.name"&gt;&lt;/div&gt;
+&lt;p&gt;{{ form.name }}&lt;/p&gt;
+
+&lt;!-- BEST: controllerAs makes every binding "vm.something" --&gt;
+&lt;div ng-controller="FormCtrl as vm"&gt;&lt;input ng-model="vm.name"&gt;&lt;/div&gt;</pre>
+  </section>
+
+  <!-- =============== Scope & digest =============== -->
+  <section class="topic" id="scope-digest" data-nav="Scope and the digest cycle" data-group="1 · Fundamentals" data-level="i">
+    <h2>Scope and the digest cycle <span class="badge i">Mid</span></h2>
+    <p><b>$scope</b> is the object that glues a controller to its view. <code>$rootScope</code> is the parent of all scopes; child scopes form a tree that mirrors the DOM structure of controllers and directives.</p>
+    <div class="why"><b>How can AngularJS know that a value changed?</b>It does not observe properties. Instead, every <code>{{ }}</code>, <code>ng-model</code> or <code>$watch</code> registers a <b>watcher</b> (a getter function + a listener). After any event that AngularJS knows about, it runs the <b>digest cycle</b>: it loops over every watcher, compares the current value with the last remembered value (<i>dirty checking</i>), and calls the listener if different. Because a listener may change other data, it repeats until a full pass finds nothing dirty (maximum <b>10</b> passes by default).</div>
+    <div class="seq" data-title="One digest cycle after the user types in an input">
+<script type="text/seq">
+participants: User | Browser DOM | ngModel directive | $rootScope | Watchers
+User -> Browser DOM : types a letter (input event)
+Browser DOM -> ngModel directive : event handler runs inside $apply
+ngModel directive -> $rootScope : $scope.$apply(updateModel)
+$rootScope -> Watchers : $digest pass 1: compare every watcher
+Watchers --> $rootScope : some values changed (dirty)
+$rootScope -> Watchers : $digest pass 2: re-check everything
+Watchers --> $rootScope : nothing changed (clean)
+$rootScope -> Browser DOM : listeners already updated {{ }} text
+</script>
+    </div>
+    <div class="lab" id="ng-digest-lab"></div>
+    <h3>$apply, $digest, $evalAsync</h3>
+    <div class="tblwrap"><table><tr><th>Call</th><th>What it does</th><th>When to use</th></tr>
+      <tr><td><code>$scope.$apply(fn)</code></td><td>Runs <code>fn</code> in a try/catch, then <code>$rootScope.$digest()</code> (the whole tree)</td><td>Model changed by code <b>outside</b> AngularJS: <code>setTimeout</code>, jQuery, WebSocket, native events</td></tr>
+      <tr><td><code>$scope.$digest()</code></td><td>Digests this scope and its children only</td><td>Rare micro-optimisation; usually prefer <code>$apply</code></td></tr>
+      <tr><td><code>$timeout(fn)</code></td><td><code>setTimeout</code> + automatic <code>$apply</code></td><td>Preferred over raw <code>setTimeout</code>; also useful to "wait for the next digest"</td></tr>
+      <tr><td><code>$scope.$evalAsync(fn)</code></td><td>Queues <code>fn</code> to run in the current/next digest, safe even if one is in progress</td><td>Avoid "$digest already in progress" errors</td></tr>
+      <tr><td><code>$applyAsync(fn)</code></td><td>Batches several calls into one digest (also <code>$httpProvider.useApplyAsync(true)</code>)</td><td>Many responses arriving at once</td></tr></table></div>
+    <pre data-lang="js" data-file="outside-angular.js">// BUG: the model changes but the view does not update (no digest was triggered)
+setTimeout(function () { $scope.count++; }, 1000);
+
+// FIX 1: use the AngularJS wrapper, which digests automatically
+$timeout(function () { $scope.count++; }, 1000);
+
+// FIX 2: wrap third-party callbacks yourself
+thirdPartyLib.onChange(function (value) {
+  $scope.$apply(function () { $scope.value = value; });
+});</pre>
+    <div class="warn"><b>Common errors</b><code>$rootScope:inprog</code> &ndash; you called <code>$apply</code> while a digest was already running (use <code>$evalAsync</code> or <code>$timeout</code>). <code>$rootScope:infdig</code> &ndash; "10 $digest() iterations reached": a watcher keeps changing data (or returns a new object/array each call, e.g. a function that does <code>return items.filter(...)</code> bound in the template).</div>
+    <h3>Watching manually</h3>
+    <pre data-lang="js" data-file="watch.js">// Reference watch (default): fires when the value / reference changes
+var stop = $scope.$watch('vm.query', function (newVal, oldVal) {
+  if (newVal !== oldVal) vm.search(newVal);       // first call has newVal === oldVal
+});
+
+$scope.$watch('vm.items', fn, true);              // deep watch (angular.equals): expensive
+$scope.$watchCollection('vm.items', fn);          // shallow: add/remove/reorder only
+$scope.$on('$destroy', stop);                     // deregister (scopes do this for you on destroy)</pre>
+    <details><summary>Why is AngularJS slow with thousands of bindings?</summary><div class="dbody">
+      <p>Every digest runs <i>every</i> watcher at least twice (once to find changes, once to confirm stability). 2,000+ watchers on a page can make each keystroke visibly slow. The remedies are listed in the performance chapter: one-time bindings, <code>track by</code>, pagination/virtual scroll, <code>ng-model-options</code> debounce, avoiding deep watches and heavy functions in templates, and disabling debug info in production.</p></div></details>
+  </section>
+
+  <!-- =============== Controllers =============== -->
+  <section class="topic" id="controllers" data-nav="Controllers" data-group="1 · Fundamentals" data-level="b">
+    <h2>Controllers <span class="badge b">Basic</span></h2>
+    <p>A <b>controller</b> is a constructor function that AngularJS instantiates (with DI) for a piece of the view. Its job: set up initial state and expose functions the view can call. It should <b>not</b> manipulate the DOM, format data (use filters) or contain business logic and HTTP code (use services).</p>
+    <div class="tabs">
+      <div class="tabpane" data-title="controllerAs (recommended)"><pre data-lang="js" data-file="products.controller.js">angular.module('shop').controller('ProductListCtrl', ProductListCtrl);
+
+ProductListCtrl.$inject = ['ProductService'];          // explicit annotation, minification-safe
+function ProductListCtrl(ProductService) {
+  var vm = this;                                       // view-model
+  vm.products = [];
+  vm.loading = true;
+  vm.remove = remove;
+
+  activate();
+
+  function activate() {
+    ProductService.getAll().then(function (list) { vm.products = list; })
+      .finally(function () { vm.loading = false; });
+  }
+  function remove(p) { return ProductService.remove(p.id).then(activate); }
+}</pre><pre data-lang="html" data-file="products.html">&lt;div ng-controller="ProductListCtrl as vm"&gt;
+  &lt;p ng-if="vm.loading"&gt;Loading...&lt;/p&gt;
+  &lt;ul&gt;&lt;li ng-repeat="p in vm.products track by p.id"&gt;{{ p.name }} &lt;button ng-click="vm.remove(p)"&gt;x&lt;/button&gt;&lt;/li&gt;&lt;/ul&gt;
+&lt;/div&gt;</pre></div>
+      <div class="tabpane" data-title="$scope style (classic)"><pre data-lang="js" data-file="classic.controller.js">angular.module('shop').controller('ProductListCtrl', ['$scope', 'ProductService',
+  function ($scope, ProductService) {
+    $scope.products = [];
+    ProductService.getAll().then(function (list) { $scope.products = list; });
+    $scope.remove = function (p) { /* ... */ };
+  }]);</pre><div class="note"><b>Why prefer controllerAs?</b>No dependence on scope inheritance quirks (the dot rule), clearer templates (<code>vm.x</code> shows where data comes from), controllers become plain classes, and it is the natural stepping stone to <code>.component()</code> and to Angular 2+.</div></div>
+    </div>
+    <h3>Rules of thumb</h3>
+    <ul>
+      <li>One controller per view / component; keep it thin and delegate to services.</li>
+      <li>Never inject <code>$element</code>/DOM into a controller; use directives for DOM work.</li>
+      <li>Do not share state between controllers via <code>$rootScope</code>; use a service.</li>
+      <li>Clean up in <code>$scope.$on('$destroy', ...)</code> (timers, listeners, intervals).</li>
+    </ul>
+  </section>
+
+  <!-- =============== Built-in directives =============== -->
+  <section class="topic" id="directives-builtin" data-nav="Built-in directives" data-group="1 · Fundamentals" data-level="b">
+    <h2>Built-in directives you must know <span class="badge b">Basic</span></h2>
+    <p>A <b>directive</b> is a marker on a DOM element (attribute, element, class or comment) that tells the AngularJS compiler to attach behaviour or transform the element. The built-in ones cover most needs.</p>
+    <div class="tblwrap"><table><tr><th>Directive</th><th>Purpose</th><th>Notes</th></tr>
+      <tr><td><code>ng-app</code>, <code>ng-controller</code></td><td>Bootstrap and attach controller</td><td></td></tr>
+      <tr><td><code>ng-model</code></td><td>Two-way bind a form control</td><td>Creates <code>ngModelController</code> (validation, <code>$dirty</code>, <code>$touched</code>...)</td></tr>
+      <tr><td><code>ng-repeat</code></td><td>Repeat a template per item</td><td>Use <code>track by item.id</code> to reuse DOM nodes. Exposes <code>$index</code>, <code>$first</code>, <code>$last</code>, <code>$even</code>...</td></tr>
+      <tr><td><code>ng-if</code></td><td>Add/remove element from the DOM</td><td>Creates a child scope; destroys it when false.</td></tr>
+      <tr><td><code>ng-show</code> / <code>ng-hide</code></td><td>Toggle visibility with CSS class <code>ng-hide</code></td><td>Element stays in the DOM; watchers keep running. Cheap to toggle, costly if hidden content is big.</td></tr>
+      <tr><td><code>ng-switch</code></td><td>Choose one of several templates</td><td></td></tr>
+      <tr><td><code>ng-class</code>, <code>ng-style</code></td><td>Dynamic classes / inline styles</td><td><code>ng-class="{active: vm.sel === p, 'text-danger': p.err}"</code></td></tr>
+      <tr><td><code>ng-click</code>, <code>ng-change</code>, <code>ng-submit</code>, <code>ng-keyup</code>...</td><td>Event handlers</td><td>Run inside <code>$apply</code> automatically.</td></tr>
+      <tr><td><code>ng-href</code>, <code>ng-src</code></td><td>Interpolated URLs</td><td>Avoids a broken request/link before interpolation.</td></tr>
+      <tr><td><code>ng-include</code></td><td>Load an HTML fragment</td><td>Creates a child scope. Prefer components.</td></tr>
+      <tr><td><code>ng-options</code></td><td>Build <code>&lt;select&gt;</code> options from data</td><td>Binds objects, not only strings.</td></tr>
+      <tr><td><code>ng-cloak</code></td><td>Hide template until compiled</td><td>Prevents the <code>{{ }}</code> flash.</td></tr>
+      <tr><td><code>ng-bind-html</code>, <code>ng-non-bindable</code>, <code>ng-init</code></td><td>Special cases</td><td><code>ng-init</code> is discouraged outside <code>ng-repeat</code> aliases.</td></tr></table></div>
+    <pre data-lang="html" data-file="repeat.html">&lt;table&gt;
+  &lt;tr ng-repeat="u in vm.users | filter:vm.q | orderBy:'name' track by u.id" ng-class="{odd: $odd}"&gt;
+    &lt;td&gt;{{ $index + 1 }}&lt;/td&gt;&lt;td&gt;{{ u.name }}&lt;/td&gt;&lt;td&gt;{{ u.joined | date:'mediumDate' }}&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+&lt;p ng-if="!vm.users.length"&gt;No users found.&lt;/p&gt;</pre>
+    <div class="tip"><b>ng-if vs ng-show</b>Use <code>ng-if</code> when the content is rarely shown or expensive (it removes DOM and watchers) and <code>ng-show</code> for frequent cheap toggling. Remember <code>ng-if</code> adds a child scope: use the dot rule or controllerAs.</div>
+    <details><summary>Why "track by" in ng-repeat?</summary><div class="dbody">
+      <p>By default <code>ng-repeat</code> tracks items by identity (<code>$$hashKey</code> added to objects). If you replace the list with fresh objects from the server (same data, new objects), every DOM node is destroyed and re-created. <code>track by item.id</code> lets AngularJS reuse the DOM for items whose id has not changed, which is faster and keeps focus and scroll position. It also avoids the <code>ngRepeat:dupes</code> error when a list contains duplicate primitives (<code>track by $index</code>).</p></div></details>
+  </section>
+
+  <!-- =============== Filters =============== -->
+  <section class="topic" id="filters" data-nav="Filters" data-group="1 · Fundamentals" data-level="b">
+    <h2>Filters <span class="badge b">Basic</span></h2>
+    <p>A <b>filter</b> formats or selects data for display: <code>{{ value | filterName:arg1:arg2 }}</code>. Filters can be chained and also used from code via <code>$filter('name')</code>.</p>
+    <div class="tblwrap"><table><tr><th>Filter</th><th>Example</th><th>Result</th></tr>
+      <tr><td><code>currency</code></td><td><code>{{ 1234.5 | currency:'$' }}</code></td><td>$1,234.50</td></tr>
+      <tr><td><code>number</code></td><td><code>{{ 3.14159 | number:2 }}</code></td><td>3.14</td></tr>
+      <tr><td><code>date</code></td><td><code>{{ d | date:'dd/MM/yyyy HH:mm' }}</code></td><td>02/11/2026 06:01</td></tr>
+      <tr><td><code>uppercase</code>, <code>lowercase</code></td><td><code>{{ 'abc' | uppercase }}</code></td><td>ABC</td></tr>
+      <tr><td><code>json</code></td><td><code>{{ obj | json }}</code></td><td>Pretty JSON (debugging)</td></tr>
+      <tr><td><code>limitTo</code></td><td><code>{{ list | limitTo:3 }}</code></td><td>First 3 items / chars</td></tr>
+      <tr><td><code>orderBy</code></td><td><code>list | orderBy:'-price'</code></td><td>Sorted descending</td></tr>
+      <tr><td><code>filter</code></td><td><code>list | filter:{active:true}</code></td><td>Subset matching a predicate</td></tr></table></div>
+    <h3>Custom filter</h3>
+    <pre data-lang="js" data-file="filesize.filter.js">angular.module('shop').filter('fileSize', function () {
+  var units = ['B', 'KB', 'MB', 'GB'];
+  return function (bytes, digits) {                 // the factory returns the filter function
+    if (isNaN(bytes)) return '-';
+    var i = 0;
+    while (bytes &gt;= 1024 &amp;&amp; i &lt; units.length - 1) { bytes /= 1024; i++; }
+    return bytes.toFixed(digits === undefined ? 1 : digits) + ' ' + units[i];
+  };
+});
+// {{ file.size | fileSize:2 }}</pre>
+    <div class="warn"><b>Performance</b>Filters in templates re-run on every digest. Keep them cheap and <i>pure</i> (same input &rarr; same output; AngularJS skips re-running pure filters when inputs are unchanged). For heavy filtering of big lists, filter once in the controller (<code>$filter('filter')(list, q)</code>) when the query changes.</div>
+  </section>
+
+  <!-- =============== Forms =============== -->
+  <section class="topic" id="forms" data-nav="Forms and validation" data-group="1 · Fundamentals" data-level="b">
+    <h2>Forms and validation <span class="badge b">Basic</span></h2>
+    <p>AngularJS augments HTML forms: <code>&lt;form name="f"&gt;</code> creates a <code>FormController</code> and each <code>ng-model</code> input gets an <code>ngModelController</code>. Both expose state flags and a <code>$error</code> object you can use in the template.</p>
+    <pre data-lang="html" data-file="register.html">&lt;form name="regForm" ng-submit="vm.save()" novalidate&gt;
+  &lt;input name="email" type="email" ng-model="vm.user.email" required
+         ng-model-options="{ debounce: 300 }"&gt;
+  &lt;div ng-messages="regForm.email.$error" ng-if="regForm.email.$touched"&gt;   &lt;!-- ngMessages module --&gt;
+    &lt;span ng-message="required"&gt;Email is required&lt;/span&gt;
+    &lt;span ng-message="email"&gt;Not a valid email&lt;/span&gt;
+  &lt;/div&gt;
+
+  &lt;input name="pwd" type="password" ng-model="vm.user.pwd" ng-minlength="8" ng-pattern="/\d/" required&gt;
+  &lt;button type="submit" ng-disabled="regForm.$invalid || vm.saving"&gt;Register&lt;/button&gt;
+&lt;/form&gt;</pre>
+    <div class="tblwrap"><table><tr><th>Flag</th><th>Meaning</th></tr>
+      <tr><td><code>$pristine</code> / <code>$dirty</code></td><td>Value has not / has been changed by the user</td></tr>
+      <tr><td><code>$untouched</code> / <code>$touched</code></td><td>Control has not / has lost focus (blur)</td></tr>
+      <tr><td><code>$valid</code> / <code>$invalid</code></td><td>All validators pass / at least one fails</td></tr>
+      <tr><td><code>$error.required</code>, <code>$error.minlength</code>...</td><td>Which validator failed</td></tr>
+      <tr><td>CSS classes</td><td><code>ng-valid</code>, <code>ng-invalid</code>, <code>ng-dirty</code>, <code>ng-touched</code>, <code>ng-pending</code> are added automatically for styling</td></tr></table></div>
+    <h3>Custom (sync and async) validators</h3>
+    <pre data-lang="js" data-file="validators.js">angular.module('shop').directive('noSpaces', function () {
+  return {
+    require: 'ngModel',
+    link: function (scope, el, attrs, ctrl) {
+      ctrl.$validators.noSpaces = function (modelValue, viewValue) {
+        return !/\s/.test(viewValue || '');
+      };
+    }
+  };
+}).directive('uniqueEmail', function ($http, $q) {
+  return {
+    require: 'ngModel',
+    link: function (scope, el, attrs, ctrl) {
+      ctrl.$asyncValidators.uniqueEmail = function (modelValue) {      // must return a promise
+        return $http.get('/api/users/exists', { params: { email: modelValue } })
+          .then(function (r) { return r.data.exists ? $q.reject('taken') : true; });
+      };
+    }
+  };
+});</pre>
+    <div class="tip"><b>Server-side validation is mandatory</b>Client validation is for user experience only. Always re-validate on the server; map server field errors back with <code>form.field.$setValidity('server', false)</code>.</div>
+  </section>
+
+  <div class="part-title">Part 2 &mdash; Dependency injection, services and HTTP</div>
+
+  <!-- =============== DI =============== -->
+  <section class="topic" id="di" data-nav="Dependency injection" data-group="2 · DI, Services & HTTP" data-level="i">
+    <h2>Dependency injection and minification <span class="badge i">Mid</span></h2>
+    <p><b>Dependency injection (DI)</b> means a component declares <i>what</i> it needs and the framework's <b>injector</b> supplies it. In AngularJS the injector looks at the names you ask for (<code>$http</code>, <code>ProductService</code>...) and passes the matching singleton instances.</p>
+    <div class="why"><b>Why DI?</b>Components never create their own collaborators, so tests can replace <code>$http</code> with a mock and swap real storage for a fake. It also gives one place to configure shared objects (providers) and a lazily-created, app-wide singleton for each service.</div>
+    <h3>Three ways to annotate dependencies</h3>
+    <pre data-lang="js" data-file="annotation.js">// 1. Implicit (by parameter name) - BREAKS when minified because $http becomes "a"
+app.controller('A', function ($scope, $http) { });
+
+// 2. Inline array annotation - safe
+app.controller('B', ['$scope', '$http', function ($scope, $http) { }]);
+
+// 3. $inject property - safe, readable, tool-friendly
+function C($scope, $http) { }
+C.$inject = ['$scope', '$http'];
+app.controller('C', C);
+
+// Automate it in the build: ng-annotate / babel-plugin-angularjs-annotate / ngAnnotate
+// Or enforce the discipline at run time with ng-strict-di</pre>
+    <div class="warn"><b>"Unknown provider: aProvider &lt;- a"</b>This is the classic symptom of implicit injection after minification. Fix with array annotation/<code>$inject</code>, an annotate plugin in the build, or <code>ng-strict-di</code> to find them early in development.</div>
+    <h3>Injectable things</h3>
+    <div class="tblwrap"><table><tr><th>Where</th><th>Can inject</th></tr>
+      <tr><td>Controller, directive, filter, service, factory, run block</td><td>Services, values, constants, <code>$scope</code> (controllers only), <code>$rootScope</code>, built-ins (<code>$http</code>, <code>$q</code>, <code>$timeout</code>...)</td></tr>
+      <tr><td><code>config</code> block</td><td>Providers (<code>xyzProvider</code>) and constants only</td></tr>
+      <tr><td>Provider constructor</td><td>Other providers and constants only</td></tr></table></div>
+  </section>
+
+  <!-- =============== Services =============== -->
+  <section class="topic" id="services" data-nav="Services, factories and providers" data-group="2 · DI, Services & HTTP" data-level="i">
+    <h2>Services, factories, providers, values and constants <span class="badge i">Mid</span></h2>
+    <p>All of these are recipes for telling the injector <i>how to create</i> an object. Whatever recipe you use, the result is a <b>singleton</b>: created lazily once per injector and shared by every consumer.</p>
+    <div class="tblwrap"><table><tr><th>Recipe</th><th>What you write</th><th>Injector does</th><th>Use for</th></tr>
+      <tr><td><code>value</code></td><td>A literal or object</td><td>Returns it as is</td><td>Simple shared settings (not available in config)</td></tr>
+      <tr><td><code>constant</code></td><td>A literal or object</td><td>Returns it; <b>also usable in <code>config()</code></b>; cannot be decorated</td><td>App-wide config, URLs, enums</td></tr>
+      <tr><td><code>service</code></td><td>A constructor function</td><td><code>new fn()</code> &ndash; you use <code>this.x = ...</code></td><td>Class-style services</td></tr>
+      <tr><td><code>factory</code></td><td>A function returning an object</td><td>Calls it, uses the return value</td><td>Most common; flexible, can return functions/primitives</td></tr>
+      <tr><td><code>provider</code></td><td>An object with <code>$get</code></td><td>Instantiates the provider, calls <code>$get</code></td><td>Services configurable in <code>config()</code> (e.g. <code>$routeProvider</code>)</td></tr>
+      <tr><td><code>decorator</code></td><td>A function wrapping an existing service</td><td>Replaces/extends the instance</td><td>Patching third-party services</td></tr></table></div>
+    <pre data-lang="js" data-file="services.js">angular.module('shop')
+  .constant('API', { baseUrl: '/api/v1' })
+
+  // factory: returns the public API (revealing module pattern)
+  .factory('ProductService', function ($http, API) {
+    return { getAll: getAll, get: get, save: save };
+    function getAll()  { return $http.get(API.baseUrl + '/products').then(function (r) { return r.data; }); }
+    function get(id)   { return $http.get(API.baseUrl + '/products/' + id).then(function (r) { return r.data; }); }
+    function save(p)   { return p.id ? $http.put(API.baseUrl + '/products/' + p.id, p) : $http.post(API.baseUrl + '/products', p); }
+  })
+
+  // service: constructor style
+  .service('Cart', function () {
+    this.items = [];
+    this.add = function (p) { this.items.push(p); };
+  })
+
+  // provider: configurable before the app runs
+  .provider('Logger', function () {
+    var level = 'warn';
+    this.setLevel = function (l) { level = l; };             // available in config()
+    this.$get = function ($log) {                             // the actual service
+      return { info: function (m) { if (level === 'info') $log.info(m); } };
+    };
+  })
+  .config(function (LoggerProvider) { LoggerProvider.setLevel('info'); });</pre>
+    <div class="tip"><b>Rule of thumb</b>Start with <code>factory</code>. Use <code>service</code> if you prefer classes/ES6 <code>class</code>. Use <code>provider</code> only when the service must be configured in <code>config()</code>. All three are singletons &ndash; services keep shared state, so never store per-request/per-user mutable state carelessly.</div>
+    <details><summary>factory vs service vs provider &ndash; the interview answer</summary><div class="dbody">
+      <p><code>service</code> and <code>factory</code> are both shortcuts for <code>provider</code>. A <code>provider</code> is the full recipe: an object with a <code>$get</code> method that returns the service instance, and it is the only one configurable in the <code>config</code> phase. <code>factory(fn)</code> is a provider whose <code>$get</code> is <code>fn</code>. <code>service(Ctor)</code> is a factory that does <code>$injector.instantiate(Ctor)</code> (i.e. <code>new</code>). All produce singletons.</p></div></details>
+  </section>
+
+  <!-- =============== $http & promises =============== -->
+  <section class="topic" id="http" data-nav="$http, promises and interceptors" data-group="2 · DI, Services & HTTP" data-level="i">
+    <h2>$http, promises ($q) and interceptors <span class="badge i">Mid</span></h2>
+    <p><code>$http</code> is the core service for XMLHttpRequest/JSON calls. It returns a <b>promise</b> (AngularJS's <code>$q</code>), and its callbacks run <i>inside</i> a digest, so the view updates automatically.</p>
+    <pre data-lang="js" data-file="http.js">$http.get('/api/products', { params: { page: 2, q: 'phone' } })     // /api/products?page=2&amp;q=phone
+  .then(function (response) {
+    // response.data, .status, .headers(), .config
+    vm.items = response.data;
+  })
+  .catch(function (err) { vm.error = err.status + ' ' + err.statusText; })
+  .finally(function () { vm.loading = false; });
+
+$http.post('/api/orders', order, { headers: { 'X-Request-Id': id }, timeout: 5000 });
+
+// Parallel calls
+$q.all({ user: UserSvc.me(), orders: OrderSvc.mine() }).then(function (r) { vm.user = r.user; vm.orders = r.orders; });
+
+// Create your own promise
+function wait(ms) { var d = $q.defer(); $timeout(d.resolve, ms); return d.promise; }</pre>
+    <div class="warn"><b>.success() / .error() are removed</b>They were deprecated in 1.4 and removed in 1.6. Use <code>.then()</code> / <code>.catch()</code>. Note that <code>.then</code> gets the full response object, not only the data. Also from 1.6, an unhandled rejection logs "Possibly unhandled rejection" &ndash; always add a <code>.catch</code>.</div>
+    <h3>Interceptors: cross-cutting HTTP concerns</h3>
+    <p>An <b>interceptor</b> is a factory returning <code>request</code>, <code>requestError</code>, <code>response</code> and <code>responseError</code> hooks. They run for every <code>$http</code> call: ideal for auth headers, global error handling and loading spinners.</p>
+    <pre data-lang="js" data-file="auth.interceptor.js">angular.module('shop').factory('AuthInterceptor', function ($q, $injector, TokenStore) {
+  return {
+    request: function (config) {
+      var t = TokenStore.get();
+      if (t) config.headers.Authorization = 'Bearer ' + t;
+      return config;
+    },
+    responseError: function (rejection) {
+      if (rejection.status === 401) $injector.get('$state').go('login');   // $injector avoids circular dependency
+      return $q.reject(rejection);                                          // keep the chain rejected!
+    }
+  };
+}).config(function ($httpProvider) {
+  $httpProvider.interceptors.push('AuthInterceptor');
+});</pre>
+    <div class="seq" data-title="Request with an interceptor and a 401 response">
+<script type="text/seq">
+participants: Controller | $http | Interceptor | Server
+Controller -> $http : $http.get('/api/orders')
+$http -> Interceptor : request(config)
+Interceptor --> $http : config + Authorization header
+$http -> Server : GET /api/orders
+Server --> $http : 401 Unauthorized
+$http -> Interceptor : responseError(rejection)
+Interceptor -> Interceptor : redirect to login, return $q.reject
+Interceptor --> Controller : promise rejected (catch runs)
+</script>
+    </div>
+    <details><summary>Promise essentials: chaining, error recovery, $q.when</summary><div class="dbody">
+      <ul><li><code>.then(success, error)</code> returns a <b>new</b> promise; returning a value resolves it, returning another promise waits for it, <b>throwing or returning <code>$q.reject()</code></b> rejects it.</li>
+      <li>A <code>.catch()</code> that returns a normal value <i>recovers</i> the chain (later <code>.then</code> runs).</li>
+      <li><code>$q.all([...])</code> waits for all (fails fast); <code>$q.race</code> for the first; <code>$q.when(x)</code> wraps a value or third-party promise so it joins a digest.</li>
+      <li>Native <code>Promise</code> / <code>async-await</code> work, but their callbacks run <b>outside</b> the digest, so the view will not refresh unless you call <code>$scope.$applyAsync()</code>. Prefer <code>$q</code> (or wrap with <code>$q.when</code>) in AngularJS code.</li></ul></div></details>
+  </section>
+
+  <div class="part-title">Part 3 &mdash; Directives and components</div>
+
+  <!-- =============== Custom directives =============== -->
+  <section class="topic" id="custom-directives" data-nav="Writing custom directives" data-group="3 · Directives & Components" data-level="a">
+    <h2>Writing custom directives <span class="badge a">Adv</span></h2>
+    <p>Create a directive when you need DOM behaviour or a reusable UI piece. The compiler finds your directive by name (<code>myTooltip</code> &harr; <code>my-tooltip</code>), then runs your <b>compile</b> and <b>link</b> functions.</p>
+    <pre data-lang="js" data-file="focus.directive.js">angular.module('shop').directive('autoFocus', function ($timeout) {
+  return {
+    restrict: 'A',                         // A=attribute, E=element, C=class, M=comment (default 'EA')
+    link: function (scope, element, attrs) {       // DOM work lives here
+      scope.$watch(attrs.autoFocus, function (v) { if (v) $timeout(function () { element[0].focus(); }); });
+    }
+  };
+});
+// &lt;input auto-focus="vm.editing"&gt;</pre>
+    <h3>Directive definition object (key options)</h3>
+    <div class="tblwrap"><table><tr><th>Option</th><th>Meaning</th></tr>
+      <tr><td><code>restrict</code></td><td>How it may be used: attribute (recommended for behaviour) or element (for components)</td></tr>
+      <tr><td><code>template</code> / <code>templateUrl</code></td><td>Inline HTML or a file/cached template path</td></tr>
+      <tr><td><code>scope</code></td><td><code>false</code> (share parent), <code>true</code> (new inherited child), <code>{}</code> (<b>isolate scope</b>)</td></tr>
+      <tr><td><code>bindToController</code> + <code>controllerAs</code></td><td>Put isolate bindings on the controller instead of <code>$scope</code></td></tr>
+      <tr><td><code>transclude</code></td><td>Let the user supply content that is inserted with <code>ng-transclude</code></td></tr>
+      <tr><td><code>require</code></td><td>Get another directive's controller (<code>ngModel</code>, <code>^form</code>, <code>^tabs</code>)</td></tr>
+      <tr><td><code>priority</code>, <code>terminal</code></td><td>Order of execution among directives on the same element</td></tr>
+      <tr><td><code>compile</code> / <code>link</code></td><td>Compile: transform the template once (before cloning). Link: wire up each instance (watchers, events).</td></tr></table></div>
+    <h3>Isolate scope binding types</h3>
+    <div class="tblwrap"><table><tr><th>Symbol</th><th>Name</th><th>Direction</th><th>Example in template</th></tr>
+      <tr><td><code>@</code></td><td>Text / interpolation</td><td>Parent &rarr; child (string)</td><td><code>title="Hello {{vm.name}}"</code></td></tr>
+      <tr><td><code>=</code></td><td>Two-way expression</td><td>Parent &harr; child</td><td><code>item="vm.selected"</code> (avoid for new code)</td></tr>
+      <tr><td><code>&lt;</code></td><td>One-way expression (1.5+)</td><td>Parent &rarr; child</td><td><code>items="vm.items"</code> (preferred)</td></tr>
+      <tr><td><code>&amp;</code></td><td>Callback / expression</td><td>Child calls parent</td><td><code>on-save="vm.save(item)"</code></td></tr></table></div>
+    <pre data-lang="js" data-file="rating.directive.js">angular.module('shop').directive('starRating', function () {
+  return {
+    restrict: 'E',
+    scope: { value: '&lt;', max: '&lt;?', onRate: '&amp;' },           // isolate scope; '?' = optional
+    template: '&lt;span ng-repeat="s in stars" ng-click="rate($index + 1)" ng-class="{on: $index &lt; value}"&gt;&amp;#9733;&lt;/span&gt;',
+    link: function (scope) {
+      scope.stars = new Array(scope.max || 5);
+      scope.rate = function (n) { scope.onRate({ rating: n }); };     // callback with locals
+    }
+  };
+});
+// &lt;star-rating value="vm.product.rating" on-rate="vm.rate(rating)"&gt;&lt;/star-rating&gt;</pre>
+    <div class="note"><b>Clean up</b>If a directive adds DOM event listeners, timers or global watchers, remove them on <code>scope.$on('$destroy', ...)</code> or <code>element.on('$destroy', ...)</code> to avoid memory leaks.</div>
+  </section>
+
+  <!-- =============== Components =============== -->
+  <section class="topic" id="components" data-nav="Components (1.5+)" data-group="3 · Directives & Components" data-level="i">
+    <h2>Components (<code>.component()</code>, AngularJS 1.5+) <span class="badge i">Mid</span></h2>
+    <p>A <b>component</b> is a simplified directive for building a UI element: always an element, always an isolate scope, always <code>controllerAs</code> (default <code>$ctrl</code>) with bindings on the controller. It is the recommended style and mirrors how Angular 2+ works, so it eases migration.</p>
+    <pre data-lang="js" data-file="product-card.component.js">angular.module('shop').component('productCard', {
+  bindings: { product: '&lt;', onAdd: '&amp;' },            // inputs (one-way) and outputs (callbacks)
+  templateUrl: 'components/product-card.html',
+  controller: function () {
+    var $ctrl = this;
+    $ctrl.$onInit = function () { /* bindings are ready here, not in the constructor */ };
+    $ctrl.$onChanges = function (changes) { if (changes.product) { /* react to new input */ } };
+    $ctrl.$onDestroy = function () { /* cleanup */ };
+    $ctrl.add = function () { $ctrl.onAdd({ product: $ctrl.product }); };
+  }
+});</pre>
+    <pre data-lang="html" data-file="usage.html">&lt;product-card ng-repeat="p in $ctrl.products track by p.id" product="p" on-add="$ctrl.cart.add(product)"&gt;&lt;/product-card&gt;</pre>
+    <div class="tblwrap"><table><tr><th>Lifecycle hook</th><th>When</th></tr>
+      <tr><td><code>$onInit</code></td><td>After the controller is constructed and bindings are initialised &ndash; put setup here</td></tr>
+      <tr><td><code>$onChanges(changes)</code></td><td>Whenever a one-way (<code>&lt;</code>) or <code>@</code> binding changes</td></tr>
+      <tr><td><code>$doCheck</code></td><td>Each digest; for custom change detection (mutations inside objects)</td></tr>
+      <tr><td><code>$postLink</code></td><td>After the element and children are linked (DOM is ready)</td></tr>
+      <tr><td><code>$onDestroy</code></td><td>Before the scope is destroyed &ndash; remove listeners/timers</td></tr></table></div>
+    <h3>Smart vs presentational components</h3>
+    <p>Keep <b>container (smart)</b> components responsible for loading data and calling services; keep <b>presentational (dumb)</b> components free of services: data in through <code>&lt;</code> bindings, events out through <code>&amp;</code> callbacks. They are easier to test, reuse and later port to Angular.</p>
+    <div class="tip"><b>Do not mutate one-way inputs</b>With <code>&lt;</code> the reference is one-way, but the object is shared. Mutating <code>$ctrl.product.name</code> in a child also changes the parent's object. Copy (<code>angular.copy</code>) or emit an event for changes.</div>
+  </section>
+
+  <!-- =============== Events and communication =============== -->
+  <section class="topic" id="events" data-nav="Events and component communication" data-group="3 · Directives & Components" data-level="i">
+    <h2>Events and communication between parts of the app <span class="badge i">Mid</span></h2>
+    <div class="tblwrap"><table><tr><th>Need</th><th>Best tool</th><th>Notes</th></tr>
+      <tr><td>Parent &rarr; child data</td><td>Component <code>&lt;</code> / <code>@</code> bindings</td><td>Explicit and testable</td></tr>
+      <tr><td>Child &rarr; parent notification</td><td>Component <code>&amp;</code> callback</td><td>Call with locals: <code>onSave({item: x})</code></td></tr>
+      <tr><td>Sibling / unrelated</td><td>Shared <b>service</b> (state or observable-style)</td><td>The cleanest approach</td></tr>
+      <tr><td>Broadcast to many</td><td><code>$scope.$emit</code> (up), <code>$broadcast</code> (down), <code>$on</code></td><td>Powerful but implicit; hurts readability; always deregister listeners</td></tr>
+      <tr><td>Sibling directives on one element</td><td><code>require</code> the other's controller</td><td></td></tr></table></div>
+    <pre data-lang="js" data-file="events.js">// $emit goes UP the scope tree (parent chain); $broadcast goes DOWN to all children
+$scope.$emit('cart:changed', { count: 3 });
+$rootScope.$broadcast('auth:logout');
+
+var off = $rootScope.$on('auth:logout', function (event, data) { vm.user = null; });
+$scope.$on('$destroy', off);              // $rootScope listeners are NOT removed automatically - leak risk!</pre>
+    <div class="warn"><b>Leak alert</b>Listeners added to <code>$rootScope</code> from short-lived controllers live forever unless you call the deregistration function returned by <code>$on</code>.</div>
+  </section>
+
+  <div class="part-title">Part 4 &mdash; Routing</div>
+
+  <!-- =============== Routing overview =============== -->
+  <section class="topic" id="routing-intro" data-nav="Routing: concepts and setup" data-group="4 · Routing" data-level="b">
+    <h2>Routing in AngularJS: how a single-page app navigates <span class="badge b">Basic</span></h2>
+    <p>In an SPA the server delivers one HTML page; <b>routing</b> maps a URL to a <i>view</i> (template + controller/component) and swaps it inside a placeholder without reloading the page. AngularJS core has no router: you add one of two modules.</p>
+    <div class="tblwrap"><table><tr><th></th><th><code>ngRoute</code> (official)</th><th><code>ui-router</code> (community standard)</th></tr>
+      <tr><td>Package</td><td><code>angular-route</code></td><td><code>@uirouter/angularjs</code> (1.x) or legacy <code>angular-ui-router</code> 0.x</td></tr>
+      <tr><td>Model</td><td>URL &rarr; one view</td><td>Named <b>states</b>, nested and multiple views</td></tr>
+      <tr><td>Placeholder</td><td><code>ng-view</code></td><td><code>ui-view</code> (can be nested/named)</td></tr>
+      <tr><td>Nested views</td><td>No</td><td>Yes (parent/child states)</td></tr>
+      <tr><td>Resolves</td><td>Per route</td><td>Per state, inherited by children</td></tr>
+      <tr><td>Navigation</td><td><code>href="#!/path"</code>, <code>$location</code></td><td><code>ui-sref="state({id:1})"</code>, <code>$state.go()</code></td></tr>
+      <tr><td>Best for</td><td>Small apps, simple flat navigation</td><td>Real applications with layouts, tabs, wizards, auth guards</td></tr></table></div>
+    <h3>Request flow</h3>
+    <div class="seq" data-title="What happens when the URL changes">
+<script type="text/seq">
+participants: Browser | $location | Router | Resolves | View
+Browser -> $location : hash / path changed
+$location -> Router : $locationChangeSuccess
+Router -> Router : match URL to route or state
+Router -> Resolves : run resolve functions (data, auth)
+Resolves --> Router : all promises resolved
+Router -> View : load template, create controller with resolved data
+note View : $routeChangeSuccess / $stateChangeSuccess fired
+</script>
+    </div>
+    <h3>URL modes: hashbang vs HTML5 mode</h3>
+    <div class="tblwrap"><table><tr><th>Mode</th><th>URL example</th><th>Server requirement</th></tr>
+      <tr><td><b>Hashbang</b> (default)</td><td><code>https://site/app/#!/products/5</code></td><td>None &ndash; the server only ever sees <code>/app/</code></td></tr>
+      <tr><td><b>HTML5 mode</b></td><td><code>https://site/products/5</code></td><td>Server must <b>rewrite all unknown paths to index.html</b> (otherwise refresh gives 404). Needs <code>&lt;base href="/"&gt;</code>.</td></tr></table></div>
+    <pre data-lang="js" data-file="location.config.js">angular.module('shop').config(function ($locationProvider) {
+  $locationProvider.html5Mode({ enabled: true, requireBase: true });
+  $locationProvider.hashPrefix('!');             // 1.6+ default is '!'
+});</pre>
+    <pre data-lang="xml" data-file="web.config">&lt;!-- IIS URL Rewrite: serve index.html for non-file, non-API requests (HTML5 mode) --&gt;
+&lt;rule name="SPA" stopProcessing="true"&gt;
+  &lt;match url=".*" /&gt;
+  &lt;conditions logicalGrouping="MatchAll"&gt;
+    &lt;add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" /&gt;
+    &lt;add input="{REQUEST_URI}" pattern="^/api" negate="true" /&gt;
+  &lt;/conditions&gt;
+  &lt;action type="Rewrite" url="/index.html" /&gt;
+&lt;/rule&gt;</pre>
+    <div class="note"><b>With ASP.NET Core</b>Use <code>app.UseDefaultFiles(); app.UseStaticFiles(); ... app.MapFallbackToFile("index.html");</code> after mapping API controllers so unknown non-API URLs return the SPA shell.</div>
+  </section>
+
+  <!-- =============== ngRoute =============== -->
+  <section class="topic" id="ngroute" data-nav="ngRoute in practice" data-group="4 · Routing" data-level="b">
+    <h2>ngRoute: configuration, parameters, resolve <span class="badge b">Basic</span></h2>
+    <pre data-lang="html" data-file="index.html">&lt;script src="node_modules/angular/angular.min.js"&gt;&lt;/script&gt;
+&lt;script src="node_modules/angular-route/angular-route.min.js"&gt;&lt;/script&gt;
+&lt;a href="#!/"&gt;Home&lt;/a&gt; &lt;a href="#!/products"&gt;Products&lt;/a&gt;
+&lt;div ng-view&gt;&lt;/div&gt;                         &lt;!-- the routed view is injected here --&gt;</pre>
+    <pre data-lang="js" data-file="routes.js">angular.module('shop', ['ngRoute']).config(function ($routeProvider) {
+  $routeProvider
+    .when('/', { template: '&lt;home&gt;&lt;/home&gt;' })
+    .when('/products', {
+      templateUrl: 'views/products.html', controller: 'ProductListCtrl', controllerAs: 'vm'
+    })
+    .when('/products/:id', {                               // :id is a path parameter
+      component: 'productDetail',                          // 1.5.x+: route straight to a component
+      resolve: {
+        product: function ($route, ProductService) {       // route waits for this promise
+          return ProductService.get($route.current.params.id);
+        }
+      }
+    })
+    .when('/admin', { templateUrl: 'views/admin.html', resolve: { auth: function (Auth) { return Auth.require('admin'); } } })
+    .otherwise({ redirectTo: '/' });                       // fallback
+});</pre>
+    <pre data-lang="js" data-file="route-params.js">// Reading parameters
+function ProductDetailCtrl($routeParams, $location, product) {
+  var id = $routeParams.id;                  // from /products/:id
+  var tab = $location.search().tab;          // from ?tab=reviews
+  this.product = product;                    // injected from 'resolve'
+}
+// Navigating from code
+$location.path('/products/5').search({ tab: 'reviews' });
+// Listening for route events (useful for guards, spinners)
+$rootScope.$on('$routeChangeStart', function (e, next, current) { /* check auth here */ });
+$rootScope.$on('$routeChangeError', function (e, cur, prev, rejection) { $location.path('/login'); });</pre>
+    <div class="tip"><b>Resolve</b>The route (and controller) is not activated until all <code>resolve</code> promises succeed; a rejection raises <code>$routeChangeError</code>. Resolved values are injected into the controller by their key name &ndash; a clean way to guarantee data (and authorisation) exists before the view renders.</div>
+  </section>
+
+  <!-- =============== ui-router =============== -->
+  <section class="topic" id="ui-router" data-nav="ui-router: states, nesting, guards" data-group="4 · Routing" data-level="i">
+    <h2>ui-router: states, nested views and guards <span class="badge i">Mid</span></h2>
+    <p>ui-router organises navigation as a <b>tree of states</b>. A state has a name (<code>app.products.detail</code>), a URL fragment, views and optional <code>resolve</code>. Child states render inside the parent's <code>ui-view</code>, so a layout (header, sidebar) is declared once.</p>
+    <div class="diagram"><div class="dtitle">State tree and nested ui-view</div>
+      <div class="layers">
+        <div class="layer">state <b>app</b> (abstract) &ndash; template: header + sidebar + &lt;ui-view&gt;<small>url: "" &middot; resolve: current user</small></div><div class="down">&darr; child fills the parent's ui-view</div>
+        <div class="layer l2">state <b>app.products</b> &ndash; list view<small>url: /products?page&amp;q</small></div><div class="down">&darr;</div>
+        <div class="layer l3">state <b>app.products.detail</b> &ndash; detail view<small>url: /:id &rarr; full URL /products/42</small></div>
+      </div>
+    </div>
+    <pre data-lang="js" data-file="states.js">angular.module('shop', ['ui.router']).config(function ($stateProvider, $urlRouterProvider, $locationProvider) {
+  $locationProvider.html5Mode(true);
+  $urlRouterProvider.otherwise('/products');
+
+  $stateProvider
+    .state('app', {
+      abstract: true,                                   // cannot be navigated to directly; layout only
+      templateUrl: 'layout/shell.html',
+      resolve: { user: function (Auth) { return Auth.currentUser(); } }
+    })
+    .state('app.products', {
+      url: '/products?page&amp;q',                          // query params declared in the URL
+      params: { page: { value: '1', squash: true } },
+      component: 'productList',
+      resolve: { products: function (ProductService, $transition$) { return ProductService.getAll($transition$.params()); } }
+    })
+    .state('app.products.detail', {
+      url: '/:id',                                       // path param, e.g. /products/42
+      component: 'productDetail',
+      data: { requiresRole: 'user' }                     // custom metadata used by guards
+    })
+    .state('login', { url: '/login', component: 'loginForm' });
+});</pre>
+    <pre data-lang="html" data-file="shell.html">&lt;nav&gt;
+  &lt;a ui-sref="app.products" ui-sref-active="active"&gt;Products&lt;/a&gt;
+  &lt;a ui-sref="app.products.detail({ id: 42 })"&gt;Product 42&lt;/a&gt;
+&lt;/nav&gt;
+&lt;div ui-view&gt;&lt;/div&gt;                  &lt;!-- children render here --&gt;</pre>
+    <h3>Guarding routes (ui-router 1.x transition hooks)</h3>
+    <pre data-lang="js" data-file="guards.js">angular.module('shop').run(function ($transitions, Auth) {
+  $transitions.onBefore({ to: function (state) { return state.data &amp;&amp; state.data.requiresRole; } }, function (trans) {
+    var role = trans.to().data.requiresRole;
+    return Auth.hasRole(role) ? true : trans.router.stateService.target('login', { returnTo: trans.to().name });
+  });
+  $transitions.onError({}, function (trans) { console.error('Transition failed', trans.error()); });
+});
+
+// Programmatic navigation
+$state.go('app.products.detail', { id: 7 }, { reload: false });
+$stateParams.id;           // read current params (legacy); in 1.x components use bindings: bindings: { product: '&lt;' }</pre>
+    <div class="tblwrap"><table><tr><th>Feature</th><th>Detail</th></tr>
+      <tr><td>Nested states</td><td><code>parent.child</code> naming; child URL is appended to the parent's</td></tr>
+      <tr><td>Named / multiple views</td><td><code>views: { 'header@': {...}, 'main@': {...} }</code> fill several <code>ui-view="name"</code> in one page</td></tr>
+      <tr><td>Lazy loading</td><td><code>lazyLoad</code> (with ocLazyLoad / dynamic <code>import()</code>) loads a module's code when its state is first used</td></tr>
+      <tr><td>Resolve inheritance</td><td>Child states can inject parent's resolved data (<code>user</code>) without refetching</td></tr>
+      <tr><td>Redirects</td><td><code>redirectTo: 'app.products'</code> on a state; <code>$urlRouterProvider.when('/old', '/new')</code></td></tr></table></div>
+    <div class="warn"><b>Version trap</b>Old tutorials use ui-router 0.x (<code>$stateChangeStart</code> event, <code>$stateParams</code>, <code>templateUrl</code> only). 1.x replaced events with the <b>transition hooks</b> above and added <code>component:</code> support. Check the package version before copying code.</div>
+  </section>
+
+  <section class="topic" id="route-lab-section" data-nav="Lab: route matcher" data-group="4 · Routing" data-level="b">
+    <h2>Lab: URL pattern matcher <span class="badge b">Practice</span></h2>
+    <p>See how ngRoute/ui-router style patterns (<code>/products/:id</code>, <code>/files/*path</code>, optional trailing segments) extract parameters from a URL and which route wins when several match (first defined wins in ngRoute).</p>
+    <div class="lab" id="ng-route-lab"></div>
+  </section>
+
+  <div class="part-title">Part 5 &mdash; Storing data in the browser</div>
+
+  <!-- =============== Storage overview =============== -->
+  <section class="topic" id="storage-overview" data-nav="Which storage should I use?" data-group="5 · Storage" data-level="b">
+    <h2>Client-side storage options: choosing the right place <span class="badge b">Basic</span></h2>
+    <p>"Storage" in an AngularJS app can mean four different things: <b>in-memory state</b> (lives until refresh), <b>browser storage</b> (survives reload), <b>HTTP caches</b>, and <b>the server/database</b>. Pick based on lifetime, size, security and who needs to read the data.</p>
+    <div class="tblwrap"><table><tr><th>Option</th><th>Lifetime</th><th>Capacity</th><th>Sent to server?</th><th>Accessible from JS?</th><th>Best for</th></tr>
+      <tr><td><b>Service / <code>$rootScope</code></b> (memory)</td><td>Until page reload</td><td>RAM</td><td>No</td><td>Yes</td><td>Current UI state, access token in memory, shared data between views</td></tr>
+      <tr><td><b>sessionStorage</b></td><td>Until the tab closes</td><td>~5 MB</td><td>No</td><td>Yes (same origin, same tab)</td><td>Wizard progress, per-tab drafts</td></tr>
+      <tr><td><b>localStorage</b></td><td>Until cleared (persistent)</td><td>~5-10 MB</td><td>No</td><td>Yes (any script of the origin)</td><td>Preferences, theme, non-sensitive cache</td></tr>
+      <tr><td><b>Cookies</b> (<code>$cookies</code>)</td><td>Session or until expiry</td><td>~4 KB each</td><td><b>Yes, on every request</b></td><td>Yes, unless <code>HttpOnly</code></td><td>Server session ids, auth cookie, small flags</td></tr>
+      <tr><td><b>IndexedDB</b></td><td>Persistent</td><td>Hundreds of MB+</td><td>No</td><td>Yes (async API)</td><td>Offline data, large structured collections, blobs</td></tr>
+      <tr><td><b>Cache API / Service Worker</b></td><td>Persistent</td><td>Large</td><td>No</td><td>Yes</td><td>Offline app shell, PWA assets</td></tr>
+      <tr><td><b>$http / $templateCache / $cacheFactory</b></td><td>Until reload</td><td>RAM</td><td>No</td><td>Yes</td><td>Caching GET responses and HTML templates</td></tr>
+      <tr><td><b>Server database</b></td><td>Permanent</td><td>Unlimited</td><td>&mdash;</td><td>Via API</td><td>Anything important, shared or secret</td></tr></table></div>
+    <div class="diagram"><div class="dtitle">Decision guide</div>
+      <div class="flow">
+        <div class="node">Is the data needed after a page refresh?<small>No &rarr; keep it in a service</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Does the <b>server</b> need it on each request?<small>Yes &rarr; cookie (HttpOnly + Secure)</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Small and non-sensitive?<small>Yes &rarr; localStorage / sessionStorage</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Large, structured or offline?<small>Yes &rarr; IndexedDB / Cache API</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">Sensitive or authoritative?<small>Yes &rarr; server, never the browser</small></div>
+      </div>
+    </div>
+    <div class="warn"><b>Security rule</b>Anything in <code>localStorage</code>, <code>sessionStorage</code> or a non-HttpOnly cookie can be read by any script on the page. One XSS vulnerability (or a compromised third-party script) exposes all of it. Do not keep passwords, card data or long-lived secrets there.</div>
+  </section>
+
+  <!-- =============== Web Storage =============== -->
+  <section class="topic" id="web-storage" data-nav="localStorage and sessionStorage" data-group="5 · Storage" data-level="b">
+    <h2>localStorage and sessionStorage (Web Storage API) <span class="badge b">Basic</span></h2>
+    <p>Both give a synchronous key-value store of <b>strings</b>, scoped to the origin (scheme + host + port). They share the same API; only the lifetime differs.</p>
+    <pre data-lang="js" data-file="web-storage.js">localStorage.setItem('theme', 'dark');
+localStorage.getItem('theme');                  // "dark"  (null if missing)
+localStorage.removeItem('theme');
+localStorage.clear();                            // everything for this origin
+localStorage.length; localStorage.key(0);
+
+// Only strings! Serialize objects:
+localStorage.setItem('prefs', JSON.stringify({ lang: 'en', pageSize: 20 }));
+var prefs = JSON.parse(localStorage.getItem('prefs') || '{}');
+
+// 'storage' event: fires in OTHER tabs of the same origin when localStorage changes
+window.addEventListener('storage', function (e) { console.log(e.key, e.oldValue, e.newValue); });</pre>
+    <h3>A safe, AngularJS-friendly wrapper service</h3>
+    <p>Wrap storage in a service: handles JSON, missing storage (private mode, quota exceeded), key prefixes, and makes tests easy to mock. Remember to trigger a digest if you update scope from the <code>storage</code> event.</p>
+    <pre data-lang="js" data-file="storage.service.js">angular.module('shop').factory('Store', function ($window, $rootScope) {
+  var PREFIX = 'shop.';
+  var backend = tryStorage($window.localStorage);
+  function tryStorage(s) { try { s.setItem('__t', '1'); s.removeItem('__t'); return s; } catch (e) { return memory(); } }
+  function memory() { var m = {}; return { getItem: function (k) { return k in m ? m[k] : null; }, setItem: function (k, v) { m[k] = String(v); }, removeItem: function (k) { delete m[k]; } }; }
+
+  $window.addEventListener('storage', function (e) {            // sync across tabs
+    if (e.key &amp;&amp; e.key.indexOf(PREFIX) === 0) $rootScope.$applyAsync(function () { $rootScope.$broadcast('store:changed', e.key.slice(PREFIX.length)); });
+  });
+
+  return {
+    get: function (key, fallback) {
+      var raw = backend.getItem(PREFIX + key);
+      if (raw === null) return fallback;
+      try { return JSON.parse(raw); } catch (e) { return fallback; }
+    },
+    set: function (key, value) {
+      try { backend.setItem(PREFIX + key, JSON.stringify(value)); return true; }
+      catch (e) { return false; }                               // QuotaExceededError
+    },
+    remove: function (key) { backend.removeItem(PREFIX + key); }
+  };
+});</pre>
+    <div class="lab" id="ng-storage-lab"></div>
+    <details><summary>Third-party helper modules</summary><div class="dbody">
+      <ul><li><b>angular-local-storage</b> / <b>ngStorage</b> &ndash; wrap localStorage/sessionStorage, add prefixes and (ngStorage) auto-sync a <code>$localStorage</code> object with scope. Convenient but implicit: it deep-watches the object on every digest.</li>
+      <li><b>angular-cookies</b> (<code>ngCookies</code>) &ndash; official cookie service (next chapter).</li>
+      <li><b>localForage / angular-localforage</b> &ndash; one promise-based API on top of IndexedDB, WebSQL or localStorage with automatic fallback.</li></ul></div></details>
+    <div class="tip"><b>Limitations to remember</b>Synchronous (blocks the main thread on large data), strings only, ~5 MB quota, no expiry built in (store a timestamp yourself), no encryption, and not shared across origins or between normal and private windows.</div>
+  </section>
+
+  <!-- =============== Cookies =============== -->
+  <section class="topic" id="cookies" data-nav="Cookies ($cookies)" data-group="5 · Storage" data-level="b">
+    <h2>Cookies with <code>ngCookies</code> <span class="badge b">Basic</span></h2>
+    <p>A cookie is a small name/value pair the browser <b>automatically sends</b> to the server on every matching request. That is what makes cookies suitable for session ids and authentication, and also what makes them a CSRF target.</p>
+    <pre data-lang="js" data-file="cookies.js">angular.module('shop', ['ngCookies']).controller('PrefCtrl', function ($cookies) {
+  var expires = new Date(); expires.setDate(expires.getDate() + 30);
+  $cookies.put('lang', 'en', { expires: expires, path: '/', secure: true, samesite: 'lax' });
+  $cookies.get('lang');                                // "en"
+  $cookies.putObject('cart', { items: [1, 2] });       // JSON serialises for you
+  $cookies.getObject('cart');
+  $cookies.remove('lang', { path: '/' });
+  $cookies.getAll();
+});</pre>
+    <div class="tblwrap"><table><tr><th>Attribute</th><th>Purpose</th></tr>
+      <tr><td><code>HttpOnly</code></td><td>JavaScript cannot read it (blocks theft via XSS). <b>Can only be set by the server</b> in <code>Set-Cookie</code>.</td></tr>
+      <tr><td><code>Secure</code></td><td>Only sent over HTTPS</td></tr>
+      <tr><td><code>SameSite=Lax|Strict|None</code></td><td>Restricts cross-site sending &ndash; main CSRF defence</td></tr>
+      <tr><td><code>Expires</code> / <code>Max-Age</code></td><td>Persistent vs session cookie</td></tr>
+      <tr><td><code>Path</code>, <code>Domain</code></td><td>Which URLs/subdomains receive it</td></tr></table></div>
+    <div class="note"><b>XSRF protection built into $http</b>For cross-site request forgery with cookie-based auth, <code>$http</code> reads the cookie <code>XSRF-TOKEN</code> and sends it back as header <code>X-XSRF-TOKEN</code>. Your server sets the first and validates the second (ASP.NET Core: <code>AddAntiforgery(o =&gt; o.HeaderName = "X-XSRF-TOKEN")</code>). Rename with <code>$httpProvider.defaults.xsrfCookieName / xsrfHeaderName</code>.</div>
+  </section>
+
+  <!-- =============== Token storage =============== -->
+  <section class="topic" id="token-storage" data-nav="Where to keep auth tokens" data-group="5 · Storage" data-level="a">
+    <h2>Where should an AngularJS app keep an auth token (JWT)? <span class="badge a">Adv</span></h2>
+    <div class="tblwrap"><table><tr><th>Approach</th><th>XSS risk</th><th>CSRF risk</th><th>Survives refresh</th><th>Verdict</th></tr>
+      <tr><td>localStorage / sessionStorage</td><td class="no">High &ndash; any script can read it</td><td class="yes">None (not auto-sent)</td><td>Yes</td><td>Common but weakest; needs strict CSP and sanitisation</td></tr>
+      <tr><td>In-memory only (service variable)</td><td class="mid">Lower &ndash; not persisted, harder to harvest</td><td class="yes">None</td><td class="no">No &ndash; silently refresh on load</td><td>Good for short-lived access tokens</td></tr>
+      <tr><td>HttpOnly + Secure + SameSite cookie</td><td class="yes">Token not readable by JS</td><td class="mid">Needs SameSite + anti-forgery token</td><td>Yes</td><td>Recommended, especially for the refresh token</td></tr></table></div>
+    <pre data-lang="js" data-file="token.service.js">// Best-practice shape: short access token in memory + refresh token in an HttpOnly cookie
+angular.module('shop').factory('TokenStore', function ($http, $q) {
+  var access = null, refreshing = null;
+  return {
+    get: function () { return access; },
+    set: function (t) { access = t; },
+    refresh: function () {                              // single in-flight refresh shared by all callers
+      return refreshing = refreshing || $http.post('/api/auth/refresh', null, { withCredentials: true })
+        .then(function (r) { access = r.data.accessToken; return access; })
+        .finally(function () { refreshing = null; });
+    }
+  };
+});
+// On app start (run block): TokenStore.refresh() to restore the session without storing the token</pre>
+    <div class="why"><b>Takeaway</b>There is no perfect browser storage for secrets. Reduce the blast radius: short-lived tokens, HttpOnly refresh cookie, <code>Content-Security-Policy</code>, sanitise all HTML (<code>ngSanitize</code>), never store sensitive personal data client-side, and clear storage on logout.</div>
+  </section>
+
+  <!-- =============== IndexedDB & caches =============== -->
+  <section class="topic" id="indexeddb" data-nav="IndexedDB, Cache API and in-memory caches" data-group="5 · Storage" data-level="a">
+    <h2>IndexedDB, Cache API and AngularJS caches <span class="badge a">Adv</span></h2>
+    <p><b>IndexedDB</b> is a transactional, asynchronous object database in the browser: indexes, large data, blobs, offline sync queues. Its raw API is verbose and event-based, so most apps use <b>localForage</b>, <b>Dexie</b> or <b>idb</b>. Remember its promises are native, so wrap with <code>$q.when()</code> to keep the digest happy.</p>
+    <pre data-lang="js" data-file="indexeddb.js">// localForage (promise-based; falls back automatically)
+localforage.config({ name: 'shop', storeName: 'cache' });
+
+angular.module('shop').factory('OfflineCache', function ($q) {
+  return {
+    put: function (k, v) { return $q.when(localforage.setItem(k, v)); },   // $q.when -> runs inside the digest
+    get: function (k)    { return $q.when(localforage.getItem(k)); }
+  };
+});
+
+// Raw IndexedDB (what libraries wrap)
+var req = indexedDB.open('shop', 1);
+req.onupgradeneeded = function (e) { e.target.result.createObjectStore('orders', { keyPath: 'id' }).createIndex('byStatus', 'status'); };
+req.onsuccess = function (e) { var tx = e.target.result.transaction('orders', 'readwrite'); tx.objectStore('orders').put({ id: 1, status: 'new' }); };</pre>
+    <h3>AngularJS in-memory caches</h3>
+    <pre data-lang="js" data-file="caches.js">// 1. $http response cache
+$http.get('/api/countries', { cache: true });            // second call is served from memory
+
+// 2. Custom cache with limits
+var lru = $cacheFactory('products', { capacity: 50 });
+lru.put('p1', product); lru.get('p1'); lru.remove('p1'); lru.removeAll();
+
+// 3. $templateCache: preloaded HTML templates (build tools fill it; see Build tools)
+$templateCache.put('views/card.html', '&lt;div&gt;...&lt;/div&gt;');</pre>
+    <div class="tip"><b>Cache API &amp; Service Workers</b>For offline-capable AngularJS apps (PWA), a service worker can precache <code>index.html</code>, bundles and templates with the Cache API (Workbox). That is separate from AngularJS but works with any SPA.</div>
+    <div class="warn"><b>Cache invalidation</b>Cache a GET only if stale data is acceptable. Use a version/timestamp in your stored key, clear caches on logout (they may hold user-specific data) and bump the storage schema version when your data shapes change.</div>
+  </section>
+
+  <div class="part-title">Part 6 &mdash; Build tools and project structure</div>
+
+  <!-- =============== Why build =============== -->
+  <section class="topic" id="build-overview" data-nav="Why build tools? The pipeline" data-group="6 · Build Tools" data-level="b">
+    <h2>Why an AngularJS app needs a build step <span class="badge b">Basic</span></h2>
+    <p>You can run AngularJS with nothing but <code>&lt;script&gt;</code> tags. That is fine for a demo, but a real app has dozens or hundreds of files. A <b>build pipeline</b> turns the source tree into a few fast, safe, cache-friendly files for the browser.</p>
+    <div class="diagram"><div class="dtitle">Typical production build pipeline</div>
+      <div class="flow">
+        <div class="node">Lint<small>ESLint</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Transpile<small>Babel: ES6 &rarr; ES5</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Annotate<small>ng-annotate: safe DI</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Templates &rarr; JS<small>$templateCache</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Concat / bundle<small>fewer requests</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Minify<small>Terser, cssnano</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">Hash &amp; inject<small>app.3fa9c1.js &rarr; index.html</small></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Task</th><th>Why it matters</th></tr>
+      <tr><td>Dependency management (npm)</td><td>Version-locked <code>angular</code>, <code>angular-route</code>, <code>lodash</code>... via <code>package.json</code> and the lock file.</td></tr>
+      <tr><td>Concatenation / bundling</td><td>Fewer HTTP requests, correct file order (module declaration before its components).</td></tr>
+      <tr><td>DI annotation</td><td>Makes <code>function($scope,$http)</code> survive minification.</td></tr>
+      <tr><td>Minification + tree-shaking</td><td>Smaller download, faster parse.</td></tr>
+      <tr><td>Template caching</td><td>Preloads <code>templateUrl</code> files into <code>$templateCache</code>: no extra request per view.</td></tr>
+      <tr><td>Sass/Less &rarr; CSS, autoprefixing</td><td>Styling workflow.</td></tr>
+      <tr><td>Cache busting (content hashes)</td><td>Long-lived browser caching with instant updates on deploy.</td></tr>
+      <tr><td>Dev server + live reload + proxy</td><td>Fast feedback; proxy <code>/api</code> to the back end to avoid CORS in development.</td></tr>
+      <tr><td>Test runner &amp; CI</td><td>Run Karma/Jasmine unit tests headlessly, lint, build, deploy artefacts.</td></tr></table></div>
+  </section>
+
+  <!-- =============== npm =============== -->
+  <section class="topic" id="npm" data-nav="npm, package.json and versions" data-group="6 · Build Tools" data-level="b">
+    <h2>npm and <code>package.json</code> <span class="badge b">Basic</span></h2>
+    <p><b>npm</b> (Node Package Manager) installs libraries and runs scripts. Bower, formerly used for front-end libraries, is deprecated; use npm (or Yarn/pnpm) for everything.</p>
+    <pre data-lang="bash" data-file="terminal">npm init -y
+npm install angular@1.8.3 angular-route@1.8.3 angular-cookies@1.8.3 @uirouter/angularjs
+npm install --save-dev webpack webpack-cli webpack-dev-server babel-loader @babel/core @babel/preset-env babel-plugin-angularjs-annotate html-loader eslint karma karma-jasmine jasmine-core angular-mocks
+npm run build</pre>
+    <pre data-lang="json" data-file="package.json">{
+  "name": "shop-ui",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "lint":  "eslint src --ext .js",
+    "test":  "karma start karma.conf.js --single-run"
+  },
+  "dependencies": { "angular": "1.8.3", "angular-route": "1.8.3", "@uirouter/angularjs": "^1.0.30" },
+  "devDependencies": { "webpack": "^5.0.0", "karma": "^6.0.0", "jasmine-core": "^4.0.0" }
+}</pre>
+    <div class="tip"><b>Version ranges</b><code>^1.2.3</code> allows minor/patch updates (1.x.x), <code>~1.2.3</code> only patch (1.2.x), no prefix is exact. Commit <code>package-lock.json</code> and use <code>npm ci</code> in CI for reproducible installs. <b>Keep every <code>angular-*</code> module on exactly the same version as <code>angular</code></b>.</div>
+    <div class="warn"><b>Security</b>AngularJS is end-of-life. Run <code>npm audit</code>; for compliance needs consider a commercially supported fork (e.g. HeroDevs "Never-Ending Support") or plan a migration.</div>
+  </section>
+
+  <!-- =============== Gulp / Grunt =============== -->
+  <section class="topic" id="gulp" data-nav="Gulp and Grunt (task runners)" data-group="6 · Build Tools" data-level="i">
+    <h2>Task runners: Gulp (and Grunt) <span class="badge i">Mid</span></h2>
+    <p>Older AngularJS projects typically use <b>Gulp</b> (stream-based, code-as-config) or <b>Grunt</b> (configuration-based). They do not understand modules; they simply process files through a chain of plugins. You manage file order yourself (module files first).</p>
+    <pre data-lang="js" data-file="gulpfile.js">const gulp = require('gulp');
+const concat = require('gulp-concat');
+const annotate = require('gulp-ng-annotate');
+const uglify = require('gulp-uglify');
+const templateCache = require('gulp-angular-templatecache');
+const rev = require('gulp-rev');
+const browserSync = require('browser-sync').create();
+
+const paths = {
+  js:  ['src/app/**/*.module.js', 'src/app/**/*.js'],     // *.module.js FIRST, so modules exist before components
+  html: 'src/app/**/*.html'
+};
+
+function templates() {
+  return gulp.src(paths.html)
+    .pipe(templateCache('templates.js', { module: 'shop', root: 'app/' }))   // fills $templateCache
+    .pipe(gulp.dest('.tmp'));
+}
+function scripts() {
+  return gulp.src([...paths.js, '.tmp/templates.js'])
+    .pipe(concat('app.js'))
+    .pipe(annotate())                                      // add DI annotations
+    .pipe(uglify())
+    .pipe(rev())                                            // app-3fa9c1.js
+    .pipe(gulp.dest('dist'));
+}
+function serve() {
+  browserSync.init({ server: 'src', port: 3000, middleware: [] });
+  gulp.watch('src/**/*', browserSync.reload);
+}
+exports.build = gulp.series(templates, scripts);
+exports.serve = serve;</pre>
+    <div class="tblwrap"><table><tr><th></th><th>Grunt</th><th>Gulp</th></tr>
+      <tr><td>Style</td><td>JSON-like configuration in <code>Gruntfile.js</code></td><td>JavaScript code using streams (pipes) in <code>gulpfile.js</code></td></tr>
+      <tr><td>Speed</td><td>Writes temp files between tasks (slower)</td><td>In-memory streams (faster)</td></tr>
+      <tr><td>Today</td><td>Legacy</td><td>Common in older AngularJS; still maintained</td></tr></table></div>
+  </section>
+
+  <!-- =============== Webpack =============== -->
+  <section class="topic" id="webpack" data-nav="Webpack bundler (modern setup)" data-group="6 · Build Tools" data-level="i">
+    <h2>Webpack with ES modules <span class="badge i">Mid</span></h2>
+    <p>A <b>module bundler</b> follows <code>import</code> statements from an entry file, builds a dependency graph and emits optimised bundles. With Webpack each AngularJS file imports exactly what it uses, so you no longer care about script order and can use ES6+, SCSS and templates as modules.</p>
+    <pre data-lang="js" data-file="src/index.js">import angular from 'angular';
+import ngRoute from 'angular-route';
+import './styles/main.scss';
+
+import productsModule from './products/products.module';   // each feature exports its module name
+
+angular.module('shop', [ngRoute, productsModule])
+  .config(routes);
+
+routes.$inject = ['$routeProvider'];
+function routes($routeProvider) {
+  $routeProvider.when('/products', { component: 'productList' });
+}</pre>
+    <pre data-lang="js" data-file="src/products/product-card.component.js">import template from './product-card.html';       // html-loader turns the file into a string
+
+export default {
+  bindings: { product: '&lt;' },
+  template,                                         // no extra HTTP request, no $templateCache plumbing
+  controller: class ProductCardCtrl {
+    static get $inject() { return ['Cart']; }       // classes need explicit $inject (no auto-annotation)
+    constructor(Cart) { this.Cart = Cart; }
+    add() { this.Cart.add(this.product); }
+  }
+};</pre>
+    <pre data-lang="js" data-file="webpack.config.js">const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = (env, argv) =&gt; {
+  const prod = argv.mode === 'production';
+  return {
+    entry: './src/index.js',
+    output: { path: path.resolve(__dirname, 'dist'), filename: prod ? '[name].[contenthash:8].js' : '[name].js', clean: true },
+    module: {
+      rules: [
+        { test: /\.js$/, exclude: /node_modules/, use: { loader: 'babel-loader', options: {
+            presets: ['@babel/preset-env'],
+            plugins: ['angularjs-annotate'] } } },                       // automatic DI annotations
+        { test: /\.html$/, loader: 'html-loader' },
+        { test: /\.s?css$/, use: [prod ? MiniCssExtractPlugin.loader : 'style-loader', 'css-loader', 'sass-loader'] },
+        { test: /\.(png|svg|woff2?)$/, type: 'asset' }
+      ]
+    },
+    optimization: { splitChunks: { chunks: 'all' } },                   // vendor.js (angular...) cached separately
+    plugins: [new HtmlWebpackPlugin({ template: 'src/index.html' }), new MiniCssExtractPlugin({ filename: '[name].[contenthash:8].css' })],
+    devServer: { port: 3000, historyApiFallback: true, proxy: { '/api': 'http://localhost:5000' } },   // HTML5-mode fallback + API proxy
+    devtool: prod ? 'source-map' : 'eval-source-map'
+  };
+};</pre>
+    <div class="tip"><b>Lazy loading features</b>Use <code>import('./admin/admin.module').then(...)</code> or ui-router's <code>lazyLoad</code> to split rarely used areas (admin, reports) into separate chunks that load on first navigation.</div>
+    <details><summary>Gulp vs Webpack vs Angular CLI &ndash; which to use?</summary><div class="dbody">
+      <ul><li><b>Existing Gulp project</b>: keep it unless it is painful; stable and understood.</li>
+      <li><b>New or modernising AngularJS app</b>: Webpack (or Vite with plugins) with ES modules; it prepares code for migration.</li>
+      <li><b>Angular CLI</b> targets Angular 2+. For hybrid AngularJS + Angular apps it can host the legacy code via <code>@angular/upgrade</code> (ngUpgrade), but it is a migration tool, not an AngularJS build tool.</li></ul></div></details>
+  </section>
+
+  <!-- =============== Project structure =============== -->
+  <section class="topic" id="structure" data-nav="Project structure and style guide" data-group="6 · Build Tools" data-level="i">
+    <h2>Project structure and naming <span class="badge i">Mid</span></h2>
+    <p>Organise by <b>feature</b> (not by file type). Each feature folder holds its module, components, services, templates, styles and tests, and exposes one module name. This is the structure recommended by the community John Papa and Todd Motto style guides.</p>
+    <pre data-lang="plain" data-file="folder layout">src/
+  index.html
+  index.js                     entry: imports vendors + app module
+  app/
+    app.module.js              root module: depends on feature modules
+    app.config.js              routes, interceptors, html5Mode
+    app.run.js                 auth guards, startup work
+    core/                      singletons shared everywhere: interceptors, Store, Auth
+    shared/                    reusable presentational components, filters, directives
+    products/
+      products.module.js
+      products.routes.js
+      product-list.component.js / .html / .scss / .spec.js
+      product.service.js / .spec.js
+    orders/ ...
+  assets/ images, fonts
+karma.conf.js  webpack.config.js  .eslintrc.json  package.json</pre>
+    <ul>
+      <li>Names: <code>feature.type.js</code> (<code>product.service.js</code>); services in PascalCase, controllers end in <code>Ctrl</code>, directives/components in camelCase in JS and kebab-case in HTML.</li>
+      <li>Wrap files in an IIFE (or use ES modules) so nothing leaks into the global scope.</li>
+      <li>One component/service per file; avoid <code>$rootScope</code> state; keep config in <code>constant</code>s.</li>
+      <li>Production flags: <code>$compileProvider.debugInfoEnabled(false)</code> and <code>$compileProvider.commentDirectivesEnabled(false)</code> / <code>cssClassDirectivesEnabled(false)</code> (1.6+) for a faster app.</li>
+    </ul>
+  </section>
+
+  <!-- =============== Testing -->
+  <section class="topic" id="testing" data-nav="Unit testing: Karma, Jasmine, mocks" data-group="6 · Build Tools" data-level="i">
+    <h2>Unit testing with Karma + Jasmine + angular-mocks <span class="badge i">Mid</span></h2>
+    <p><b>Karma</b> launches browsers (Chrome Headless) and runs tests; <b>Jasmine</b> provides <code>describe/it/expect</code>; <b>angular-mocks</b> adds <code>module()</code>, <code>inject()</code> and <code>$httpBackend</code>. DI is what makes AngularJS code easy to test.</p>
+    <pre data-lang="js" data-file="product.service.spec.js">describe('ProductService', function () {
+  var ProductService, $httpBackend;
+
+  beforeEach(angular.mock.module('shop'));                       // load the module under test
+  beforeEach(inject(function (_ProductService_, _$httpBackend_) { // _x_ underscores are stripped by inject
+    ProductService = _ProductService_; $httpBackend = _$httpBackend_;
+  }));
+  afterEach(function () { $httpBackend.verifyNoOutstandingExpectation(); $httpBackend.verifyNoOutstandingRequest(); });
+
+  it('loads products from the API', function () {
+    $httpBackend.expectGET('/api/v1/products').respond(200, [{ id: 1, name: 'Phone' }]);
+    var result;
+    ProductService.getAll().then(function (d) { result = d; });
+    $httpBackend.flush();                                         // resolve the fake response and run the digest
+    expect(result.length).toBe(1);
+  });
+});
+
+// Component test
+it('renders the product name', inject(function ($compile, $rootScope) {
+  var scope = $rootScope.$new(); scope.p = { name: 'Phone' };
+  var el = $compile('&lt;product-card product="p"&gt;&lt;/product-card&gt;')(scope);
+  scope.$digest();                                                // needed to render bindings
+  expect(el.text()).toContain('Phone');
+}));</pre>
+    <pre data-lang="js" data-file="karma.conf.js">module.exports = function (config) {
+  config.set({
+    frameworks: ['jasmine'],
+    files: ['node_modules/angular/angular.js', 'node_modules/angular-mocks/angular-mocks.js', 'src/**/*.module.js', 'src/**/*.js'],
+    browsers: ['ChromeHeadless'],
+    reporters: ['progress', 'coverage'],
+    singleRun: true
+  });
+};</pre>
+    <div class="note"><b>End-to-end tests</b>Protractor (the old AngularJS e2e tool) is deprecated. Use Cypress or Playwright for browser-level tests.</div>
+  </section>
+
+  <div class="part-title">Part 7 &mdash; Performance, security and migration</div>
+
+  <section class="topic" id="performance" data-nav="Performance tuning" data-group="7 · Quality & Migration" data-level="a">
+    <h2>Performance tuning <span class="badge a">Adv</span></h2>
+    <p>Almost every AngularJS performance problem is "too many watchers" or "digests that do too much work".</p>
+    <div class="tblwrap"><table><tr><th>Technique</th><th>How</th></tr>
+      <tr><td>Fewer watchers</td><td>One-time bindings <code>{{ ::x }}</code>, <code>ng-if</code> instead of <code>ng-show</code> for heavy hidden content, avoid <code>ng-repeat</code> inside <code>ng-repeat</code> on big data.</td></tr>
+      <tr><td>Cheaper watchers</td><td>No functions that allocate in templates, avoid deep <code>$watch(..., true)</code>, use <code>$watchCollection</code>.</td></tr>
+      <tr><td>Rendering lists</td><td><code>track by</code>, pagination, infinite scroll or virtual scroll (<code>angular-vs-repeat</code>).</td></tr>
+      <tr><td>Fewer digests</td><td><code>ng-model-options="{ debounce: 300 }"</code>, <code>$httpProvider.useApplyAsync(true)</code>, <code>$timeout(fn, 0, false)</code> for work needing no digest.</td></tr>
+      <tr><td>Production flags</td><td><code>$compileProvider.debugInfoEnabled(false)</code> (remove scope data from DOM), disable comment/class directives.</td></tr>
+      <tr><td>Network</td><td>Bundle + gzip/brotli, long-lived caching with hashes, lazy-load rarely used modules, <code>$http</code> cache for static lookups.</td></tr>
+      <tr><td>Diagnose</td><td>Chrome Performance tab, Batarang (legacy), <code>angular.element(el).scope().$$watchersCount</code> in dev, or count watchers via a console snippet.</td></tr></table></div>
+    <pre data-lang="js" data-file="count-watchers.js">// Paste in the browser console (with debugInfoEnabled) to count watchers on the page
+(function () {
+  var root = angular.element(document.querySelector('[ng-app]')), seen = {}, n = 0;
+  (function walk(el) {
+    var s = el.data().$scope, i = el.data().$isolateScope;
+    [s, i].forEach(function (sc) { if (sc &amp;&amp; !seen[sc.$id]) { seen[sc.$id] = 1; n += (sc.$$watchers || []).length; } });
+    angular.forEach(el.children(), function (c) { walk(angular.element(c)); });
+  })(root);
+  console.log('watchers:', n);
+})();</pre>
+  </section>
+
+  <section class="topic" id="security" data-nav="Security essentials" data-group="7 · Quality & Migration" data-level="a">
+    <h2>Security essentials for AngularJS apps <span class="badge a">Adv</span></h2>
+    <div class="tblwrap"><table><tr><th>Threat</th><th>What AngularJS does</th><th>What you must do</th></tr>
+      <tr><td><b>XSS</b></td><td>Interpolation escapes HTML; <code>ng-bind-html</code> sanitises when <code>ngSanitize</code> is loaded; <code>$sce</code> strict contextual escaping is on by default.</td><td>Never call <code>$sce.trustAsHtml</code> on user input. Never build templates from user data (template injection can run code in expressions). Use a strict <code>Content-Security-Policy</code>.</td></tr>
+      <tr><td><b>CSRF</b></td><td><code>$http</code> copies <code>XSRF-TOKEN</code> cookie into <code>X-XSRF-TOKEN</code>.</td><td>Validate the header on the server; use <code>SameSite</code> cookies.</td></tr>
+      <tr><td><b>Token theft</b></td><td>Nothing.</td><td>See the token storage chapter: memory + HttpOnly refresh cookie.</td></tr>
+      <tr><td><b>JSON vulnerability</b></td><td>Strips the <code>)]}',\n</code> prefix from responses.</td><td>Optional server prefix for old browsers.</td></tr>
+      <tr><td><b>Open redirects / URL whitelisting</b></td><td><code>$sceDelegateProvider.resourceUrlWhitelist</code> (<code>trustedResourceUrlList</code> in 1.8) for <code>ng-include</code>/JSONP.</td><td>Keep the list narrow.</td></tr>
+      <tr><td><b>Client-only authorisation</b></td><td>Route guards are UX only.</td><td>Enforce every permission on the API.</td></tr></table></div>
+    <div class="warn"><b>End of life</b>Known unfixed AngularJS vulnerabilities (ReDoS in <code>angular.copy</code>/<code>$sanitize</code>, prototype pollution, etc.) will not be patched upstream. Isolate the app behind a strict CSP and a WAF, update to 1.8.3, and plan the migration.</div>
+  </section>
+
+  <section class="topic" id="migration" data-nav="Migrating to Angular (2+)" data-group="7 · Quality & Migration" data-level="a">
+    <h2>Migrating from AngularJS to Angular <span class="badge a">Adv</span></h2>
+    <p>Big-bang rewrites rarely succeed. The recommended approach is an <b>incremental ("strangler") migration</b> running both frameworks side by side with <code>@angular/upgrade/static</code> (<b>ngUpgrade</b>), which lets AngularJS components be used inside Angular templates and vice versa.</p>
+    <div class="diagram"><div class="dtitle">Migration path</div>
+      <div class="flow">
+        <div class="node ok">1. Prepare<small>Components, controllerAs,<br>one-way bindings, TypeScript,<br>no <code>$rootScope</code> state</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">2. Bootstrap hybrid<small>Angular + AngularJS<br>in one page (ngUpgrade)</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">3. Convert leaf-first<small>Services, then shared<br>components, then views</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">4. Move routing<small>Angular Router takes<br>over from ui-router</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">5. Remove AngularJS<small>Drop <code>angular</code> + upgrade module</small></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table><tr><th>AngularJS</th><th>Angular equivalent</th></tr>
+      <tr><td><code>.component()</code> with <code>bindings</code></td><td><code>@Component</code> with <code>@Input()</code> / <code>@Output()</code></td></tr>
+      <tr><td><code>factory</code>/<code>service</code></td><td><code>@Injectable()</code> class with constructor injection</td></tr>
+      <tr><td><code>$http</code> + <code>$q</code></td><td><code>HttpClient</code> + RxJS Observables</td></tr>
+      <tr><td><code>ng-repeat</code>, <code>ng-if</code></td><td><code>*ngFor</code>/<code>@for</code>, <code>*ngIf</code>/<code>@if</code></td></tr>
+      <tr><td><code>ng-model</code></td><td><code>[(ngModel)]</code> or Reactive Forms</td></tr>
+      <tr><td>ui-router / ngRoute</td><td>Angular Router (<code>RouterModule</code>, guards, resolvers, lazy routes)</td></tr>
+      <tr><td>Gulp / Webpack config</td><td>Angular CLI (<code>ng build</code>, <code>ng serve</code>, <code>ng test</code>)</td></tr>
+      <tr><td>Filters</td><td>Pipes</td></tr>
+      <tr><td>Digest cycle</td><td>Zone.js change detection (or Signals)</td></tr></table></div>
+  </section>
+
+  <div class="part-title">Part 8 &mdash; Interview preparation &amp; revision</div>
+
+  <section class="topic" id="quiz" data-nav="Self-test quiz" data-group="8 · Resources" data-level="b">
+    <h2>Self-test quiz <span class="badge b">Practice</span></h2>
+    <p>Ten questions that interviewers like. Pick an answer, read the explanation, and keep score.</p>
+    <div class="lab quiz" data-title="AngularJS quiz">
+      <script type="application/json">
+      [
+        {"q":"What is two-way data binding implemented with in AngularJS?","o":["Object.observe / Proxies","Dirty checking of watchers during the digest cycle","MutationObserver on the DOM","Virtual DOM diffing"],"a":1,"e":"AngularJS keeps a list of watchers (one per binding). During a digest it compares each watched value with the previous one and runs the listener if it changed, repeating until stable."},
+        {"q":"Why does the view not update here?","code":"setTimeout(function () {\n  $scope.count++;\n}, 1000);","o":["count must be declared with var","setTimeout runs outside AngularJS, so no digest is triggered","AngularJS does not support numbers","$scope is read-only in timers"],"a":1,"e":"Use `$timeout` (which wraps setTimeout and triggers a digest) or call `$scope.$apply()`/`$applyAsync()` after changing the model."},
+        {"q":"A child scope created by `ng-if` contains `<input ng-model=\"name\">`. The parent's `name` never changes. Why?","o":["ng-if blocks events","The child scope writes a NEW primitive property that shadows the parent's","ng-model only works with objects","Parent scopes are read-only"],"a":1,"e":"Scopes inherit prototypically. Reading goes up the chain, but assigning a primitive creates a property on the child. Bind to an object property (`form.name`) or use controllerAs."},
+        {"q":"Which statement about factory vs service vs provider is correct?","o":["They create different instances for every consumer","All three produce singletons; only provider is configurable in a config block","service creates a new instance per controller","factory cannot return an object"],"a":1,"e":"The injector caches one instance per recipe. `service` and `factory` are syntactic sugar over `provider`, which exposes a `$get` method and is available as `xProvider` in config()."},
+        {"q":"After minification you get `Unknown provider: aProvider <- a`. What is the cause and fix?","o":["A missing script tag; add it","Implicit DI by parameter names; use array annotation, $inject, ng-annotate, or strictDi","A circular dependency; remove a service","A bad route; fix .otherwise()"],"a":1,"e":"Minifiers rename parameters ($http becomes a). Provide dependency names as strings (array notation or `$inject`) or let ng-annotate do it at build time."},
+        {"q":"In ngRoute, what does `resolve` do?","o":["Resolves DNS names","Delays route activation until the promises resolve and injects results into the controller","Resolves circular dependencies","Caches templates"],"a":1,"e":"The route change waits for all resolve promises. If one rejects, `$routeChangeError` is broadcast and the view is not shown. Resolved values are injectable by key name."},
+        {"q":"You enable `html5Mode`; refreshing `/products/5` returns 404 from the server. What is missing?","o":["A `#!` in the URL","A server rewrite that returns index.html for unknown paths (plus a `<base>` tag)","The ngRoute module","A larger cache"],"a":1,"e":"Without the hash, the browser asks the server for /products/5. The server must serve the SPA shell and let AngularJS route on the client."},
+        {"q":"Which is the most XSS-resistant place for a refresh token?","o":["localStorage","A global JavaScript variable","An HttpOnly, Secure, SameSite cookie","A hidden form field"],"a":2,"e":"HttpOnly cookies cannot be read by JavaScript, so an XSS payload cannot steal them. Add SameSite and an anti-forgery token to handle CSRF."},
+        {"q":"What data can localStorage hold?","o":["Any JavaScript object directly","Only strings (so serialise with JSON)","Only numbers","Binary blobs of any size"],"a":1,"e":"Web Storage stores strings, around 5 MB per origin, synchronously. Use JSON.stringify/parse or IndexedDB for larger/structured data."},
+        {"q":"Why must `angular-annotate` or `ng-strict-di` be part of a Gulp/Webpack production build?","o":["To speed up Sass","To keep dependency injection working after uglification","To create source maps","To enable HTML5 mode"],"a":1,"e":"Minification renames function parameters. ng-annotate rewrites functions so injectable names are strings; strictDi throws early in development when annotations are missing."}
+      ]
+      </script>
+    </div>
+  </section>
+
+  <section class="topic" id="interview-qa" data-nav="Interview questions & answers" data-group="8 · Resources" data-level="a">
+    <h2>Common AngularJS interview questions <span class="badge a">Prep</span></h2>
+    <p>Filter by topic, expand a question and try to answer it aloud first.</p>
+    <div class="qfilter" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
+      <button class="btn primary" data-f="all" type="button">All</button><button class="btn" data-f="core" type="button">Core</button><button class="btn" data-f="di" type="button">DI &amp; Services</button><button class="btn" data-f="route" type="button">Routing</button><button class="btn" data-f="store" type="button">Storage</button><button class="btn" data-f="build" type="button">Build/Test</button><button class="btn" data-f="design" type="button">Design</button>
+    </div>
+
+    <details class="qa" data-tag="core"><summary>What is AngularJS and what problems does it solve? <span class="qtag">core</span></summary><div class="dbody"><p>A client-side MVC/MVVM framework for SPAs. It adds declarative templates, two-way data binding, dependency injection, directives, routing support and testability, removing the manual DOM manipulation and plumbing of jQuery-style apps.</p></div></details>
+    <details class="qa" data-tag="core"><summary>Explain the digest cycle and dirty checking. <span class="qtag">core</span></summary><div class="dbody"><p>Each binding adds a watcher. After events AngularJS knows about ($http, ng-click, $timeout) it runs <code>$rootScope.$digest()</code>: loop through all watchers, compare current vs last value, call listeners for changes, and repeat while anything changed (max 10 iterations, else <code>infdig</code>). Cost is proportional to the number of watchers.</p></div></details>
+    <details class="qa" data-tag="core"><summary>$apply vs $digest vs $timeout? <span class="qtag">core</span></summary><div class="dbody"><p><code>$apply(fn)</code> runs <code>fn</code> then digests from <code>$rootScope</code>; <code>$digest()</code> only from the given scope down; <code>$timeout</code> wraps <code>setTimeout</code> and applies automatically, and is also the safe way to defer to "after the current digest" without the <code>inprog</code> error.</p></div></details>
+    <details class="qa" data-tag="core"><summary>What is scope inheritance and the "dot rule"? <span class="qtag">core</span></summary><div class="dbody"><p>Child scopes prototypally inherit from their parent. Reading falls through to the parent; assigning a primitive shadows it on the child. Bind to object properties (<code>ng-model="form.name"</code>) or use <code>controllerAs</code> so that writes mutate the shared object.</p></div></details>
+    <details class="qa" data-tag="core"><summary>ng-if vs ng-show; ng-repeat track by? <span class="qtag">core</span></summary><div class="dbody"><p><code>ng-if</code> adds/removes DOM and creates a child scope; <code>ng-show</code> only toggles <code>display</code> and keeps watchers alive. <code>track by item.id</code> lets ng-repeat reuse DOM nodes for objects with the same key and avoids duplicate-key errors on primitives (<code>track by $index</code>).</p></div></details>
+    <details class="qa" data-tag="core"><summary>What are isolate scope binding types <code>@</code>, <code>=</code>, <code>&lt;</code>, <code>&amp;</code>? <span class="qtag">core</span></summary><div class="dbody"><p><code>@</code> one-way string (interpolated), <code>=</code> two-way, <code>&lt;</code> one-way expression (preferred, 1.5+), <code>&amp;</code> callback to the parent. Components use the same syntax in <code>bindings</code>.</p></div></details>
+    <details class="qa" data-tag="core"><summary>Directive vs component; compile vs link? <span class="qtag">core</span></summary><div class="dbody"><p>A component is a directive preset (element-only, isolate scope, controllerAs <code>$ctrl</code>, lifecycle hooks) for UI pieces. In directives, <code>compile</code> runs once per template and may transform the DOM; <code>link</code> (post-link) runs per instance to attach watchers and handlers.</p></div></details>
+    <details class="qa" data-tag="core"><summary>What are filters and how do they affect performance? <span class="qtag">core</span></summary><div class="dbody"><p>Functions that format/select data in templates or code (<code>$filter</code>). They run on every digest when used in expressions, so keep them pure and cheap, and for expensive transformations precompute in the controller.</p></div></details>
+    <details class="qa" data-tag="core"><summary>What are promises in AngularJS? How does <code>$q</code> differ from native Promise? <span class="qtag">core</span></summary><div class="dbody"><p><code>$q</code> is a promise implementation integrated with the digest: resolution callbacks execute inside a digest so views update. Native promise callbacks run outside, requiring <code>$apply</code>. Use <code>$q.all</code>, <code>$q.when</code>, <code>$q.defer</code>, and always add <code>.catch</code>.</p></div></details>
+
+    <details class="qa" data-tag="di"><summary>What is dependency injection and how does AngularJS implement it? <span class="qtag">di</span></summary><div class="dbody"><p>Components declare dependencies by name and the injector (per app) creates/provides singletons from registered recipes. Names are read from parameter names, array annotation or <code>$inject</code>. Benefits: loose coupling, testability, configuration via providers.</p></div></details>
+    <details class="qa" data-tag="di"><summary>service vs factory vs provider vs value vs constant? <span class="qtag">di</span></summary><div class="dbody"><p>Provider is the base recipe with <code>$get</code>, configurable in <code>config</code>. Factory = function returning the service. Service = constructor instantiated with <code>new</code>. Value = simple injectable. Constant = available in <code>config</code> and cannot be decorated. All singletons.</p></div></details>
+    <details class="qa" data-tag="di"><summary>config vs run block? <span class="qtag">di</span></summary><div class="dbody"><p><code>config</code> runs first, only providers/constants injectable, used for routes/interceptors. <code>run</code> runs after the injector is built, instances injectable, like <code>main</code> (auth listeners, initial data).</p></div></details>
+    <details class="qa" data-tag="di"><summary>How do HTTP interceptors work and why return $q.reject? <span class="qtag">di</span></summary><div class="dbody"><p>Interceptors are factories with <code>request/requestError/response/responseError</code> hooks pushed to <code>$httpProvider.interceptors</code>. In <code>responseError</code> you must return <code>$q.reject(rejection)</code>, otherwise the chain is treated as recovered and callers would run their success path with an undefined value.</p></div></details>
+    <details class="qa" data-tag="di"><summary>How do controllers talk to each other? <span class="qtag">di</span></summary><div class="dbody"><p>Best: through a shared service or component bindings (inputs/callbacks). Alternatives: <code>$emit/$broadcast/$on</code> (implicit, easy to leak), <code>require</code> in directives, <code>$rootScope</code> (avoid).</p></div></details>
+
+    <details class="qa" data-tag="route"><summary>ngRoute vs ui-router? <span class="qtag">route</span></summary><div class="dbody"><p>ngRoute maps URL to a single view with <code>ng-view</code>, no nesting. ui-router models named, hierarchical states with nested/multiple <code>ui-view</code>s, state-based navigation (<code>ui-sref</code>), inherited resolves, abstract layouts and transition hooks, and is preferred for real apps.</p></div></details>
+    <details class="qa" data-tag="route"><summary>How do you pass and read route parameters? <span class="qtag">route</span></summary><div class="dbody"><p>ngRoute: <code>/products/:id</code> read from <code>$routeParams.id</code>; query via <code>$location.search()</code>. ui-router: <code>url: '/:id'</code> and <code>?q</code> declared on the state, read with <code>$stateParams</code> / <code>$transition$.params()</code> or injected into components via resolve bindings.</p></div></details>
+    <details class="qa" data-tag="route"><summary>How do you protect routes (authentication/authorisation)? <span class="qtag">route</span></summary><div class="dbody"><p>ngRoute: a <code>resolve</code> that rejects, or <code>$routeChangeStart</code> listener. ui-router 1.x: <code>$transitions.onBefore</code> hook redirecting to login, with <code>data.requiresRole</code> metadata. Always enforce on the server too: client guards are cosmetic.</p></div></details>
+    <details class="qa" data-tag="route"><summary>Hashbang vs HTML5 mode; what changes on the server? <span class="qtag">route</span></summary><div class="dbody"><p>Hashbang URLs keep the route after <code>#!</code> so the server never sees it. HTML5 mode uses the History API and clean URLs; it requires <code>&lt;base href&gt;</code> and server fallback to <code>index.html</code> for all non-file, non-API URLs (IIS rewrite, nginx <code>try_files</code>, ASP.NET Core <code>MapFallbackToFile</code>).</p></div></details>
+    <details class="qa" data-tag="route"><summary>What is lazy loading of states/modules in AngularJS? <span class="qtag">route</span></summary><div class="dbody"><p>AngularJS has no built-in module lazy loading. Use ui-router <code>lazyLoad</code> with <code>ocLazyLoad</code> or dynamic <code>import()</code> in a Webpack build to fetch a feature's chunk when its state is first entered and register its module at run time.</p></div></details>
+
+    <details class="qa" data-tag="store"><summary>localStorage vs sessionStorage vs cookies? <span class="qtag">store</span></summary><div class="dbody"><p>localStorage: persistent, ~5 MB, not sent to the server. sessionStorage: per tab, cleared when the tab closes. Cookies: ~4 KB, sent with every request, can be HttpOnly/Secure/SameSite, set expiry. Web Storage is synchronous and strings-only; both web storages are accessible to any script (XSS risk).</p></div></details>
+    <details class="qa" data-tag="store"><summary>How would you store large or structured offline data? <span class="qtag">store</span></summary><div class="dbody"><p>IndexedDB (via localForage/Dexie), optionally with a service worker and Cache API for the app shell. Wrap in a service returning <code>$q</code> promises, version the schema, and plan a sync strategy with the server.</p></div></details>
+    <details class="qa" data-tag="store"><summary>Where do you store a JWT in an AngularJS SPA, and why? <span class="qtag">store</span></summary><div class="dbody"><p>Prefer a short-lived access token in memory plus a refresh token in an HttpOnly, Secure, SameSite cookie. localStorage is simple but exposes tokens to XSS. Add CSP, sanitise HTML, clear on logout, and handle refresh with a single in-flight request.</p></div></details>
+    <details class="qa" data-tag="store"><summary>What is $cacheFactory / $templateCache and the <code>cache</code> option of $http? <span class="qtag">store</span></summary><div class="dbody"><p>In-memory caches. <code>$http</code> with <code>cache: true</code> stores GET responses for the page lifetime; <code>$templateCache</code> holds HTML templates (often prefilled by the build); <code>$cacheFactory</code> creates custom caches with optional capacity (LRU).</p></div></details>
+    <details class="qa" data-tag="store"><summary>How do you keep state across a page refresh in a multi-step form? <span class="qtag">store</span></summary><div class="dbody"><p>Keep the in-progress model in a service, and persist drafts in sessionStorage (per tab) or localStorage (per browser), or on the server for authenticated users. Restore in a <code>resolve</code> or <code>$onInit</code>; clear on completion. Never persist secrets.</p></div></details>
+
+    <details class="qa" data-tag="build"><summary>Why do AngularJS apps break after minification and how do you prevent it? <span class="qtag">build</span></summary><div class="dbody"><p>Implicit DI relies on parameter names. Minifiers shorten them. Use array/<code>$inject</code> annotation, run ng-annotate (<code>babel-plugin-angularjs-annotate</code>) in the pipeline, and enable <code>ng-strict-di</code> in development.</p></div></details>
+    <details class="qa" data-tag="build"><summary>Gulp vs Webpack for AngularJS? <span class="qtag">build</span></summary><div class="dbody"><p>Gulp is a task runner that pipes files through plugins (you manage order, concat, annotate, uglify, template cache). Webpack is a module bundler that builds a graph from <code>import</code>s, supports loaders (Babel, HTML, Sass), code splitting, hashed filenames and a dev server. Webpack suits modern/modular code; Gulp suits legacy script-tag projects.</p></div></details>
+    <details class="qa" data-tag="build"><summary>What does the template cache step do? <span class="qtag">build</span></summary><div class="dbody"><p>It converts HTML templates referenced by <code>templateUrl</code> into JavaScript that fills <code>$templateCache</code> (gulp-angular-templatecache) or inlines them with html-loader, avoiding one HTTP request per template at runtime.</p></div></details>
+    <details class="qa" data-tag="build"><summary>How do you unit test a service that calls $http? <span class="qtag">build</span></summary><div class="dbody"><p>Load the module with <code>angular.mock.module</code>, inject the service and <code>$httpBackend</code>, set <code>expectGET(...).respond(...)</code>, call the service, then <code>$httpBackend.flush()</code> and assert. Verify no outstanding requests in <code>afterEach</code>.</p></div></details>
+    <details class="qa" data-tag="build"><summary>How do you improve AngularJS performance? <span class="qtag">build</span></summary><div class="dbody"><p>Reduce watchers (one-time bindings, <code>ng-if</code>, pagination), use <code>track by</code>, debounce <code>ng-model</code>, avoid deep watches and expensive template functions, disable debug info in production, bundle/minify/gzip, and lazy load features.</p></div></details>
+
+    <details class="qa" data-tag="design"><summary>AngularJS is end of life. What would you do with a large legacy app? <span class="qtag">design</span></summary><div class="dbody"><p>Reduce risk first (CSP, dependency audit, update to 1.8.3 or a supported fork), standardise on components and controllerAs, move builds to Webpack and TypeScript, add tests, then migrate incrementally to Angular (or another framework) with ngUpgrade/micro-frontends, converting leaf components and services first.</p></div></details>
+    <details class="qa" data-tag="design"><summary>How would you structure a large AngularJS application? <span class="qtag">design</span></summary><div class="dbody"><p>Feature-based folders each with its own module, routes, components and services; a thin core module for singletons (interceptors, auth, store); shared module for presentational components; container components talk to services, leaf components get data via <code>&lt;</code> and emit via <code>&amp;</code>; lazy-load big areas; keep state in services, not <code>$rootScope</code>.</p></div></details>
+    <details class="qa" data-tag="design"><summary>How do you integrate an AngularJS front end with an ASP.NET Core Web API? <span class="qtag">design</span></summary><div class="dbody"><p>Serve the built bundle as static files (or from a CDN), use HTML5 mode with <code>MapFallbackToFile("index.html")</code>, call the API with <code>$http</code> services plus an auth interceptor, enable CORS only when hosts differ, send the antiforgery token via <code>X-XSRF-TOKEN</code> for cookie auth, and generate typed API docs with Swagger/OpenAPI.</p></div></details>
+  </section>
+
+  <section class="topic" id="mistakes" data-nav="Common mistakes & best practices" data-group="8 · Resources" data-level="i">
+    <h2>Common mistakes &amp; best practices <span class="badge i">Mid</span></h2>
+    <div class="tblwrap"><table>
+      <tr><th>Mistake</th><th>Why it hurts</th><th>Do this instead</th></tr>
+      <tr><td><code>ng-model="name"</code> on primitives in child scopes</td><td>Shadowing; value not shared</td><td><code>controllerAs</code> / object property</td></tr>
+      <tr><td>Changing the model in <code>setTimeout</code>, jQuery, native promises</td><td>No digest, stale view</td><td><code>$timeout</code>, <code>$q</code>, or <code>$applyAsync</code></td></tr>
+      <tr><td>DOM manipulation inside controllers</td><td>Untestable, brittle</td><td>Directives / components</td></tr>
+      <tr><td>Implicit DI + minification</td><td><code>Unknown provider</code> in production</td><td><code>$inject</code>, ng-annotate, <code>ng-strict-di</code></td></tr>
+      <tr><td>Storing tokens/PII in localStorage</td><td>XSS exfiltration</td><td>Memory + HttpOnly cookie</td></tr>
+      <tr><td>Functions in templates returning new arrays/objects</td><td><code>infdig</code>, slow digests</td><td>Precompute in the controller</td></tr>
+      <tr><td><code>$rootScope</code> as global state</td><td>Hidden coupling, leaks</td><td>Services</td></tr>
+      <tr><td>Not deregistering <code>$rootScope.$on</code>, timers, DOM events</td><td>Memory leaks</td><td>Use the returned deregister function on <code>$destroy</code></td></tr>
+      <tr><td><code>angular.module('x', [])</code> repeated</td><td>Overwrites module</td><td>Setter once, getter everywhere</td></tr>
+      <tr><td>Using <code>.success()</code> / <code>.error()</code></td><td>Removed in 1.6</td><td><code>.then()</code> / <code>.catch()</code></td></tr>
+      <tr><td>Huge <code>ng-repeat</code> lists</td><td>Thousands of watchers</td><td>Paging, virtual scroll, one-time bindings</td></tr>
+      <tr><td>Relying on route guards for security</td><td>Easily bypassed</td><td>Authorise on the server</td></tr>
+      <tr><td>Mixing <code>angular</code> and <code>angular-*</code> versions</td><td>Obscure runtime errors</td><td>Pin the same version for all modules</td></tr>
+    </table></div>
+  </section>
+
+  <section class="topic" id="summary" data-nav="Summary cheat sheet" data-group="8 · Resources" data-level="b">
+    <h2>Summary cheat sheet <span class="badge b">Recap</span></h2>
+    <div class="tblwrap"><table><tr><th>Topic</th><th>Remember</th></tr>
+      <tr><td>Framework</td><td>AngularJS 1.x, MVC/MVVM, JavaScript, end of life since Dec 2021. Angular 2+ is a different framework.</td></tr>
+      <tr><td>Binding</td><td><code>{{ }}</code>, <code>ng-model</code>, <code>::</code> one-time; dirty checking in the digest cycle (max 10 loops).</td></tr>
+      <tr><td>Scope</td><td>Prototypal inheritance; use a dot / controllerAs; use <code>$timeout</code>/<code>$apply</code> outside Angular.</td></tr>
+      <tr><td>DI</td><td>Singletons via injector; factory/service/provider/value/constant; annotate for minification; <code>config</code> = providers, <code>run</code> = instances.</td></tr>
+      <tr><td>HTTP</td><td><code>$http</code> returns <code>$q</code> promises; interceptors for auth/errors; use <code>.then/.catch</code>.</td></tr>
+      <tr><td>UI building blocks</td><td>Components with <code>&lt;</code> and <code>&amp;</code> bindings and lifecycle hooks; directives for DOM; filters for formatting.</td></tr>
+      <tr><td>Routing</td><td>ngRoute (flat, <code>ng-view</code>, <code>$routeProvider</code>) vs ui-router (states, <code>ui-view</code>, nested, hooks); HTML5 mode needs server fallback.</td></tr>
+      <tr><td>Storage</td><td>Memory &lt; sessionStorage &lt; localStorage &lt; cookie &lt; IndexedDB by capacity/lifetime; secrets in HttpOnly cookies or memory; wrap storage in a service.</td></tr>
+      <tr><td>Build</td><td>npm + (Gulp or Webpack): lint, transpile, annotate, template cache, bundle, minify, hash. Karma + Jasmine + angular-mocks for tests.</td></tr>
+      <tr><td>Performance</td><td>Fewer watchers, <code>track by</code>, debounce, no debug info in prod, lazy loading.</td></tr>
+      <tr><td>Future</td><td>Move incrementally to Angular via ngUpgrade; adopt components, TypeScript and modules now.</td></tr>
+    </table></div>
+    <div class="tip"><b>Next step</b>Pair this guide with the <a href="CSharp-Concepts-Guide.html">C# Concepts</a>, <a href="ASP.NET-Core-Concepts-Guide.html">ASP.NET Core Concepts</a> and <a href="ASP.NET-Core-Web-API-Guide.html">Web API</a> guides: a classic enterprise stack is an AngularJS front end calling an ASP.NET Core Web API secured with JWT.</div>
+  </section>
+
+</main>
+</div>
+
+<script src="assets/guide.js"></script>
+<script src="assets/concepts.js"></script>
+<script src="assets/angularjs.js"></script>
+</body>
+</html>

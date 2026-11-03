@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>React - Components, Hooks, State, Routing, Performance, Testing</title>
+<link rel="stylesheet" href="assets/guide.css">
+<style>
+:root{--accent:#0e7fa8;--accent-soft:#d9f0f8}
+body.dark{--accent:#61dafb;--accent-soft:#10303a}
+.hero{background:linear-gradient(135deg,#06293a,#0e7fa8 55%,#61dafb)}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="brand"><h1>React Concepts</h1><small>JSX &rarr; Components &rarr; Hooks &rarr; State &rarr; Routing &rarr; Data &rarr; Performance &rarr; Testing</small></div>
+  <div class="search"><input id="search" type="search" placeholder="Search concepts ( press / )" autocomplete="off"><div id="search-results"></div></div>
+  <nav id="nav"></nav>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    <button id="menu-btn" type="button">Menu</button>
+    <div class="prog"><i id="progress"></i></div>
+    <button id="expand-all" type="button">Expand all</button>
+    <button id="collapse-all" type="button">Collapse all</button>
+    <button id="theme-btn" type="button">Dark / Light</button>
+  </div>
+
+  <main id="content">
+
+  <div class="hero" id="top">
+    <h1>React &ndash; From First Component to Production</h1>
+    <p>Modern React (18/19) with function components and hooks: how <b>JSX</b> and the <b>virtual DOM</b> work, the rules of <b>state, props and effects</b>, <b>context</b> and state-management options, <b>routing</b>, <b>data fetching</b> and forms, <b>performance</b> (memoisation, code splitting), <b>testing</b>, a Vite build setup, and the mapping from AngularJS ideas. Three labs simulate keys/reconciliation, effect timing and batched state updates.</p>
+    <div class="chips"><span>JSX &middot; Props &middot; State</span><span>useState &middot; useEffect &middot; useRef</span><span>Context &middot; Reducer &middot; Zustand</span><span>React Router</span><span>TanStack Query</span><span>memo &middot; lazy &middot; Suspense</span><span>Vitest &middot; Testing Library</span></div>
+  </div>
+
+  <section class="topic" id="how-to-use" data-nav="How to use this guide" data-group="Start here">
+    <h2>How to use this guide</h2>
+    <div class="grid3">
+      <div class="card"><h4>1. Learn the mental model</h4><p>UI = function(state). A component describes what the screen should look like for the current props and state; React works out the DOM changes. Parts 1-2 build this model.</p></div>
+      <div class="card"><h4>2. Run the labs</h4><p>Keys/reconciliation, the useEffect timeline and batched updates. They simulate React's documented rules in plain JavaScript, so they run offline with nothing to install.</p></div>
+      <div class="card"><h4>3. Build something</h4><p>Part 5 and the mini project give you a Vite setup to type along with. Press <span class="kbd">/</span> to search any topic.</p></div>
+    </div>
+    <div class="note"><b>Assumes</b>Basic modern JavaScript: <code>const/let</code>, arrow functions, destructuring, spread, modules, <code>map/filter</code>, promises and <code>async/await</code>. TypeScript is used in a few examples (<code>tsx</code>) and is the norm in new React code.</div>
+  </section>
+
+  <div class="part-title">Part 1 &mdash; Core ideas</div>
+
+  <section class="topic" id="what-is-react" data-nav="What React is" data-group="1 · Core" data-level="b">
+    <h2>What React is and why it exists <span class="badge b">Basic</span></h2>
+    <p><b>React</b> is a JavaScript library for building user interfaces from reusable <b>components</b>. It is declarative: you describe the UI for a given state and React updates the DOM efficiently. It is a <i>library</i>, not a full framework: routing, data fetching and forms come from the ecosystem (or a framework built on React such as Next.js).</p>
+    <div class="tblwrap"><table><tr><th>Idea</th><th>Meaning</th></tr>
+      <tr><td><b>Component</b></td><td>A function that takes <b>props</b> and returns UI (JSX)</td></tr>
+      <tr><td><b>Declarative</b></td><td>You write <i>what</i> it should look like, not the step-by-step DOM mutations</td></tr>
+      <tr><td><b>One-way data flow</b></td><td>Data flows parent &rarr; child through props; children notify parents through callbacks</td></tr>
+      <tr><td><b>Virtual DOM &amp; reconciliation</b></td><td>React compares the new element tree with the previous one and applies only the minimal real-DOM changes</td></tr>
+      <tr><td><b>Immutability</b></td><td>State is never changed in place; you give React a new value so it can see that something changed</td></tr>
+      <tr><td><b>Composition over inheritance</b></td><td>Build complex UIs by nesting components and passing children/props</td></tr></table></div>
+    <div class="diagram"><div class="dtitle">How an update happens</div>
+      <div class="flow">
+        <div class="node">Event<small>click, input, response</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">setState<small>schedule an update</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Render phase<small>call components, build new element tree (pure)</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Reconcile<small>diff against previous tree</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Commit<small>apply minimal DOM changes</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">Effects<small>useEffect runs after paint</small></div>
+      </div>
+    </div>
+    <h3>Where React runs</h3>
+    <ul><li><b>Client-side SPA</b> (Vite + React Router): the browser downloads JS and renders.</li><li><b>Server rendering / SSG</b> (Next.js, Remix/React Router framework mode): HTML comes from the server, then hydrates.</li><li><b>React Native</b>: same component model for iOS/Android.</li><li><b>Server Components</b> (React 19 frameworks): components that run only on the server and send no JS for themselves.</li></ul>
+  </section>
+
+  <section class="topic" id="setup" data-nav="Project setup with Vite" data-group="1 · Core" data-level="b">
+    <h2>Creating a project (Vite) <span class="badge b">Basic</span></h2>
+    <p>Create React App is deprecated. Use <b>Vite</b> for a plain SPA, or a framework (Next.js) when you need server rendering.</p>
+    <pre data-lang="bash" data-file="terminal">npm create vite@latest shop-ui -- --template react-ts
+cd shop-ui
+npm install
+npm run dev          # dev server with hot module replacement (http://localhost:5173)
+npm run build        # production bundle in dist/
+npm run preview      # serve dist/ locally</pre>
+    <pre data-lang="plain" data-file="Project layout">shop-ui/
+  index.html            # single HTML page with &lt;div id="root"&gt;
+  vite.config.ts
+  src/
+    main.tsx            # entry: createRoot(...).render(&lt;App /&gt;)
+    App.tsx
+    components/         # reusable UI pieces
+    pages/              # route-level components
+    hooks/              # custom hooks (useDebounce, useFetch...)
+    api/                # fetch helpers / query functions
+    types/</pre>
+    <pre data-lang="tsx" data-file="src/main.tsx">import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
+
+createRoot(document.getElementById('root')!).render(
+  &lt;StrictMode&gt;
+    &lt;App /&gt;
+  &lt;/StrictMode&gt;
+);</pre>
+    <div class="tip"><b>StrictMode</b>In development it renders components twice and re-runs effects once to surface impure renders and missing cleanups. It does nothing in production builds.</div>
+  </section>
+
+  <section class="topic" id="jsx" data-nav="JSX" data-group="1 · Core" data-level="b">
+    <h2>JSX <span class="badge b">Basic</span></h2>
+    <p><b>JSX</b> is syntax sugar for <code>React.createElement</code> / the JSX runtime calls. It looks like HTML but it is JavaScript: the build tool (Babel/SWC/esbuild) turns it into function calls.</p>
+    <pre data-lang="tsx" data-file="Greeting.tsx">type GreetingProps = { name: string; unread?: number };
+
+export function Greeting({ name, unread = 0 }: GreetingProps) {
+  const isVip = name === 'Asha';
+  return (
+    &lt;section className="card" style={{ padding: 16 }}&gt;       {/* className, camelCase style object */}
+      &lt;h2&gt;Hello, {name.toUpperCase()}!&lt;/h2&gt;                {/* any JS expression in { } */}
+      {unread &gt; 0 &amp;&amp; &lt;span&gt;{unread} new messages&lt;/span&gt;}   {/* conditional render */}
+      {isVip ? &lt;b&gt;VIP&lt;/b&gt; : &lt;i&gt;member&lt;/i&gt;}
+      &lt;label htmlFor="q"&gt;Search&lt;/label&gt;&lt;input id="q" /&gt;       {/* htmlFor, self-closing tags */}
+    &lt;/section&gt;
+  );
+}</pre>
+    <div class="tblwrap"><table><tr><th>JSX rule</th><th>Detail</th></tr>
+      <tr><td>One root</td><td>Return a single parent, or a <b>Fragment</b> <code>&lt;&gt;...&lt;/&gt;</code> (no extra DOM node)</td></tr>
+      <tr><td>Attributes are camelCase</td><td><code>className</code>, <code>htmlFor</code>, <code>onClick</code>, <code>tabIndex</code></td></tr>
+      <tr><td>Expressions, not statements</td><td>Use ternary and <code>&amp;&amp;</code>; put <code>if/for</code> above the <code>return</code></td></tr>
+      <tr><td>Auto-escaping</td><td>Interpolated strings are escaped, which helps prevent XSS. <code>dangerouslySetInnerHTML</code> bypasses it: sanitise first</td></tr>
+      <tr><td><code>0 &amp;&amp; ...</code> pitfall</td><td><code>{count &amp;&amp; &lt;List/&gt;}</code> renders "0" when count is 0. Use <code>count &gt; 0 &amp;&amp; ...</code></td></tr>
+      <tr><td>Components start with a capital</td><td><code>&lt;Greeting/&gt;</code> is a component; <code>&lt;div&gt;</code> is a DOM tag</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="components-props" data-nav="Components, props and children" data-group="1 · Core" data-level="b">
+    <h2>Components, props and children <span class="badge b">Basic</span></h2>
+    <p>A component is a function. Props are its (read-only) inputs. A component must be <b>pure</b> during render: same props and state in, same JSX out, no side effects.</p>
+    <pre data-lang="tsx" data-file="Card.tsx">import type { ReactNode } from 'react';
+
+type CardProps = {
+  title: string;
+  footer?: ReactNode;
+  children: ReactNode;            // whatever is nested between the tags
+  onClose?: () =&gt; void;           // callback prop: child tells parent something happened
+};
+
+export function Card({ title, footer, children, onClose }: CardProps) {
+  return (
+    &lt;article className="card"&gt;
+      &lt;header&gt;&lt;h3&gt;{title}&lt;/h3&gt;{onClose &amp;&amp; &lt;button onClick={onClose}&gt;x&lt;/button&gt;}&lt;/header&gt;
+      {children}
+      {footer &amp;&amp; &lt;footer&gt;{footer}&lt;/footer&gt;}
+    &lt;/article&gt;
+  );
+}
+
+// usage
+&lt;Card title="Order #12" footer={&lt;small&gt;Paid&lt;/small&gt;} onClose={() =&gt; setOpen(false)}&gt;
+  &lt;OrderLines id={12} /&gt;
+&lt;/Card&gt;</pre>
+    <div class="grid2">
+      <div class="card"><h4>Props rules</h4><ul><li>Read-only: never modify <code>props</code></li><li>Pass functions to send events up</li><li>Spread (<code>{...rest}</code>) to forward attributes</li><li>In React 19, <code>ref</code> is an ordinary prop for function components</li></ul></div>
+      <div class="card"><h4>Composition patterns</h4><ul><li><b>children</b> for layout wrappers</li><li><b>Slots</b> via props (<code>header=&lt;...&gt;</code>)</li><li><b>Render props</b> (rare now)</li><li><b>Custom hooks</b> instead of HOCs for reuse</li></ul></div>
+    </div>
+  </section>
+
+  <section class="topic" id="lists-events" data-nav="Lists, keys, events and conditionals" data-group="1 · Core" data-level="b">
+    <h2>Rendering lists, keys, events and conditionals <span class="badge b">Basic</span></h2>
+    <pre data-lang="tsx" data-file="UserList.tsx">type User = { id: number; name: string; active: boolean };
+
+export function UserList({ users, onSelect }: { users: User[]; onSelect: (id: number) =&gt; void }) {
+  if (users.length === 0) return &lt;p&gt;No users yet.&lt;/p&gt;;                    // early return
+  return (
+    &lt;ul&gt;
+      {users.filter(u =&gt; u.active).map(u =&gt; (
+        &lt;li key={u.id} onClick={() =&gt; onSelect(u.id)}&gt;{u.name}&lt;/li&gt;   {/* key = stable id */}
+      ))}
+    &lt;/ul&gt;
+  );
+}</pre>
+    <div class="lab" id="recon-lab"></div>
+    <div class="tblwrap"><table><tr><th>Topic</th><th>Rules</th></tr>
+      <tr><td><b>Keys</b></td><td>Unique among siblings, stable across renders, from your data (id). Not <code>Math.random()</code>, and avoid the array index when the list can reorder or change. Keys are not passed as a prop.</td></tr>
+      <tr><td><b>Events</b></td><td>Pass a function, do not call it: <code>onClick={handle}</code>, not <code>onClick={handle()}</code>. Handlers receive a synthetic event (<code>e.preventDefault()</code>, <code>e.stopPropagation()</code>).</td></tr>
+      <tr><td><b>Conditionals</b></td><td>Early return, ternary, <code>&amp;&amp;</code>; extract a component when the branches get big.</td></tr>
+      <tr><td><b>Forms</b></td><td><i>Controlled</i> inputs: value comes from state, <code>onChange</code> updates it. <i>Uncontrolled</i>: read via ref or <code>FormData</code>.</td></tr></table></div>
+  </section>
+
+  <div class="part-title">Part 2 &mdash; State, hooks and effects</div>
+
+  <section class="topic" id="usestate" data-nav="useState and the render snapshot" data-group="2 · Hooks" data-level="b">
+    <h2>useState and state as a snapshot <span class="badge b">Basic</span></h2>
+    <p><code>useState</code> gives a component memory. State belongs to a component <i>instance</i> at a position in the tree. Calling the setter schedules a re-render; the new value is visible on the <b>next</b> render, not on the next line.</p>
+    <pre data-lang="tsx" data-file="Counter.tsx">import { useState } from 'react';
+
+export function Counter() {
+  const [count, setCount] = useState(0);
+  const [user, setUser] = useState({ name: 'Asha', tags: ['new'] });
+
+  function addThree() {
+    setCount(count + 1); setCount(count + 1); setCount(count + 1);       // adds 1 (stale snapshot)
+    setCount(c =&gt; c + 1); setCount(c =&gt; c + 1); setCount(c =&gt; c + 1);   // adds 3 (functional updates)
+  }
+  function rename(n: string) {
+    setUser({ ...user, name: n });                                        // new object: never mutate user.name = n
+  }
+  function addTag(t: string) {
+    setUser(u =&gt; ({ ...u, tags: [...u.tags, t] }));                       // new array too
+  }
+  return &lt;button onClick={() =&gt; setCount(c =&gt; c + 1)}&gt;Clicked {count} times&lt;/button&gt;;
+}</pre>
+    <div class="lab" id="batch-lab"></div>
+    <div class="tblwrap"><table><tr><th>Rule</th><th>Why</th></tr>
+      <tr><td>Treat state as <b>immutable</b></td><td>React uses <code>Object.is</code> to decide if state changed; mutating in place keeps the same reference, so nothing re-renders</td></tr>
+      <tr><td>Use the <b>updater form</b> when the new value depends on the old</td><td>Avoids stale values and works when updates are batched</td></tr>
+      <tr><td>Updates are <b>batched</b></td><td>Several setters in one event cause one render (React 18+ batches everywhere, including promises and timeouts)</td></tr>
+      <tr><td>Lazy initial value</td><td><code>useState(() =&gt; expensive())</code> runs only once</td></tr>
+      <tr><td><b>Derive</b>, do not duplicate</td><td>Compute <code>fullName</code> or a filtered list during render instead of storing it in a second state variable</td></tr>
+      <tr><td><b>Lift state up</b></td><td>When two components need the same state, move it to the closest common parent and pass it down</td></tr></table></div>
+    <details><summary>Immutable update cheat sheet</summary><div class="dbody">
+      <pre data-lang="ts" data-file="immutable.ts">// object:  { ...obj, key: value }
+// nested:  { ...s, address: { ...s.address, city: 'Pune' } }
+// array add:     [...arr, item]          remove: arr.filter(x =&gt; x.id !== id)
+// array replace: arr.map(x =&gt; x.id === id ? { ...x, done: true } : x)
+// insert at i:   [...arr.slice(0, i), item, ...arr.slice(i)]
+// deep or heavy updates: use Immer (produce) or useImmerReducer</pre></div></details>
+  </section>
+
+  <section class="topic" id="useeffect" data-nav="useEffect, cleanup and when not to use it" data-group="2 · Hooks" data-level="i">
+    <h2>useEffect: synchronising with the outside world <span class="badge i">Intermediate</span></h2>
+    <p>An <b>effect</b> runs after React has painted and is for syncing with something <i>outside</i> React: network subscriptions, timers, browser APIs, non-React widgets. It re-runs when a value in its dependency array changed, and its cleanup runs before the next run and on unmount.</p>
+    <pre data-lang="tsx" data-file="Effects.tsx">import { useEffect, useState } from 'react';
+
+function OnlineBadge({ userId }: { userId: number }) {
+  const [online, setOnline] = useState(false);
+
+  useEffect(() =&gt; {
+    const ws = new WebSocket(`wss://api.shop.com/presence/${userId}`);
+    ws.onmessage = e =&gt; setOnline(JSON.parse(e.data).online);
+    return () =&gt; ws.close();                 // cleanup: runs before re-run and on unmount
+  }, [userId]);                               // re-sync when userId changes
+
+  return &lt;span&gt;{online ? 'Online' : 'Offline'}&lt;/span&gt;;
+}
+
+function useDocumentTitle(title: string) {
+  useEffect(() =&gt; { document.title = title; }, [title]);
+}
+
+function Clock() {
+  const [now, setNow] = useState(() =&gt; new Date());
+  useEffect(() =&gt; {
+    const id = setInterval(() =&gt; setNow(new Date()), 1000);
+    return () =&gt; clearInterval(id);
+  }, []);                                     // [] = set up once on mount
+  return &lt;time&gt;{now.toLocaleTimeString()}&lt;/time&gt;;
+}</pre>
+    <div class="lab" id="effect-lab"></div>
+    <div class="tblwrap"><table><tr><th>You need to...</th><th>Do this (no effect needed)</th></tr>
+      <tr><td>Compute a value from props/state</td><td>Calculate it during render (use <code>useMemo</code> only if it is measurably slow)</td></tr>
+      <tr><td>Respond to a user action</td><td>Put the logic in the event handler</td></tr>
+      <tr><td>Reset state when a prop changes</td><td>Give the component a different <code>key</code></td></tr>
+      <tr><td>Fetch data</td><td>Prefer a data library (TanStack Query / SWR) or framework loaders; a raw effect needs cancellation and race handling</td></tr>
+      <tr><td>Adjust state based on other state</td><td>Derive it, or update both in one handler</td></tr></table></div>
+    <pre data-lang="tsx" data-file="fetch-effect.tsx">useEffect(() =&gt; {
+  const ctrl = new AbortController();                     // avoid race conditions and updates after unmount
+  fetch(`/api/products?q=${q}`, { signal: ctrl.signal })
+    .then(r =&gt; { if (!r.ok) throw new Error(r.statusText); return r.json(); })
+    .then(setProducts)
+    .catch(e =&gt; { if (e.name !== 'AbortError') setError(e); });
+  return () =&gt; ctrl.abort();
+}, [q]);</pre>
+    <div class="warn"><b>Common bugs</b>Missing dependencies (stale values, use the <code>react-hooks/exhaustive-deps</code> lint rule); an object/function created each render in the deps (infinite loop); setting state inside an effect with no deps; forgetting cleanup so listeners and timers leak.</div>
+  </section>
+
+  <section class="topic" id="hooks-others" data-nav="Other hooks: ref, memo, callback, reducer, transition" data-group="2 · Hooks" data-level="i">
+    <h2>The other built-in hooks <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th>Hook</th><th>Use</th><th>Notes</th></tr>
+      <tr><td><code>useRef</code></td><td>Mutable box that survives renders without causing one; DOM access (<code>ref.current</code>)</td><td>Focus an input, store a timer id, previous value. Changing it does not re-render</td></tr>
+      <tr><td><code>useReducer</code></td><td>Complex state with many transitions: <code>(state, action) =&gt; newState</code></td><td>Centralises update logic; pairs well with context</td></tr>
+      <tr><td><code>useContext</code></td><td>Read a value from the nearest provider</td><td>Avoids prop drilling; all consumers re-render when the value changes</td></tr>
+      <tr><td><code>useMemo</code></td><td>Cache an expensive computed value</td><td>Optimisation only; code must work without it</td></tr>
+      <tr><td><code>useCallback</code></td><td>Cache a function identity</td><td>Useful when passing callbacks to memoised children or as effect deps</td></tr>
+      <tr><td><code>useLayoutEffect</code></td><td>Runs synchronously before paint</td><td>Measure layout; rare</td></tr>
+      <tr><td><code>useId</code></td><td>Stable unique ids for accessibility attributes</td><td>SSR-safe</td></tr>
+      <tr><td><code>useTransition</code> / <code>useDeferredValue</code></td><td>Mark an update as non-urgent so typing stays responsive</td><td>Concurrent rendering features</td></tr>
+      <tr><td><code>useActionState</code>, <code>useOptimistic</code>, <code>use</code> (React 19)</td><td>Form actions, optimistic UI, reading promises/context in render</td><td>Know they exist; used heavily in framework code</td></tr></table></div>
+    <pre data-lang="tsx" data-file="more-hooks.tsx">import { useReducer, useRef, useMemo, useCallback } from 'react';
+
+type Action = { type: 'add'; text: string } | { type: 'toggle'; id: number } | { type: 'clear' };
+type Todo = { id: number; text: string; done: boolean };
+
+function reducer(state: Todo[], a: Action): Todo[] {
+  switch (a.type) {
+    case 'add':    return [...state, { id: Date.now(), text: a.text, done: false }];
+    case 'toggle': return state.map(t =&gt; t.id === a.id ? { ...t, done: !t.done } : t);
+    case 'clear':  return [];
+  }
+}
+
+export function Todos() {
+  const [todos, dispatch] = useReducer(reducer, []);
+  const inputRef = useRef&lt;HTMLInputElement&gt;(null);
+  const remaining = useMemo(() =&gt; todos.filter(t =&gt; !t.done).length, [todos]);
+  const add = useCallback(() =&gt; {
+    const v = inputRef.current!.value.trim();
+    if (v) { dispatch({ type: 'add', text: v }); inputRef.current!.value = ''; inputRef.current!.focus(); }
+  }, []);
+  return (&lt;&gt;
+    &lt;input ref={inputRef} /&gt; &lt;button onClick={add}&gt;Add&lt;/button&gt; &lt;span&gt;{remaining} left&lt;/span&gt;
+    &lt;ul&gt;{todos.map(t =&gt; &lt;li key={t.id} onClick={() =&gt; dispatch({ type: 'toggle', id: t.id })}&gt;{t.done ? '✓ ' : ''}{t.text}&lt;/li&gt;)}&lt;/ul&gt;
+  &lt;/&gt;);
+}</pre>
+    <div class="why"><b>Rules of Hooks</b>Call hooks only at the <b>top level</b> of a component or custom hook (never in loops, conditions or nested functions) and only from React functions. React identifies hooks by call order, so the order must be identical every render.</div>
+  </section>
+
+  <section class="topic" id="custom-hooks" data-nav="Custom hooks" data-group="2 · Hooks" data-level="i">
+    <h2>Custom hooks: reusing stateful logic <span class="badge i">Intermediate</span></h2>
+    <p>A custom hook is a function whose name starts with <code>use</code> and that calls other hooks. It shares <i>logic</i>, not state: each caller gets its own state.</p>
+    <pre data-lang="tsx" data-file="hooks.ts">import { useEffect, useState } from 'react';
+
+export function useDebounce&lt;T&gt;(value: T, ms = 300): T {
+  const [v, setV] = useState(value);
+  useEffect(() =&gt; { const id = setTimeout(() =&gt; setV(value), ms); return () =&gt; clearTimeout(id); }, [value, ms]);
+  return v;
+}
+
+export function useLocalStorage&lt;T&gt;(key: string, initial: T) {
+  const [value, setValue] = useState&lt;T&gt;(() =&gt; {
+    try { const raw = localStorage.getItem(key); return raw ? (JSON.parse(raw) as T) : initial; } catch { return initial; }
+  });
+  useEffect(() =&gt; { localStorage.setItem(key, JSON.stringify(value)); }, [key, value]);
+  return [value, setValue] as const;
+}
+
+// usage
+const [theme, setTheme] = useLocalStorage('theme', 'light');
+const q = useDebounce(search, 400);          // call the API with q, not search</pre>
+  </section>
+
+  <div class="part-title">Part 3 &mdash; Sharing state</div>
+
+  <section class="topic" id="context" data-nav="Context and prop drilling" data-group="3 · State management" data-level="i">
+    <h2>Context: sharing values without prop drilling <span class="badge i">Intermediate</span></h2>
+    <p>Context lets a provider make a value available to any descendant. It is ideal for slowly changing, app-wide values: theme, locale, current user, feature flags.</p>
+    <pre data-lang="tsx" data-file="AuthContext.tsx">import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+
+type Auth = { user: string | null; login: (u: string) =&gt; void; logout: () =&gt; void };
+const AuthContext = createContext&lt;Auth | null&gt;(null);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState&lt;string | null&gt;(null);
+  const value = useMemo(() =&gt; ({ user, login: setUser, logout: () =&gt; setUser(null) }), [user]);   // stable identity
+  return &lt;AuthContext.Provider value={value}&gt;{children}&lt;/AuthContext.Provider&gt;;
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used inside &lt;AuthProvider&gt;');
+  return ctx;
+}</pre>
+    <div class="warn"><b>Context is not a state manager for fast-changing data</b>Every consumer re-renders when the provider value changes. Split contexts (state vs dispatch), keep values stable with <code>useMemo</code>, or use a store with selectors for frequently changing data.</div>
+  </section>
+
+  <section class="topic" id="state-mgmt" data-nav="State management options" data-group="3 · State management" data-level="i">
+    <h2>Choosing a state-management approach <span class="badge i">Intermediate</span></h2>
+    <p>Most "state management" problems are really <b>server state</b> (data from an API) or <b>URL state</b>. Separate the kinds of state first:</p>
+    <div class="tblwrap"><table><tr><th>Kind of state</th><th>Where it should live</th><th>Tool</th></tr>
+      <tr><td><b>Local UI state</b> (open/closed, input text)</td><td>The component</td><td><code>useState</code>, <code>useReducer</code></td></tr>
+      <tr><td><b>Shared UI state</b> (theme, sidebar, modal)</td><td>Common parent or context</td><td>Context, <b>Zustand</b>, Jotai, Redux Toolkit</td></tr>
+      <tr><td><b>Server state</b> (products, orders)</td><td>A cache keyed by query</td><td><b>TanStack Query</b>, SWR, RTK Query, framework loaders</td></tr>
+      <tr><td><b>URL state</b> (filters, page, selected id)</td><td>The URL</td><td>React Router search params</td></tr>
+      <tr><td><b>Form state</b></td><td>The form</td><td>React Hook Form, Formik, native <code>FormData</code>/actions</td></tr></table></div>
+    <pre data-lang="ts" data-file="store.ts">// Zustand: tiny global store with selectors (components re-render only for the slice they read)
+import { create } from 'zustand';
+
+type CartState = { items: { id: number; qty: number }[]; add: (id: number) =&gt; void; clear: () =&gt; void };
+export const useCart = create&lt;CartState&gt;(set =&gt; ({
+  items: [],
+  add: id =&gt; set(s =&gt; ({ items: s.items.some(i =&gt; i.id === id)
+      ? s.items.map(i =&gt; i.id === id ? { ...i, qty: i.qty + 1 } : i)
+      : [...s.items, { id, qty: 1 }] })),
+  clear: () =&gt; set({ items: [] }),
+}));
+
+// in a component:  const count = useCart(s =&gt; s.items.length);</pre>
+    <div class="tip"><b>Redux in one line</b>A single store, plain actions, pure reducers and a one-way loop (view &rarr; action &rarr; reducer &rarr; store &rarr; view). Use <b>Redux Toolkit</b> (<code>createSlice</code>) today; it removes the old boilerplate and includes Immer and async thunks. Pick it for large apps needing strict structure and devtools time-travel.</div>
+  </section>
+
+  <div class="part-title">Part 4 &mdash; Routing, data and forms</div>
+
+  <section class="topic" id="routing" data-nav="Routing with React Router" data-group="4 · Routing & data" data-level="i">
+    <h2>Client-side routing with React Router <span class="badge i">Intermediate</span></h2>
+    <p>A SPA has one HTML page; the router maps URLs to components using the History API (no full page reload). It also handles nested layouts, dynamic params, redirects, and lazy loading.</p>
+    <pre data-lang="tsx" data-file="router.tsx">import { createBrowserRouter, RouterProvider, Outlet, Link, NavLink, useParams, useNavigate,
+         useSearchParams, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+
+const Admin = lazy(() =&gt; import('./pages/Admin'));            // code-split route
+
+function Layout() {
+  return (&lt;&gt;
+    &lt;nav&gt;&lt;NavLink to="/"&gt;Home&lt;/NavLink&gt; &lt;NavLink to="/products"&gt;Products&lt;/NavLink&gt;&lt;/nav&gt;
+    &lt;Outlet /&gt;                                                {/* child route renders here */}
+  &lt;/&gt;);
+}
+
+function ProductPage() {
+  const { id } = useParams();                                 // /products/42 -&gt; "42"
+  const [sp, setSp] = useSearchParams();                      // ?tab=reviews
+  const navigate = useNavigate();
+  return &lt;button onClick={() =&gt; navigate('/products')}&gt;Back (id {id}, tab {sp.get('tab')})&lt;/button&gt;;
+}
+
+function RequireAuth({ children }: { children: JSX.Element }) {
+  const { user } = useAuth();
+  return user ? children : &lt;Navigate to="/login" replace /&gt;;       // route guard
+}
+
+const router = createBrowserRouter([
+  { path: '/', element: &lt;Layout /&gt;, errorElement: &lt;p&gt;Something went wrong&lt;/p&gt;, children: [
+      { index: true, element: &lt;Home /&gt; },
+      { path: 'products', element: &lt;ProductList /&gt; },
+      { path: 'products/:id', element: &lt;ProductPage /&gt;,
+        loader: ({ params }) =&gt; fetch(`/api/products/${params.id}`) },       // data loading before render
+      { path: 'admin', element: &lt;RequireAuth&gt;&lt;Suspense fallback="Loading..."&gt;&lt;Admin /&gt;&lt;/Suspense&gt;&lt;/RequireAuth&gt; },
+      { path: '*', element: &lt;p&gt;404&lt;/p&gt; },
+  ]},
+]);
+
+export default function App() { return &lt;RouterProvider router={router} /&gt;; }</pre>
+    <div class="tblwrap"><table><tr><th>Concept</th><th>Detail</th></tr>
+      <tr><td><code>&lt;Link&gt;</code> vs <code>&lt;a&gt;</code></td><td>Link navigates without reloading the page; <code>NavLink</code> adds an active class</td></tr>
+      <tr><td>Nested routes + <code>Outlet</code></td><td>Layouts persist while children swap</td></tr>
+      <tr><td>Params and search params</td><td><code>/products/:id</code> via <code>useParams</code>; filters in <code>useSearchParams</code> keep pages shareable</td></tr>
+      <tr><td>History vs Hash</td><td>Browser (History API) routing needs the server to return <code>index.html</code> for unknown paths; hash routing (<code>/#/x</code>) does not</td></tr>
+      <tr><td>Guards</td><td>Redirect in a wrapper component or loader; the server must still enforce authorisation</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="data-fetching" data-nav="Data fetching with TanStack Query" data-group="4 · Routing & data" data-level="i">
+    <h2>Data fetching and server state <span class="badge i">Intermediate</span></h2>
+    <p>Fetching in effects works but you must handle loading, errors, caching, retries, de-duplication, race conditions and refetching yourself. <b>TanStack Query</b> does it declaratively.</p>
+    <pre data-lang="tsx" data-file="products.tsx">import { QueryClient, QueryClientProvider, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+const qc = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: 2 } } });
+// &lt;QueryClientProvider client={qc}&gt;&lt;App /&gt;&lt;/QueryClientProvider&gt;
+
+const getProducts = async (q: string): Promise&lt;Product[]&gt; =&gt; {
+  const r = await fetch(`/api/products?q=${encodeURIComponent(q)}`);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+};
+
+export function Products({ q }: { q: string }) {
+  const { data, isPending, isError, error, refetch } = useQuery({ queryKey: ['products', q], queryFn: () =&gt; getProducts(q) });
+  const queryClient = useQueryClient();
+  const add = useMutation({
+    mutationFn: (p: NewProduct) =&gt; fetch('/api/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }),
+    onSuccess: () =&gt; queryClient.invalidateQueries({ queryKey: ['products'] }),     // refetch the list
+  });
+
+  if (isPending) return &lt;p&gt;Loading...&lt;/p&gt;;
+  if (isError) return &lt;p&gt;{error.message} &lt;button onClick={() =&gt; refetch()}&gt;Retry&lt;/button&gt;&lt;/p&gt;;
+  return &lt;ul&gt;{data.map(p =&gt; &lt;li key={p.id}&gt;{p.name}&lt;/li&gt;)}&lt;/ul&gt;;
+}</pre>
+    <div class="tip"><b>What the cache gives you</b>Instant UI from cached data while a background refetch runs (stale-while-revalidate), request de-duplication, retries with back-off, pagination/infinite scroll helpers, optimistic updates, and refetch on focus/reconnect. The <code>queryKey</code> identifies the data; include every variable the query depends on.</div>
+    <div class="warn"><b>Token storage</b>Prefer HttpOnly, Secure, SameSite cookies for session tokens. A JWT in <code>localStorage</code> is readable by any XSS payload. See the AngularJS guide's storage section: the same trade-offs apply to any SPA.</div>
+  </section>
+
+  <section class="topic" id="forms" data-nav="Forms and validation" data-group="4 · Routing & data" data-level="i">
+    <h2>Forms and validation <span class="badge i">Intermediate</span></h2>
+    <pre data-lang="tsx" data-file="LoginForm.tsx">import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const schema = z.object({
+  email: z.string().email('Enter a valid email'),
+  password: z.string().min(8, 'At least 8 characters'),
+});
+type Form = z.infer&lt;typeof schema&gt;;
+
+export function LoginForm({ onLogin }: { onLogin: (f: Form) =&gt; Promise&lt;void&gt; }) {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm&lt;Form&gt;({ resolver: zodResolver(schema) });
+  return (
+    &lt;form onSubmit={handleSubmit(onLogin)} noValidate&gt;
+      &lt;label&gt;Email &lt;input type="email" {...register('email')} /&gt;&lt;/label&gt;
+      {errors.email &amp;&amp; &lt;p role="alert"&gt;{errors.email.message}&lt;/p&gt;}
+      &lt;label&gt;Password &lt;input type="password" {...register('password')} /&gt;&lt;/label&gt;
+      {errors.password &amp;&amp; &lt;p role="alert"&gt;{errors.password.message}&lt;/p&gt;}
+      &lt;button disabled={isSubmitting}&gt;Sign in&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</pre>
+    <ul><li><b>Controlled</b> inputs re-render on every keystroke; <b>React Hook Form</b> uses uncontrolled inputs for speed.</li><li>One <b>schema</b> (Zod/Yup) can validate both client and server input and infer the TypeScript type.</li><li>Always validate again on the server: client validation is for user experience, not security.</li><li>Accessibility: label every input, link errors with <code>aria-describedby</code>, announce them with <code>role="alert"</code>.</li></ul>
+  </section>
+
+  <div class="part-title">Part 5 &mdash; Performance, testing and build</div>
+
+  <section class="topic" id="performance" data-nav="Performance: memo, splitting, profiling" data-group="5 · Quality" data-level="a">
+    <h2>Performance <span class="badge a">Advanced</span></h2>
+    <p>React is fast by default. A component re-renders when its state changes, its parent re-renders, or a context it reads changes. Re-rendering is cheap unless the work is large; <b>measure first</b> with the React DevTools Profiler.</p>
+    <div class="tblwrap"><table><tr><th>Technique</th><th>Use when</th></tr>
+      <tr><td>Move state down / lift content up</td><td>Only a small part needs the changing state; pass the rest as <code>children</code></td></tr>
+      <tr><td><code>React.memo(Component)</code></td><td>A child re-renders with identical props and its render is expensive. Needs stable props (<code>useMemo</code>/<code>useCallback</code>)</td></tr>
+      <tr><td><code>useMemo</code> / <code>useCallback</code></td><td>Expensive calculations; stable references for memoised children or effect deps</td></tr>
+      <tr><td>Virtualised lists</td><td>Thousands of rows: render only visible ones (<code>react-window</code>, TanStack Virtual)</td></tr>
+      <tr><td>Code splitting</td><td><code>lazy()</code> + <code>Suspense</code> per route; dynamic <code>import()</code> for heavy libraries</td></tr>
+      <tr><td><code>useTransition</code> / <code>useDeferredValue</code></td><td>Keep typing responsive while a heavy list updates</td></tr>
+      <tr><td>Stable <code>key</code>s, avoid inline object props to memoised children</td><td>Preserve DOM and state, avoid needless work</td></tr>
+      <tr><td>Bundle hygiene</td><td>Analyse bundle size (<code>vite-bundle-visualizer</code>), tree-shake, import only what you use, compress, cache with hashed filenames</td></tr>
+      <tr><td><b>React Compiler</b></td><td>Newer build step that auto-memoises; reduces manual <code>useMemo</code>/<code>useCallback</code></td></tr></table></div>
+    <pre data-lang="tsx" data-file="memo.tsx">const Row = memo(function Row({ item, onSelect }: { item: Item; onSelect: (id: number) =&gt; void }) {
+  return &lt;li onClick={() =&gt; onSelect(item.id)}&gt;{item.name}&lt;/li&gt;;
+});
+
+function List({ items }: { items: Item[] }) {
+  const [selected, setSelected] = useState(0);
+  const onSelect = useCallback((id: number) =&gt; setSelected(id), []);   // same function every render -&gt; Row can skip
+  return &lt;ul&gt;{items.map(i =&gt; &lt;Row key={i.id} item={i} onSelect={onSelect} /&gt;)}&lt;/ul&gt;;
+}</pre>
+    <div class="warn"><b>Premature memoisation</b>Wrapping everything in <code>memo</code>/<code>useMemo</code> adds code and comparison cost and can hide bugs. Profile, find the slow commit, then fix that one.</div>
+  </section>
+
+  <section class="topic" id="testing" data-nav="Testing React" data-group="5 · Quality" data-level="i">
+    <h2>Testing: Vitest/Jest and React Testing Library <span class="badge i">Intermediate</span></h2>
+    <p><b>React Testing Library</b> tests behaviour the way a user experiences it: find elements by role/label/text, interact, assert on what is visible. Avoid asserting on internal state or implementation details.</p>
+    <pre data-lang="tsx" data-file="Counter.test.tsx">import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+import { Counter } from './Counter';
+
+describe('Counter', () =&gt; {
+  it('increments when clicked', async () =&gt; {
+    const user = userEvent.setup();
+    render(&lt;Counter /&gt;);
+    await user.click(screen.getByRole('button', { name: /clicked 0 times/i }));
+    expect(screen.getByRole('button')).toHaveTextContent('Clicked 1 times');
+  });
+
+  it('loads products from the API', async () =&gt; {
+    vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify([{ id: 1, name: 'Mug' }])));
+    render(&lt;Products q="mug" /&gt;);
+    expect(await screen.findByText('Mug')).toBeInTheDocument();     // findBy waits; getBy is immediate; queryBy returns null
+  });
+});</pre>
+    <div class="tblwrap"><table><tr><th>Layer</th><th>Tool</th></tr>
+      <tr><td>Unit and component</td><td>Vitest (Vite projects) or Jest + Testing Library</td></tr>
+      <tr><td>API mocking</td><td>MSW (Mock Service Worker) intercepts network calls realistically</td></tr>
+      <tr><td>End-to-end</td><td>Playwright or Cypress against a running app</td></tr>
+      <tr><td>Accessibility</td><td>jest-axe / axe-core, eslint-plugin-jsx-a11y</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="build" data-nav="Build, env and deployment" data-group="5 · Quality" data-level="i">
+    <h2>Build tools, environment variables and deployment <span class="badge i">Intermediate</span></h2>
+    <pre data-lang="ts" data-file="vite.config.ts">import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  server: { proxy: { '/api': 'http://localhost:5000' } },        // avoid CORS in development
+  build: { sourcemap: true, rollupOptions: { output: { manualChunks: { vendor: ['react', 'react-dom'] } } } },
+});</pre>
+    <ul>
+      <li><b>Env variables:</b> in Vite only names starting with <code>VITE_</code> reach the browser (<code>import.meta.env.VITE_API_URL</code>). Anything in the bundle is public: never put secrets there.</li>
+      <li><b>Output:</b> <code>dist/</code> static files with hashed names. Host on any static host / CDN (Azure Static Web Apps, S3 + CloudFront, Netlify, nginx). Serve <code>index.html</code> for unknown routes (SPA fallback) and cache hashed assets for a year, <code>index.html</code> never.</li>
+      <li><b>Quality gates:</b> ESLint (with hooks and a11y rules), Prettier, <code>tsc --noEmit</code>, tests in CI before the build.</li>
+      <li><b>Frameworks:</b> Next.js (SSR/SSG/RSC, file routing), Remix / React Router framework mode, Gatsby (static). Choose a framework when SEO, first-paint speed or server logic matter.</li>
+    </ul>
+    <pre data-lang="yaml" data-file=".github/workflows/web.yml">name: web
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm test -- --run
+      - run: npm run build</pre>
+  </section>
+
+  <section class="topic" id="security-a11y" data-nav="Security and accessibility" data-group="5 · Quality" data-level="i">
+    <h2>Security and accessibility essentials <span class="badge i">Intermediate</span></h2>
+    <div class="grid2">
+      <div class="card"><h4>Security</h4><ul><li>JSX escapes output; avoid <code>dangerouslySetInnerHTML</code> (sanitise with DOMPurify if unavoidable)</li><li>Validate <code>href</code>/<code>src</code> from users (<code>javascript:</code> URLs)</li><li>Tokens: HttpOnly cookies preferred; never secrets in the bundle</li><li>Add CSP headers; keep dependencies updated (<code>npm audit</code>)</li><li>Authorisation is enforced on the API, not by hiding buttons</li></ul></div>
+      <div class="card"><h4>Accessibility</h4><ul><li>Semantic HTML first (<code>button</code>, <code>nav</code>, <code>label</code>)</li><li>Keyboard operable; visible focus; manage focus on route/modal change</li><li>Alt text, sufficient contrast, ARIA only when native HTML cannot do it</li><li>Announce async errors and status (<code>role="alert"</code>, <code>aria-live</code>)</li></ul></div>
+    </div>
+  </section>
+
+  <div class="part-title">Part 6 &mdash; Coming from AngularJS, interview prep</div>
+
+  <section class="topic" id="from-angularjs" data-nav="AngularJS to React mapping" data-group="6 · Resources" data-level="i">
+    <h2>If you know AngularJS 1.x: the mapping <span class="badge i">Bridge</span></h2>
+    <div class="tblwrap"><table><tr><th>AngularJS 1.x</th><th>React</th><th>Key difference</th></tr>
+      <tr><td><code>$scope</code> / controllerAs</td><td><code>useState</code> + props</td><td>No two-way magic; state is immutable and flows down</td></tr>
+      <tr><td>Two-way <code>ng-model</code></td><td>Controlled input: <code>value</code> + <code>onChange</code></td><td>Explicit updates; no digest cycle</td></tr>
+      <tr><td>Digest cycle / <code>$watch</code></td><td>Re-render + <code>useEffect</code></td><td>Render is pure; effects are explicit and dependency-based</td></tr>
+      <tr><td><code>ng-repeat</code> + <code>track by</code></td><td><code>.map()</code> + <code>key</code></td><td>Plain JavaScript instead of template directives</td></tr>
+      <tr><td><code>ng-if</code> / <code>ng-show</code></td><td><code>cond &amp;&amp; &lt;X/&gt;</code> / CSS class or style</td><td>JSX is JS expressions</td></tr>
+      <tr><td>Components with <code>bindings</code> (<code>&lt;</code>, <code>&amp;</code>)</td><td>Props and callback props</td><td>Same one-way idea, enforced everywhere</td></tr>
+      <tr><td>Services / factories + DI</td><td>Modules, custom hooks, context</td><td>No injector; import what you need</td></tr>
+      <tr><td><code>$http</code> + interceptors</td><td><code>fetch</code>/axios + TanStack Query</td><td>Caching and states handled by the library</td></tr>
+      <tr><td>ngRoute / ui-router</td><td>React Router</td><td>Routes are components/objects, not config blocks</td></tr>
+      <tr><td>Filters</td><td>Plain functions</td><td>No filter registry</td></tr>
+      <tr><td>Directives (DOM manipulation)</td><td>Components, refs, effects</td><td>Avoid touching the DOM directly</td></tr>
+      <tr><td>Gulp/Grunt/Bower</td><td>Vite + npm</td><td>ES modules and fast dev server</td></tr></table></div>
+    <div class="note"><b>Migrating gradually</b>You can run AngularJS and React side by side (mount React islands in AngularJS views, or wrap them in a component) and migrate route by route behind a shared API layer, rather than a big-bang rewrite.</div>
+  </section>
+
+  <section class="topic" id="quiz" data-nav="Self-test quiz" data-group="6 · Resources" data-level="b">
+    <h2>Self-test quiz <span class="badge b">Practice</span></h2>
+    <p>Ten questions. Pick an answer and read the explanation.</p>
+    <div class="lab quiz" data-title="React quiz">
+      <script type="application/json">
+      [
+        {"q":"Why must you not mutate state directly (state.items.push(x))?","o":["It is slower","React compares references, so it may not detect the change and will not re-render","It throws an error","It breaks JSX"],"a":1,"e":"React uses Object.is on the state value. Mutating in place keeps the same reference. Create a new array/object instead."},
+        {"q":"A handler runs setCount(count + 1) three times with count = 0. What is count after the render?","o":["3","1","0","Undefined"],"a":1,"e":"All three calls use the same snapshot (count = 0) and queue 'set to 1'. Use setCount(c => c + 1) to add 3."},
+        {"q":"What does an empty dependency array, useEffect(fn, []), mean?","o":["Run on every render","Run once after the first render (and clean up on unmount)","Never run","Run before render"],"a":1,"e":"No reactive values to track, so the effect runs after mount only. (In Strict Mode dev it runs mount, cleanup, mount once.)"},
+        {"q":"What is the problem with key={index} in a list that can be reordered?","o":["Nothing","React may attach the wrong state/DOM to the wrong item","Keys must be strings","It is a syntax error"],"a":1,"e":"Position-based keys change meaning when items move or are inserted, causing wrong preserved state and extra DOM work. Use a stable id."},
+        {"q":"Where should an API call that runs because the user clicked 'Save' live?","o":["In useEffect","In the event handler (or a mutation)","In the render body","In a context"],"a":1,"e":"Effects are for synchronising with something. User-triggered work belongs in the event handler."},
+        {"q":"Which statement about hooks is true?","o":["You can call them in loops","You can call them inside if-statements","Call them only at the top level of components/custom hooks","They work in class components"],"a":2,"e":"React tracks hooks by call order, so the order must be the same each render."},
+        {"q":"Best tool for caching and refetching server data?","o":["useState + useEffect only","TanStack Query / SWR","Context","localStorage"],"a":1,"e":"Server state has its own concerns (caching, staleness, retries, dedup). A data library handles them."},
+        {"q":"When is React.memo useful?","o":["Always","When a child re-renders with the same props and its render is expensive (and props are stable)","To fetch data","To avoid keys"],"a":1,"e":"memo skips re-rendering when props are shallow-equal. Unstable props (new objects/functions each render) defeat it."},
+        {"q":"How do you reset a component's state when a prop like userId changes?","o":["useEffect that calls every setter","Give the component key={userId}","Use a ref","Reload the page"],"a":1,"e":"A different key tells React to unmount and mount a fresh instance with fresh state."},
+        {"q":"A Vite app defines API_SECRET=abc in .env. Is it safe from users?","o":["Yes, it is server side","No: only VITE_ variables are exposed, but anything referenced in client code ends up in the bundle and is public","Yes, it is minified","Yes, if hashed"],"a":1,"e":"Frontend code is public. Keep secrets on a server; the client should only get a short-lived token or public config."}
+      ]
+      </script>
+    </div>
+  </section>
+
+  <section class="topic" id="interview-qa" data-nav="Interview questions & answers" data-group="6 · Resources" data-level="a">
+    <h2>React interview questions <span class="badge a">Prep</span></h2>
+    <p>Filter by topic, expand a question and try to answer it aloud first.</p>
+    <div class="qfilter" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
+      <button class="btn primary" data-f="all" type="button">All</button><button class="btn" data-f="core" type="button">Core</button><button class="btn" data-f="hooks" type="button">Hooks</button><button class="btn" data-f="state" type="button">State &amp; data</button><button class="btn" data-f="perf" type="button">Performance</button><button class="btn" data-f="ecosystem" type="button">Ecosystem</button>
+    </div>
+
+    <details class="qa" data-tag="core"><summary>What is the virtual DOM and reconciliation? <span class="qtag">core</span></summary><div class="dbody"><p>React builds a lightweight tree of elements for each render, diffs it against the previous one (keys identify items; different element types replace subtrees) and applies only the necessary changes to the real DOM. It is an implementation detail that makes declarative UI efficient, not a guarantee of being faster than hand-tuned DOM code.</p></div></details>
+    <details class="qa" data-tag="core"><summary>Props vs state? <span class="qtag">core</span></summary><div class="dbody"><p>Props are inputs from the parent, read-only. State is owned by the component, changes over time and triggers a re-render. A child's props are often the parent's state.</p></div></details>
+    <details class="qa" data-tag="core"><summary>Controlled vs uncontrolled components? <span class="qtag">core</span></summary><div class="dbody"><p>Controlled: React state is the single source of truth (value + onChange). Uncontrolled: the DOM holds the value and you read it with a ref or FormData. Controlled enables live validation; uncontrolled is simpler and faster for big forms.</p></div></details>
+    <details class="qa" data-tag="core"><summary>Function vs class components? <span class="qtag">core</span></summary><div class="dbody"><p>Function components with hooks are the standard. Class components (lifecycle methods, this.setState) still work and are needed for error boundaries, which have no hook equivalent (use <code>react-error-boundary</code>).</p></div></details>
+    <details class="qa" data-tag="core"><summary>What are error boundaries? <span class="qtag">core</span></summary><div class="dbody"><p>Components that catch render errors in their subtree and show a fallback. They do not catch event-handler, async or server errors.</p></div></details>
+    <details class="qa" data-tag="core"><summary>What are Fragments and Portals? <span class="qtag">core</span></summary><div class="dbody"><p>Fragments group children without an extra DOM node. Portals render children into a different DOM node (modals, tooltips) while keeping React tree behaviour such as context and event bubbling.</p></div></details>
+
+    <details class="qa" data-tag="hooks"><summary>Explain useEffect and its cleanup. <span class="qtag">hooks</span></summary><div class="dbody"><p>It runs after render to synchronise with an external system, re-running when dependencies change. The returned cleanup runs before the next effect and on unmount to remove listeners, timers and subscriptions. Don't use it to derive state or handle events.</p></div></details>
+    <details class="qa" data-tag="hooks"><summary>useMemo vs useCallback vs React.memo? <span class="qtag">hooks</span></summary><div class="dbody"><p>useMemo caches a computed value; useCallback caches a function (shorthand for useMemo returning a function); React.memo skips re-rendering a component if props are shallow-equal. They are performance tools used after measuring.</p></div></details>
+    <details class="qa" data-tag="hooks"><summary>What are the Rules of Hooks and why do they exist? <span class="qtag">hooks</span></summary><div class="dbody"><p>Only call hooks at the top level and from React functions. React associates state with hooks by call order, so conditional or looped calls would shift that mapping and corrupt state.</p></div></details>
+    <details class="qa" data-tag="hooks"><summary>How is useRef different from useState? <span class="qtag">hooks</span></summary><div class="dbody"><p>Both persist across renders, but changing ref.current does not trigger a re-render. Use refs for DOM nodes, timer ids and values not shown in the UI; use state for anything that affects rendering.</p></div></details>
+    <details class="qa" data-tag="hooks"><summary>Why does my effect run twice in development? <span class="qtag">hooks</span></summary><div class="dbody"><p>StrictMode intentionally mounts, unmounts and remounts to reveal effects without proper cleanup. It happens only in development and is a prompt to make the effect idempotent with a cleanup.</p></div></details>
+
+    <details class="qa" data-tag="state"><summary>How do you avoid prop drilling? <span class="qtag">state</span></summary><div class="dbody"><p>Composition (pass children/elements), context for app-wide values, or a store (Zustand/Redux) for shared client state. Keep server data in a query cache rather than copying it into global state.</p></div></details>
+    <details class="qa" data-tag="state"><summary>Redux vs Context vs Zustand? <span class="qtag">state</span></summary><div class="dbody"><p>Context is a delivery mechanism, good for low-frequency values. Zustand is a small store with selector-based subscriptions. Redux Toolkit adds structure, devtools and middleware for large teams. Choose the simplest that fits.</p></div></details>
+    <details class="qa" data-tag="state"><summary>How do you handle API data, loading and errors? <span class="qtag">state</span></summary><div class="dbody"><p>Use TanStack Query (or a framework loader): query keys, loading/error states, caching with staleTime, retries and invalidation after mutations. With plain effects use AbortController and handle race conditions.</p></div></details>
+    <details class="qa" data-tag="state"><summary>How would you implement authentication in a React SPA? <span class="qtag">state</span></summary><div class="dbody"><p>Prefer OIDC/OAuth2 with PKCE (e.g. MSAL, Auth0) or a backend-for-frontend that sets HttpOnly cookies. Keep auth state in context, add route guards, attach tokens in an API client, handle 401 with refresh or redirect, and enforce permissions on the server.</p></div></details>
+
+    <details class="qa" data-tag="perf"><summary>How do you diagnose and fix a slow React screen? <span class="qtag">perf</span></summary><div class="dbody"><p>Profile with React DevTools (which components render and why), check for unnecessary state at a high level, large lists (virtualise), expensive computations (memo), huge bundles (code split), and network waterfalls (parallel requests/prefetch). Fix the measured bottleneck.</p></div></details>
+    <details class="qa" data-tag="perf"><summary>Why does a component re-render? <span class="qtag">perf</span></summary><div class="dbody"><p>Its state changed, its parent re-rendered (children re-render by default even with the same props), or a context it consumes changed. Memoisation and moving state down are the usual remedies.</p></div></details>
+    <details class="qa" data-tag="perf"><summary>What is code splitting? <span class="qtag">perf</span></summary><div class="dbody"><p>Loading JavaScript on demand. With <code>lazy(() =&gt; import('./Page'))</code> and Suspense, each route or heavy feature becomes its own chunk, shrinking the initial bundle.</p></div></details>
+
+    <details class="qa" data-tag="ecosystem"><summary>CSR vs SSR vs SSG, and where does Next.js fit? <span class="qtag">ecosystem</span></summary><div class="dbody"><p>CSR renders in the browser (simple, poorer SEO/first paint). SSR renders HTML per request; SSG at build time; both hydrate on the client. Next.js provides routing, data loading, SSR/SSG/ISR and React Server Components on top of React.</p></div></details>
+    <details class="qa" data-tag="ecosystem"><summary>How do you test React components? <span class="qtag">ecosystem</span></summary><div class="dbody"><p>Vitest/Jest with React Testing Library, querying by role and text and simulating users with user-event, MSW to mock the network, Playwright for end-to-end. Test behaviour, not implementation.</p></div></details>
+    <details class="qa" data-tag="ecosystem"><summary>React vs Angular? <span class="qtag">ecosystem</span></summary><div class="dbody"><p>React is a focused library: you choose routing, state and forms yourself (flexible, minimal). Angular is an opinionated framework with DI, RxJS, router, forms and CLI built in (consistent structure, steeper curve). Both are valid; team size, conventions and existing code decide.</p></div></details>
+  </section>
+
+  <section class="topic" id="next" data-nav="Mini project and next steps" data-group="6 · Resources" data-level="b">
+    <h2>Mini project and next steps <span class="badge b">Roadmap</span></h2>
+    <ol class="steps">
+      <li>Scaffold with Vite (react-ts) and build a product list with a search box (debounced) and a detail route.</li>
+      <li>Fetch from your ASP.NET Core Web API with TanStack Query; add create/edit with React Hook Form + Zod; invalidate the list on success.</li>
+      <li>Add an AuthProvider with a login page, a route guard and an API client that attaches the token.</li>
+      <li>Write 5 Testing Library tests, lazy-load the admin route, run the Profiler and the bundle visualiser.</li>
+      <li>Deploy the <code>dist</code> folder to a static host with an SPA fallback, behind CI.</li>
+    </ol>
+    <p><small>Companion guides: <a href="AngularJS-Concepts-Guide.html">AngularJS</a> &middot; <a href="ASP.NET-Core-Web-API-Guide.html">Web API</a> &middot; <a href="Networking-HTTP-Guide.html">Networking &amp; HTTP</a> &middot; <a href="General-Delivery-Guide.html">Delivery</a></small></p>
+  </section>
+
+</main>
+</div>
+
+<script src="assets/guide.js"></script>
+<script src="assets/concepts.js"></script>
+<script src="assets/react.js"></script>
+</body>
+</html>
