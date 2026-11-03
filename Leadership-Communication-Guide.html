@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leadership &amp; Communication - Feedback, Conflict, Mentoring, Influence, STAR</title>
+<link rel="stylesheet" href="assets/guide.css">
+<style>
+:root{--accent:#be185d;--accent-soft:#fce7f1}
+body.dark{--accent:#f472b6;--accent-soft:#3a1428}
+.hero{background:linear-gradient(135deg,#5b0a2f,#be185d 55%,#7c5cd8)}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="brand"><h1>Leadership &amp; Communication</h1><small>Writing &rarr; Meetings &rarr; Feedback &rarr; Conflict &rarr; Leading people &rarr; Influence &rarr; Interviews</small></div>
+  <div class="search"><input id="search" type="search" placeholder="Search concepts ( press / )" autocomplete="off"><div id="search-results"></div></div>
+  <nav id="nav"></nav>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    <button id="menu-btn" type="button">Menu</button>
+    <div class="prog"><i id="progress"></i></div>
+    <button id="expand-all" type="button">Expand all</button>
+    <button id="collapse-all" type="button">Collapse all</button>
+    <button id="theme-btn" type="button">Dark / Light</button>
+  </div>
+
+  <main id="content">
+
+  <div class="hero" id="top">
+    <h1>Leadership &amp; Communication &ndash; The Soft-Skills Guide for Engineers</h1>
+    <p>The skills that decide who gets promoted and who gets the offer: <b>writing and speaking clearly</b>, running <b>meetings</b>, giving and receiving <b>feedback</b>, handling <b>conflict</b> and <b>negotiation</b>, <b>mentoring</b> and <b>delegating</b>, building <b>psychological safety</b>, making and communicating <b>decisions</b>, <b>influencing without authority</b>, and answering behavioural questions with <b>STAR</b>. Includes three live labs and a quiz.</p>
+    <div class="chips"><span>Writing &middot; Email &middot; Slack</span><span>Meetings &middot; 1:1s</span><span>SBI feedback</span><span>Conflict &middot; Negotiation</span><span>Mentoring &middot; Delegation</span><span>Influence &middot; Stakeholders</span><span>STAR stories</span></div>
+  </div>
+
+  <section class="topic" id="how-to-use" data-nav="How to use this guide" data-group="Start here">
+    <h2>How to use this guide</h2>
+    <div class="grid3">
+      <div class="card"><h4>1. Read it as a toolkit</h4><p>Each topic gives a <i>framework</i> (SBI, STAR, BLUF, Eisenhower, DACI, GROW), a <i>when to use it</i> and an <i>example wording</i> you can adapt.</p></div>
+      <div class="card"><h4>2. Practise in the labs</h4><p>A STAR story checker, an SBI feedback composer and an Eisenhower triage board. Replace the sample text with your own situations.</p></div>
+      <div class="card"><h4>3. Rehearse aloud</h4><p>Part 6 has a quiz and behavioural questions. Soft skills improve by saying things aloud and getting feedback, not by reading alone.</p></div>
+    </div>
+    <h3>Roadmap of this guide</h3>
+    <div class="diagram"><div class="dtitle">From clear messages to leading others</div>
+      <div class="flow">
+        <div class="node ok">1. Communicate<small>writing, listening,<br>meetings</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">2. Technical comms<small>docs, ADRs, reviews,<br>status, escalation</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">3. Hard talks<small>feedback, conflict,<br>negotiation, "no"</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">4. Lead people<small>mentoring, delegation,<br>safety, decisions</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">5. Influence<small>time, stakeholders,<br>career growth</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">6. Interview<small>STAR, quiz,<br>questions</small></div>
+      </div>
+    </div>
+    <div class="note"><b>Why engineers need this</b>Seniority is mostly about scope of influence. A senior engineer who cannot explain a trade-off, disagree constructively or bring a team along is limited to what they can personally type. Interviews for mid and senior roles weigh these skills as much as code.</div>
+  </section>
+
+  <div class="part-title">Part 1 &mdash; Communication fundamentals</div>
+
+  <section class="topic" id="comm-model" data-nav="Communication basics and audience" data-group="1 · Communication" data-level="b">
+    <h2>What good communication actually is <span class="badge b">Basic</span></h2>
+    <p>Communication succeeded only if the <b>receiver understood and could act</b>. Sending the message is not the goal. Most failures come from an unclear purpose, the wrong level of detail for the audience, or the wrong channel.</p>
+    <div class="grid2">
+      <div class="card"><h4>Before you write or speak, answer 3 questions</h4><ul><li><b>Who</b> is the audience and what do they already know?</li><li><b>What</b> do I want them to know, decide or do?</li><li><b>When</b> do they need it, and which channel fits?</li></ul></div>
+      <div class="card"><h4>Match detail to audience</h4><ul><li><b>Executive</b>: outcome, risk, cost, decision needed</li><li><b>Product owner</b>: scope, trade-offs, dates, options</li><li><b>Peer developer</b>: design, edge cases, code</li><li><b>Customer</b>: impact on them, next step, plain words</li></ul></div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Principle</th><th>In practice</th></tr>
+      <tr><td><b>Lead with the point (BLUF)</b></td><td>"Bottom line up front": put the conclusion or request in the first sentence, then the reasoning.</td></tr>
+      <tr><td><b>One message, one purpose</b></td><td>Do not mix an FYI, a decision request and a complaint in the same email.</td></tr>
+      <tr><td><b>Be specific</b></td><td>"By Thursday 5 pm" instead of "soon"; "p95 rose from 300 ms to 900 ms" instead of "it is slower".</td></tr>
+      <tr><td><b>Short words, short sentences</b></td><td>Plain language is a sign of command, not simplicity.</td></tr>
+      <tr><td><b>Confirm understanding</b></td><td>Ask the other person to restate the decision, or send a one-line summary afterwards.</td></tr>
+      <tr><td><b>Assume good intent, check impact</b></td><td>Text lacks tone. Read twice before sending; if emotional, wait.</td></tr></table></div>
+    <div class="tip"><b>BLUF example</b>Weak: "I was looking at the logs from last week and noticed a few things with the queue..." Strong: "<b>Decision needed by Friday:</b> upgrade the queue library (2 days) or accept weekly timeouts. I recommend upgrading. Details below."</div>
+  </section>
+
+  <section class="topic" id="listening" data-nav="Active listening and questions" data-group="1 · Communication" data-level="b">
+    <h2>Active listening and asking good questions <span class="badge b">Basic</span></h2>
+    <p>Listening is the highest-leverage communication skill. People who feel heard cooperate; people who feel dismissed resist even correct ideas.</p>
+    <div class="tblwrap"><table><tr><th>Technique</th><th>What you do</th><th>Example</th></tr>
+      <tr><td><b>Paraphrase</b></td><td>Restate in your own words</td><td>"So the main risk for you is the data migration, not the UI. Is that right?"</td></tr>
+      <tr><td><b>Open questions</b></td><td>Start with what / how / tell me about</td><td>"What would a good outcome look like?"</td></tr>
+      <tr><td><b>Clarifying questions</b></td><td>Make vague words concrete</td><td>"When you say 'fast', is that under one second for 95% of requests?"</td></tr>
+      <tr><td><b>Silence</b></td><td>Wait 3-5 seconds after a question</td><td>Quiet people often add the most valuable point after a pause</td></tr>
+      <tr><td><b>Label emotion</b></td><td>Name what you notice</td><td>"It sounds like the late change is frustrating."</td></tr>
+      <tr><td><b>Five whys</b></td><td>Ask why repeatedly to reach the root</td><td>"Why do you need that report? ... Why monthly?"</td></tr></table></div>
+    <div class="warn"><b>Listening anti-patterns</b>Preparing your reply while the other person talks; interrupting to fix; answering a question that was not asked; checking your phone; jumping to solutions when the person wanted to be heard. Ask: "Do you want ideas, or do you just want me to listen?"</div>
+  </section>
+
+  <section class="topic" id="written" data-nav="Email, chat and async writing" data-group="1 · Communication" data-level="b">
+    <h2>Email, chat and asynchronous writing <span class="badge b">Basic</span></h2>
+    <p>Distributed teams run on writing. A message that stands alone saves several rounds of back-and-forth.</p>
+    <div class="grid2">
+      <div class="card"><h4>A message that stands alone</h4><ul><li><b>Subject / first line</b>: purpose and action ("Decision needed: ...")</li><li><b>Context</b>: two sentences, with links</li><li><b>Ask</b>: exactly what you need, from whom, by when</li><li><b>Options</b> and your recommendation</li><li><b>Next step</b> if no reply</li></ul></div>
+      <div class="card"><h4>Choosing a channel</h4><ul><li><b>Chat</b>: quick, low-stakes, perishable questions</li><li><b>Email / ticket</b>: decisions, audit trail, external parties</li><li><b>Doc / wiki</b>: anything people will search for later</li><li><b>Call</b>: ambiguity, emotion, conflict, complex negotiation</li><li><b>Face to face</b>: sensitive feedback</li></ul></div>
+    </div>
+    <pre data-lang="plain" data-file="good-async-message.txt">Subject: Decision needed by Fri 12 Jun - payment provider timeout
+
+Summary: Checkout fails for ~2% of orders when the payment provider is slow.
+Need: Approval to add a 3 s timeout with one retry (2 dev-days).
+Why now: Black Friday traffic starts in 3 weeks.
+Options:
+  A) Timeout + retry (recommended) - 2 days, removes most failures
+  B) Switch provider - 6 weeks, higher cost
+  C) Do nothing - risk of ~400 failed orders per sale day
+If I do not hear back by Friday I will start option A.
+Details: link to ticket SHOP-482 and the failure graph.</pre>
+    <h3>Synchronous vs asynchronous</h3>
+    <div class="tblwrap"><table><tr><th>Use synchronous (meeting/call) when</th><th>Use asynchronous (doc/message) when</th></tr>
+      <tr><td>Topic is ambiguous or emotional</td><td>Information is being shared, not debated</td></tr>
+      <tr><td>Real-time brainstorming helps</td><td>People are in different time zones</td></tr>
+      <tr><td>Conflict or sensitive feedback</td><td>You want considered, written input from everyone</td></tr>
+      <tr><td>Quick decision needs many voices</td><td>A permanent record is needed</td></tr></table></div>
+    <div class="tip"><b>Chat etiquette</b>Do not send just "hi" and wait. Write "Hi, quick question about X: ... (no rush, reply when free)". Use threads, state urgency honestly, and avoid @here unless it affects everyone.</div>
+  </section>
+
+  <section class="topic" id="meetings" data-nav="Running effective meetings" data-group="1 · Communication" data-level="i">
+    <h2>Running and attending effective meetings <span class="badge i">Intermediate</span></h2>
+    <p>A meeting is expensive: 8 people for one hour is a full working day. Hold one only when it beats a message.</p>
+    <div class="tblwrap"><table><tr><th>Phase</th><th>Do</th></tr>
+      <tr><td><b>Before</b></td><td>State the purpose and desired outcome (decide / inform / brainstorm). Invite only people needed. Share the agenda and pre-reads. Cancel if the purpose is met in writing.</td></tr>
+      <tr><td><b>During</b></td><td>Start on time; assign a note-taker and timekeeper; stick to the agenda; invite quieter people by name; park off-topic items in a "parking lot"; end with decisions, owners and dates.</td></tr>
+      <tr><td><b>After</b></td><td>Send notes within a day: decisions, actions (owner + date), open questions. Notes are what makes the meeting count.</td></tr></table></div>
+    <h3>Meeting types and rhythm</h3>
+    <div class="tblwrap"><table><tr><th>Type</th><th>Goal</th><th>Tip</th></tr>
+      <tr><td>Stand-up</td><td>Sync on progress and blockers</td><td>15 min, focus on the goal, not a status report to a manager</td></tr>
+      <tr><td>Planning / refinement</td><td>Agree scope and clarify items</td><td>Prepare ready items beforehand</td></tr>
+      <tr><td>Design review</td><td>Challenge a proposal</td><td>Send the doc first; discuss options, not people</td></tr>
+      <tr><td>1:1</td><td>Relationship, growth, blockers</td><td>Person's agenda first; weekly or fortnightly</td></tr>
+      <tr><td>Retrospective</td><td>Improve how the team works</td><td>End with 1-2 owned actions</td></tr>
+      <tr><td>Demo / review</td><td>Show working results</td><td>Tell the user story, not the code</td></tr></table></div>
+    <div class="note"><b>Decline politely</b>"I do not think I can add value to this one. Could you send the outcome? I am happy to review the notes or join if my input on X is needed."</div>
+  </section>
+
+  <div class="part-title">Part 2 &mdash; Technical communication</div>
+
+  <section class="topic" id="docs" data-nav="Documentation, RFCs and ADRs" data-group="2 · Technical comms" data-level="i">
+    <h2>Technical writing: README, design docs, RFCs and ADRs <span class="badge i">Intermediate</span></h2>
+    <p>Writing a design down forces clarity, lets people review asynchronously, and preserves the <b>why</b> that code alone cannot show.</p>
+    <div class="tblwrap"><table><tr><th>Document</th><th>Purpose</th><th>Contains</th></tr>
+      <tr><td><b>README</b></td><td>Onboard a new developer in 10 minutes</td><td>What it is, prerequisites, run, test, deploy, contact</td></tr>
+      <tr><td><b>Design doc / RFC</b></td><td>Propose a significant change and gather feedback</td><td>Problem, goals/non-goals, options with trade-offs, recommendation, risks, rollout</td></tr>
+      <tr><td><b>ADR</b> (Architecture Decision Record)</td><td>Record one decision permanently</td><td>Context, decision, consequences, status</td></tr>
+      <tr><td><b>Runbook</b></td><td>Help on-call fix a known problem</td><td>Symptoms, checks, commands, escalation</td></tr>
+      <tr><td><b>Post-incident review</b></td><td>Learn from failures without blame</td><td>Timeline, impact, causes, actions</td></tr></table></div>
+    <pre data-lang="plain" data-file="adr-007-queue.md"># ADR 007: Use a message queue for email sending
+
+Status: Accepted (2026-03-02)
+
+## Context
+Sending email inside the request adds 800 ms and fails the whole order
+when the provider is down.
+
+## Decision
+Publish an "OrderPlaced" message; a background worker sends the email,
+with retries and a dead-letter queue.
+
+## Consequences
++ Faster checkout, resilient to provider outages
+- Eventual consistency; need monitoring on queue depth
+- One more component to operate
+
+## Alternatives considered
+- Synchronous call with retry (rejected: still slows requests)
+- Third-party transactional service only (rejected: no ordering control)</pre>
+    <div class="tip"><b>Good design docs</b>State non-goals, show at least two real options, say what would make you change your mind, and keep it short enough to be read. Ask for specific reviewers and a deadline for comments.</div>
+  </section>
+
+  <section class="topic" id="code-review" data-nav="Code review etiquette" data-group="2 · Technical comms" data-level="i">
+    <h2>Giving and receiving code review feedback <span class="badge i">Intermediate</span></h2>
+    <p>Code review spreads knowledge and keeps quality high, but tone decides whether it builds or damages trust.</p>
+    <div class="grid2">
+      <div class="card"><h4>As a reviewer</h4><ul><li>Review the code, not the person</li><li>Ask questions: "What happens if the list is empty?"</li><li>Label severity: <code>blocker</code>, <code>suggestion</code>, <code>nit</code>, <code>question</code></li><li>Explain <i>why</i> and offer an alternative</li><li>Praise good solutions</li><li>Automate style (linters) so humans review design and risk</li><li>Respond within a working day</li></ul></div>
+      <div class="card"><h4>As an author</h4><ul><li>Keep pull requests small (under about 400 lines)</li><li>Write a description: why, what, how to test, screenshots</li><li>Self-review before requesting</li><li>Assume good intent; thank reviewers</li><li>Reply to every comment (fixed / disagree + reason)</li><li>Do not take it personally; the code is not you</li></ul></div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Instead of</th><th>Say</th></tr>
+      <tr><td>"This is wrong."</td><td>"I think this could return null when the user has no orders. Should we handle that?"</td></tr>
+      <tr><td>"Why did you do it this way?"</td><td>"Help me understand the reason for a static list here. Would a lookup table be easier to extend?"</td></tr>
+      <tr><td>"Obviously you should use a dictionary."</td><td>"suggestion: a dictionary keyed by id would make this O(1) instead of scanning the list."</td></tr></table></div>
+    <div class="warn"><b>Disagreement in review</b>If two comment rounds do not converge, stop typing and talk (call or pair). Agree on principle or let the owner decide. Do not let a PR sit for days over a style preference.</div>
+  </section>
+
+  <section class="topic" id="status" data-nav="Status updates and escalation" data-group="2 · Technical comms" data-level="i">
+    <h2>Status updates, bad news and escalation <span class="badge i">Intermediate</span></h2>
+    <p>Stakeholders do not mind problems; they mind <b>surprises</b>. Share risk early, with options.</p>
+    <div class="tblwrap"><table><tr><th>Status colour</th><th>Meaning</th><th>Example summary</th></tr>
+      <tr><td><b>Green</b></td><td>On track, no help needed</td><td>"Login rework: 80% done, release on Thursday."</td></tr>
+      <tr><td><b>Amber</b></td><td>At risk, recovery plan exists, awareness requested</td><td>"Search is 3 days behind due to API change. Plan: drop facet filters from v1."</td></tr>
+      <tr><td><b>Red</b></td><td>Will miss without a decision or help</td><td>"Cannot meet 30 June without a second developer or removing reports. Need a decision by Monday."</td></tr></table></div>
+    <pre data-lang="plain" data-file="status-update.txt">Project: Customer portal      Status: AMBER
+
+Done this week: login + password reset in staging, 40 unit tests added.
+Next week:      profile page, accessibility fixes.
+Risks:          identity provider sandbox is unstable (2 outages) - could slip 3 days.
+Asks:           contact at the IdP who can raise priority (owner: Priya, by Wed).
+Dates:          release still Fri 20 Jun; will confirm Wed.</pre>
+    <h3>How to deliver bad news</h3>
+    <ol><li><b>Say it early and plainly</b>: "We will miss the date."</li><li><b>Give impact</b>, not just cause.</li><li><b>Bring options</b> with cost and your recommendation.</li><li><b>Say what you need</b> and by when.</li><li><b>Follow up</b> with a written summary and updates on a fixed rhythm.</li></ol>
+    <h3>Escalation, done well</h3>
+    <ul><li>Try to resolve at the lowest level first; show what you tried.</li><li>Escalate <b>problems with options</b>, not complaints.</li><li>Tell the other party before you escalate ("no surprises").</li><li>Escalate on facts: impact, deadline, decision needed.</li><li>Use it for blocked decisions, resource conflicts, ethics/safety or repeated missed commitments.</li></ul>
+  </section>
+
+  <section class="topic" id="nontech" data-nav="Explaining tech to non-technical people" data-group="2 · Technical comms" data-level="i">
+    <h2>Explaining technical topics to non-technical stakeholders <span class="badge i">Intermediate</span></h2>
+    <p>Translate <b>technical facts into business impact</b>. Your audience cares about time, money, risk and customers.</p>
+    <div class="tblwrap"><table><tr><th>Technical statement</th><th>Business translation</th></tr>
+      <tr><td>"We have a lot of technical debt in the billing module."</td><td>"New billing features currently take about twice as long, and bugs here have cost us three incidents this quarter. Two weeks of cleanup would cut that."</td></tr>
+      <tr><td>"The database needs an index."</td><td>"Reports take 40 seconds. A small change will bring that to under 2 seconds."</td></tr>
+      <tr><td>"We need to upgrade the framework."</td><td>"The current version loses security support in June. Without the upgrade we cannot pass the customer's audit."</td></tr></table></div>
+    <div class="grid2">
+      <div class="card"><h4>Techniques</h4><ul><li><b>Analogy</b>: "a cache is like keeping frequently used files on your desk"</li><li><b>Concrete numbers</b> and examples</li><li><b>Layer the detail</b>: one-sentence answer, then more if asked</li><li><b>Visuals</b>: simple boxes and arrows</li><li><b>Avoid jargon</b> or define it once</li></ul></div>
+      <div class="card"><h4>Avoid</h4><ul><li>Talking down or over-explaining</li><li>Hiding uncertainty: say "I am 80% sure, here is how we will confirm"</li><li>Saying "it depends" without saying on what</li><li>Overselling certainty in estimates</li></ul></div>
+    </div>
+  </section>
+
+  <div class="part-title">Part 3 &mdash; Feedback, conflict and negotiation</div>
+
+  <section class="topic" id="feedback" data-nav="Giving and receiving feedback (SBI)" data-group="3 · Hard conversations" data-level="i">
+    <h2>Feedback: the SBI model <span class="badge i">Intermediate</span></h2>
+    <p>Useful feedback is <b>specific, timely, observable and about impact</b>. The <b>SBI</b> model keeps it factual: <b>S</b>ituation, <b>B</b>ehaviour, <b>I</b>mpact, then ask.</p>
+    <div class="tblwrap"><table><tr><th>Part</th><th>What</th><th>Example</th></tr>
+      <tr><td><b>Situation</b></td><td>When and where</td><td>"In Tuesday's design review..."</td></tr>
+      <tr><td><b>Behaviour</b></td><td>What an observer could see or hear</td><td>"...you interrupted Sam twice while she was explaining the cache design."</td></tr>
+      <tr><td><b>Impact</b></td><td>Effect on you, team or goal</td><td>"She stopped contributing, and we missed her concern about invalidation."</td></tr>
+      <tr><td><b>Invite</b></td><td>Ask for their view / next step</td><td>"How did that feel to you? What could we try next time?"</td></tr></table></div>
+    <div class="lab" id="fb-lab"></div>
+    <div class="grid2">
+      <div class="card"><h4>Giving feedback well</h4><ul><li>Give it soon, privately for corrective, publicly for praise (if the person likes it)</li><li>One or two points at a time</li><li>Separate fact from interpretation</li><li>Agree next steps and follow up</li><li>Praise specifically: what they did and what it enabled</li></ul></div>
+      <div class="card"><h4>Receiving feedback well</h4><ul><li>Listen fully; do not defend or explain first</li><li>Say thanks and ask for an example</li><li>Summarise what you heard</li><li>Take time to decide what to act on</li><li>Close the loop later: "I tried X, did it help?"</li></ul></div>
+    </div>
+    <div class="why"><b>Radical candour in one line</b>Care personally <i>and</i> challenge directly. Caring without challenging is "ruinous empathy"; challenging without caring is "obnoxious aggression".</div>
+  </section>
+
+  <section class="topic" id="conflict" data-nav="Conflict resolution" data-group="3 · Hard conversations" data-level="i">
+    <h2>Handling conflict and disagreement <span class="badge i">Intermediate</span></h2>
+    <p>Task conflict ("which design?") improves decisions when handled respectfully. Relationship conflict ("I do not trust you") destroys teams. Aim to keep disagreement about the problem.</p>
+    <div class="tblwrap"><table><tr><th>Style</th><th>Approach</th><th>Use when</th></tr>
+      <tr><td><b>Collaborate</b></td><td>Both goals fully met, joint problem-solving</td><td>Important to both, time available</td></tr>
+      <tr><td><b>Compromise</b></td><td>Each gives up something</td><td>Time pressure, roughly equal power</td></tr>
+      <tr><td><b>Accommodate</b></td><td>Yield</td><td>The issue matters more to them, or to preserve the relationship</td></tr>
+      <tr><td><b>Compete</b></td><td>Push your position</td><td>Safety, ethics, emergencies</td></tr>
+      <tr><td><b>Avoid</b></td><td>Postpone</td><td>Trivial issue or emotions too high (return later)</td></tr></table></div>
+    <h3>A practical sequence</h3>
+    <ol><li><b>Cool down</b> if emotional; arrange a private conversation.</li><li><b>Understand first</b>: ask about their goals, concerns and constraints, and paraphrase them.</li><li><b>Find the shared goal</b> ("we both want a stable release").</li><li><b>Separate positions from interests</b>: "I want microservices" (position) versus "I want independent deployments" (interest).</li><li><b>Generate options</b> and agree on objective criteria (data, benchmark, prototype, customer impact).</li><li><b>Decide</b>: consensus where possible; otherwise the accountable owner decides after hearing all views. <b>Disagree and commit</b>.</li><li><b>Record the decision</b> (ADR/ticket) and revisit with data if needed.</li></ol>
+    <pre data-lang="plain" data-file="conflict-opener.txt">"I think we see this differently and I would like to understand your view.
+ My concern is the deployment risk on Friday. What is your main concern?
+ ...
+ It sounds like the date matters most to you, and the risk matters most to me.
+ Could we release the low-risk part Friday and the rest Tuesday?"</pre>
+    <div class="warn"><b>Escalate when</b> discussion is stuck after a fair attempt, the issue crosses a team boundary, or behaviour is disrespectful or unsafe. Tell the other person first and present both views fairly.</div>
+  </section>
+
+  <section class="topic" id="negotiation" data-nav="Negotiation and saying no" data-group="3 · Hard conversations" data-level="i">
+    <h2>Negotiation, trade-offs and saying no <span class="badge i">Intermediate</span></h2>
+    <p>Negotiation is finding a deal both sides can accept, not winning. In delivery work you negotiate scope, deadlines, priorities and resources daily.</p>
+    <div class="tblwrap"><table><tr><th>Concept</th><th>Meaning</th></tr>
+      <tr><td><b>Interests, not positions</b></td><td>Ask "why do you need that?" to find flexible needs behind a fixed demand.</td></tr>
+      <tr><td><b>BATNA</b></td><td>Your best alternative if no agreement. Know it before negotiating.</td></tr>
+      <tr><td><b>ZOPA</b></td><td>The zone where a deal is acceptable to both.</td></tr>
+      <tr><td><b>Anchoring</b></td><td>The first number sets the range. Make the first offer if you have good information.</td></tr>
+      <tr><td><b>Trade, do not concede</b></td><td>"If we move the date, can we drop reports?" Always get something in return.</td></tr>
+      <tr><td><b>Objective criteria</b></td><td>Benchmarks, market data, past velocity.</td></tr></table></div>
+    <h3>Saying no without damaging the relationship</h3>
+    <div class="tblwrap"><table><tr><th>Pattern</th><th>Example</th></tr>
+      <tr><td>Yes, if...</td><td>"Yes, we can add export if we move audit logging to next sprint."</td></tr>
+      <tr><td>Not now, here is when</td><td>"I cannot take this before the release. I can start on the 24th."</td></tr>
+      <tr><td>Offer a smaller version</td><td>"I cannot build the full dashboard by Friday; I can ship the three key charts."</td></tr>
+      <tr><td>Explain impact on current priorities</td><td>"If I do this, the payment fix slips two days. Which do you prefer?"</td></tr>
+      <tr><td>Redirect</td><td>"The platform team owns this. I will introduce you and share the context."</td></tr></table></div>
+    <div class="tip"><b>Negotiating salary or role</b>Research the market range, state your value with evidence, give a range whose bottom is acceptable to you, discuss total compensation (bonus, equity, growth, flexibility), and stay positive and collaborative. Do not give a number first if you can ask for the budget.</div>
+  </section>
+
+  <div class="part-title">Part 4 &mdash; Leading people</div>
+
+  <section class="topic" id="lead-vs-manage" data-nav="Tech lead vs manager vs senior IC" data-group="4 · Leading people" data-level="i">
+    <h2>Leadership paths: senior engineer, tech lead, manager <span class="badge i">Intermediate</span></h2>
+    <p>Leadership is <b>influence</b>, not title. You can lead as an individual contributor by raising the quality and speed of everyone around you.</p>
+    <div class="tblwrap"><table><tr><th>Role</th><th>Focus</th><th>Success looks like</th></tr>
+      <tr><td><b>Senior engineer</b></td><td>Solve ambiguous problems; own a component end to end; raise the bar via reviews</td><td>Team ships faster with fewer defects because of you</td></tr>
+      <tr><td><b>Tech lead</b></td><td>Technical direction, design decisions, unblocking, delivery of one team's work</td><td>Clear architecture, aligned team, predictable delivery</td></tr>
+      <tr><td><b>Engineering manager</b></td><td>People: hiring, growth, performance, team health, process</td><td>High-performing, retained, growing team</td></tr>
+      <tr><td><b>Staff / principal / architect</b></td><td>Cross-team strategy, standards and hard technical problems</td><td>Multiple teams succeed on a coherent technical direction</td></tr></table></div>
+    <h3>Managing vs leading</h3>
+    <div class="grid2">
+      <div class="card"><h4>Management (do things right)</h4><ul><li>Plan, organise, track</li><li>Remove obstacles</li><li>Maintain stability and process</li></ul></div>
+      <div class="card"><h4>Leadership (do the right things)</h4><ul><li>Set direction and context</li><li>Motivate and align people</li><li>Drive change and growth</li></ul></div>
+    </div>
+    <div class="why"><b>Servant leadership</b>The leader's job is to make the team successful: provide clarity, remove blockers, protect focus, grow people and give credit away. Take responsibility when things go wrong, share credit when they go right.</div>
+    <div class="warn"><b>The new-lead trap</b>Continuing to be the best coder and the bottleneck. As scope grows, shift from "I solve it" to "I make sure it gets solved well": delegate, review, coach, and document.</div>
+  </section>
+
+  <section class="topic" id="mentoring" data-nav="Mentoring and coaching" data-group="4 · Leading people" data-level="i">
+    <h2>Mentoring and coaching <span class="badge i">Intermediate</span></h2>
+    <p><b>Mentoring</b> shares experience and advice; <b>coaching</b> helps a person find their own answer by asking questions. Good leaders use both and choose by the person's skill and the situation.</p>
+    <div class="tblwrap"><table><tr><th></th><th>Teaching / directing</th><th>Coaching</th><th>Delegating</th></tr>
+      <tr><td>Best for</td><td>New to the task</td><td>Some experience, building confidence</td><td>Skilled and motivated</td></tr>
+      <tr><td>You</td><td>Show, explain, give steps</td><td>Ask questions, let them try</td><td>Agree outcome, stay available</td></tr></table></div>
+    <h3>GROW coaching model</h3>
+    <div class="tblwrap"><table><tr><th>Step</th><th>Question</th></tr>
+      <tr><td><b>G</b>oal</td><td>"What do you want to achieve?"</td></tr>
+      <tr><td><b>R</b>eality</td><td>"Where are you now? What have you tried?"</td></tr>
+      <tr><td><b>O</b>ptions</td><td>"What could you do? What else?"</td></tr>
+      <tr><td><b>W</b>ill</td><td>"What will you do, and by when? What could stop you?"</td></tr></table></div>
+    <div class="grid2">
+      <div class="card"><h4>Mentoring a junior developer</h4><ul><li>Pair on a real task, then step back</li><li>Give small, scoped, increasingly hard work</li><li>Explain <i>why</i>, not just <i>what</i></li><li>Review code kindly; point to docs</li><li>Let them make safe mistakes</li><li>Set a time limit for being stuck (for example 30-60 min), then ask</li></ul></div>
+      <div class="card"><h4>Growing a strong engineer</h4><ul><li>Stretch assignments (lead a design, run a release)</li><li>Visibility: let them present</li><li>Sponsor, not just mentor: recommend them for opportunities</li><li>Agree a growth plan with 1-2 skills per quarter</li></ul></div>
+    </div>
+    <div class="tip"><b>Ask before answering</b>When someone brings a problem, try "What have you tried, and what do you think the cause is?" first. You build their problem-solving, and you learn what they already know.</div>
+  </section>
+
+  <section class="topic" id="delegation" data-nav="Delegation and ownership" data-group="4 · Leading people" data-level="i">
+    <h2>Delegation, ownership and accountability <span class="badge i">Intermediate</span></h2>
+    <p>Delegating is handing over <b>outcome and authority</b>, not just tasks. Done well it grows people and frees you for higher-leverage work.</p>
+    <div class="tblwrap"><table><tr><th>Level</th><th>Description</th></tr>
+      <tr><td>1. Do as I say</td><td>Detailed instructions</td></tr>
+      <tr><td>2. Research and report</td><td>Investigate and bring options</td></tr>
+      <tr><td>3. Recommend</td><td>Propose a decision; leader decides</td></tr>
+      <tr><td>4. Decide, then inform</td><td>Act, then tell me</td></tr>
+      <tr><td>5. Act on your own</td><td>Full ownership; report periodically</td></tr></table></div>
+    <h3>How to delegate</h3>
+    <ol><li><b>Choose the right person</b> (skill plus stretch).</li><li><b>Explain the outcome and why</b> it matters, with quality and deadline.</li><li><b>State the authority level</b> and constraints (budget, who to involve).</li><li><b>Agree check-ins</b>, not constant supervision.</li><li><b>Provide support</b> and resources; accept different approaches.</li><li><b>Give credit</b>, review learnings, adjust next time.</li></ol>
+    <div class="grid2">
+      <div class="card"><h4>Extreme ownership habits</h4><ul><li>Own outcomes, not just assigned tickets</li><li>Say "I will" and follow through, or renegotiate early</li><li>Fix the problem, then fix the cause</li><li>Do not blame; describe facts and next steps</li></ul></div>
+      <div class="card"><h4>Delegation mistakes</h4><ul><li>Dumping tasks nobody wants</li><li>Delegating without authority</li><li>Micromanaging or taking the task back at first mistake</li><li>Never delegating because "I am faster"</li></ul></div>
+    </div>
+    <div class="note"><b>RACI</b>For shared work clarify <b>R</b>esponsible (does it), <b>A</b>ccountable (one owner, final say), <b>C</b>onsulted (two-way input), <b>I</b>nformed (one-way). Exactly one A per item.</div>
+  </section>
+
+  <section class="topic" id="safety" data-nav="Psychological safety and motivation" data-group="4 · Leading people" data-level="a">
+    <h2>Psychological safety, motivation and team health <span class="badge a">Advanced</span></h2>
+    <p>Research on high-performing teams (Google's Project Aristotle) found that <b>psychological safety</b> &ndash; believing you will not be punished for speaking up, asking, or admitting mistakes &ndash; was the strongest predictor of team success.</p>
+    <div class="grid2">
+      <div class="card"><h4>How leaders create it</h4><ul><li>Admit your own mistakes and uncertainty first</li><li>Ask for dissent: "What am I missing?"</li><li>Respond to bad news with curiosity, not blame</li><li>Blameless post-incident reviews</li><li>Thank people for raising problems</li><li>Hear every voice in meetings</li></ul></div>
+      <div class="card"><h4>How it gets destroyed</h4><ul><li>Public blame or sarcasm</li><li>Punishing the messenger</li><li>Only rewarding heroics</li><li>Ignoring concerns repeatedly</li><li>One loud voice dominating</li></ul></div>
+    </div>
+    <h3>What motivates people</h3>
+    <div class="tblwrap"><table><tr><th>Driver (Pink)</th><th>Meaning</th><th>Leader action</th></tr>
+      <tr><td><b>Autonomy</b></td><td>Control over how and what</td><td>Give outcomes, not step lists</td></tr>
+      <tr><td><b>Mastery</b></td><td>Getting better at something that matters</td><td>Stretch work, learning time, feedback</td></tr>
+      <tr><td><b>Purpose</b></td><td>Knowing why the work matters</td><td>Connect tasks to users and goals</td></tr></table></div>
+    <div class="tblwrap"><table><tr><th>Tuckman stage</th><th>Team behaviour</th><th>Leader focus</th></tr>
+      <tr><td>Forming</td><td>Polite, unsure of roles</td><td>Clarity, goals, introductions</td></tr>
+      <tr><td>Storming</td><td>Conflict over approach</td><td>Coach, set norms, keep it respectful</td></tr>
+      <tr><td>Norming</td><td>Agreed ways of working</td><td>Reinforce, build trust</td></tr>
+      <tr><td>Performing</td><td>High autonomy and trust</td><td>Remove blockers, delegate</td></tr></table></div>
+    <div class="warn"><b>Burnout signals</b>Cynicism, withdrawal, quality slips, constant overtime, loss of humour. Respond with workload changes and a direct conversation, not a pep talk. Sustainable pace is a leadership responsibility.</div>
+  </section>
+
+  <section class="topic" id="decisions" data-nav="Decision making (DACI, reversible)" data-group="4 · Leading people" data-level="a">
+    <h2>Making and communicating decisions <span class="badge a">Advanced</span></h2>
+    <p>Teams slow down when nobody knows <b>who decides</b>. Clear ownership plus transparent reasoning beats endless consensus.</p>
+    <div class="tblwrap"><table><tr><th>Tool</th><th>Idea</th></tr>
+      <tr><td><b>DACI</b></td><td><b>D</b>river (runs the process), <b>A</b>pprover (one decider), <b>C</b>ontributors (give input), <b>I</b>nformed.</td></tr>
+      <tr><td><b>One-way vs two-way doors</b></td><td>Reversible decisions: decide quickly with about 70% of the information. Irreversible ones deserve more analysis.</td></tr>
+      <tr><td><b>Disagree and commit</b></td><td>Argue hard before the decision, support it fully after.</td></tr>
+      <tr><td><b>Decision matrix</b></td><td>List options, weight the criteria, score, and discuss the result (not a replacement for judgement).</td></tr>
+      <tr><td><b>Pre-mortem</b></td><td>Imagine the plan failed a year from now; list reasons; mitigate the top ones.</td></tr>
+      <tr><td><b>Time-boxed spike / prototype</b></td><td>Buy information cheaply when unknowns dominate.</td></tr></table></div>
+    <div class="grid2">
+      <div class="card"><h4>Communicate a decision</h4><ul><li>What was decided and by whom</li><li>Why: options and trade-offs considered</li><li>What happens next and who owns it</li><li>How to give input or when it will be revisited</li></ul></div>
+      <div class="card"><h4>Cognitive biases to watch</h4><ul><li><b>Confirmation</b>: seeking supporting evidence only</li><li><b>Sunk cost</b>: continuing because of past effort</li><li><b>Anchoring</b>: first number dominates</li><li><b>HiPPO</b>: highest paid person's opinion wins</li><li><b>Groupthink</b>: silence taken as agreement</li></ul></div>
+    </div>
+  </section>
+
+  <section class="topic" id="one-on-one" data-nav="1:1s, retros and performance" data-group="4 · Leading people" data-level="a">
+    <h2>Running 1:1s, retrospectives and hiring <span class="badge a">Advanced</span></h2>
+    <div class="tblwrap"><table><tr><th>Practice</th><th>How</th></tr>
+      <tr><td><b>1:1 meeting</b></td><td>Weekly or fortnightly, 30 min, the report's agenda first. Ask: "What is on your mind?", "What is blocking you?", "How can I help?", "What feedback do you have for me?", "Where do you want to grow?" Keep shared notes. Never cancel casually.</td></tr>
+      <tr><td><b>Retrospective</b></td><td>Set the stage, gather data (what went well, what to improve), generate insights, decide 1-2 actions with owners, close. Rotate facilitator and formats; review last retro's actions first.</td></tr>
+      <tr><td><b>Performance conversations</b></td><td>No surprises: continuous feedback, clear expectations, written examples, a plan with checkpoints and support. Separate coaching from evaluation.</td></tr>
+      <tr><td><b>Interviewing candidates</b></td><td>Use a structured scorecard; same questions for each candidate; behavioural plus technical; evidence over gut feel; sell the role honestly; give timely feedback.</td></tr>
+      <tr><td><b>Onboarding</b></td><td>A 30-60-90 day plan, a buddy, a first small production change in week one, documentation to read, and early feedback.</td></tr></table></div>
+    <div class="tip"><b>Interviewer biases</b>Similarity bias ("like me"), halo effect, first impressions, and judging by confidence rather than evidence. Write scores before discussing to avoid anchoring on the first opinion.</div>
+  </section>
+
+  <div class="part-title">Part 5 &mdash; Influence, time and career</div>
+
+  <section class="topic" id="influence" data-nav="Influence and stakeholder management" data-group="5 · Influence" data-level="a">
+    <h2>Influencing without authority and managing stakeholders <span class="badge a">Advanced</span></h2>
+    <p>Most important changes require agreement from people who do not report to you. Influence is built from <b>credibility, relationships and a clear case</b>.</p>
+    <div class="tblwrap"><table><tr><th>Lever</th><th>Practice</th></tr>
+      <tr><td><b>Credibility</b></td><td>Deliver what you promise; be right about small things; admit what you do not know.</td></tr>
+      <tr><td><b>Relationships</b></td><td>Invest before you need favours: coffee chats, help others, give credit.</td></tr>
+      <tr><td><b>Understand their goals</b></td><td>Frame your proposal in terms of what they care about (risk, cost, speed).</td></tr>
+      <tr><td><b>Evidence and stories</b></td><td>Data plus one concrete customer or incident story.</td></tr>
+      <tr><td><b>Small steps</b></td><td>Pilot with one team, show results, expand.</td></tr>
+      <tr><td><b>Allies first</b></td><td>Pre-wire: talk to key people privately before a meeting so there are no surprises.</td></tr></table></div>
+    <h3>Stakeholder map (power / interest)</h3>
+    <div class="tblwrap"><table><tr><th>Group</th><th>Strategy</th></tr>
+      <tr><td>High power, high interest</td><td><b>Manage closely</b>: regular meetings, involve in decisions</td></tr>
+      <tr><td>High power, low interest</td><td><b>Keep satisfied</b>: concise updates, avoid surprises</td></tr>
+      <tr><td>Low power, high interest</td><td><b>Keep informed</b>: demos, newsletters, feedback channels</td></tr>
+      <tr><td>Low power, low interest</td><td><b>Monitor</b></td></tr></table></div>
+    <div class="seq" data-title="Getting a technical proposal accepted">
+<script type="text/seq">
+participants: You | Peer Team | Tech Lead | Product Owner | Director
+You -> Peer Team : 1:1 chat, understand their concerns
+You -> Tech Lead : share draft design doc, ask for critique
+Tech Lead --> You : feedback and risks
+You -> Product Owner : explain business benefit and cost
+Product Owner --> You : priority and timing constraints
+You -> Director : short summary, options, recommendation
+Director --> You : approve pilot with a review date
+note You : Pre-wired the key people, so the meeting only confirms the decision
+</script>
+    </div>
+  </section>
+
+  <section class="topic" id="time" data-nav="Time management and focus" data-group="5 · Influence" data-level="b">
+    <h2>Time management, prioritisation and focus <span class="badge b">Basic</span></h2>
+    <p>You cannot do everything. Leaders choose what <b>not</b> to do. The Eisenhower matrix sorts work by <b>urgent</b> and <b>important</b>.</p>
+    <div class="tblwrap"><table><tr><th></th><th>Urgent</th><th>Not urgent</th></tr>
+      <tr><td><b>Important</b></td><td><b>Q1 Do now</b>: outages, deadlines</td><td><b>Q2 Schedule</b>: design, mentoring, automation, learning</td></tr>
+      <tr><td><b>Not important</b></td><td><b>Q3 Delegate/shorten</b>: interruptions, some email</td><td><b>Q4 Drop</b>: time wasters</td></tr></table></div>
+    <div class="lab" id="ei-lab"></div>
+    <div class="grid2">
+      <div class="card"><h4>Habits that work</h4><ul><li>Plan the top 1-3 outcomes each day</li><li>Block focus time (calendar) and silence notifications</li><li>Batch email and chat checks</li><li>Time-box research and be stuck for a limited time</li><li>Single-task; limit work in progress</li><li>Weekly review: what mattered, what to drop</li></ul></div>
+      <div class="card"><h4>Techniques</h4><ul><li><b>Pomodoro</b>: 25 min focus, 5 min break</li><li><b>Eat the frog</b>: hardest task first</li><li><b>Two-minute rule</b>: do it now if it takes less than 2 min</li><li><b>Parkinson's law</b>: work expands to fill the time, so set deadlines</li></ul></div>
+    </div>
+  </section>
+
+  <section class="topic" id="remote" data-nav="Remote and cross-team work" data-group="5 · Influence" data-level="i">
+    <h2>Remote, hybrid and cross-cultural collaboration <span class="badge i">Intermediate</span></h2>
+    <ul>
+      <li><b>Default to writing</b>: decisions in docs/tickets; summarise calls; make information discoverable.</li>
+      <li><b>Overlap hours</b>: agree a core window for synchronous work; rotate inconvenient meeting times fairly.</li>
+      <li><b>Over-communicate context</b>: say what you are working on, when you are away, and when you are blocked.</li>
+      <li><b>Camera and tone</b>: use video for relationship-building and sensitive topics; add emoji or a clear tone marker in chat.</li>
+      <li><b>Cross-cultural</b>: direct vs indirect styles, hierarchy, and idioms differ. Avoid slang, confirm understanding in writing, and invite quiet colleagues to contribute in writing.</li>
+      <li><b>Build trust</b>: small social moments, demos, shared goals, and credit given publicly.</li>
+      <li><b>Hand-offs across time zones</b>: end-of-day notes with state, next step and blockers so the next person can continue without waiting.</li>
+    </ul>
+    <div class="tip"><b>Working with other teams</b>Learn their priorities and constraints, agree an interface (API, SLA, contact), raise issues early with a proposed solution, and thank them publicly. Treat them as customers and partners, not obstacles.</div>
+  </section>
+
+  <section class="topic" id="career" data-nav="Career growth and personal brand" data-group="5 · Influence" data-level="i">
+    <h2>Career growth, learning and visibility <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th>Area</th><th>Practice</th></tr>
+      <tr><td><b>Self-awareness</b></td><td>List strengths and gaps; ask 3 colleagues for specific feedback; track achievements in a "brag document" with impact numbers.</td></tr>
+      <tr><td><b>Learning plan</b></td><td>Pick 1-2 skills per quarter tied to your goal; learn by building and teaching (talk, blog, internal session).</td></tr>
+      <tr><td><b>Visibility</b></td><td>Share results and learnings (demos, written updates). Visibility is communication of value, not self-promotion.</td></tr>
+      <tr><td><b>Sponsors and mentors</b></td><td>Mentors advise; sponsors advocate for you when you are not in the room. Build both.</td></tr>
+      <tr><td><b>Impact over activity</b></td><td>Promotions reward scope and outcomes: "reduced deploy time from 40 to 8 minutes for 5 teams".</td></tr>
+      <tr><td><b>Growth mindset</b></td><td>Treat failures as data. Say "not yet" instead of "I cannot".</td></tr>
+      <tr><td><b>Imposter feelings</b></td><td>Common among strong engineers. Keep evidence of wins, ask questions openly, and remember that everyone started without knowing.</td></tr></table></div>
+    <p><small>Companion guides: <a href="General-Delivery-Guide.html">Delivery &amp; Engineering Fundamentals</a> &middot; <a href="Networking-HTTP-Guide.html">Networking &amp; HTTP</a> &middot; <a href="Cloud-Fundamentals-Guide.html">Cloud</a> &middot; <a href="React-Concepts-Guide.html">React</a> &middot; <a href="SQL-Server-Database-Design-Guide.html">SQL Server &amp; DB design</a> &middot; <a href="AngularJS-Concepts-Guide.html">AngularJS</a></small></p>
+  </section>
+
+  <div class="part-title">Part 6 &mdash; Interview preparation</div>
+
+  <section class="topic" id="star" data-nav="STAR method and story bank" data-group="6 · Interviews" data-level="b">
+    <h2>Behavioural interviews: the STAR method <span class="badge b">Practice</span></h2>
+    <p>Behavioural questions ("Tell me about a time...") test past behaviour as a predictor of future behaviour. <b>STAR</b> keeps answers structured and evidence-based.</p>
+    <div class="tblwrap"><table><tr><th>Letter</th><th>Content</th><th>Share of answer</th></tr>
+      <tr><td><b>S</b>ituation</td><td>Brief context: where, when, what was at stake</td><td>about 15%</td></tr>
+      <tr><td><b>T</b>ask</td><td>Your specific responsibility or goal</td><td>about 10%</td></tr>
+      <tr><td><b>A</b>ction</td><td>What <b>you</b> did, step by step, and why (use "I")</td><td>about 60%</td></tr>
+      <tr><td><b>R</b>esult</td><td>Measurable outcome plus what you learned</td><td>about 15%</td></tr></table></div>
+    <div class="lab" id="star-lab"></div>
+    <h3>Build a story bank of six</h3>
+    <div class="grid3">
+      <div class="card"><h4>Conflict</h4><p>Disagreement with a peer or stakeholder resolved with data or compromise.</p></div>
+      <div class="card"><h4>Failure</h4><p>A real mistake, your ownership, the fix and the lasting change.</p></div>
+      <div class="card"><h4>Leadership</h4><p>Led without authority, mentored, or rallied a team.</p></div>
+      <div class="card"><h4>Tight deadline</h4><p>Prioritised, cut scope, communicated early, delivered.</p></div>
+      <div class="card"><h4>Technical decision</h4><p>Trade-offs weighed, decision made, outcome measured.</p></div>
+      <div class="card"><h4>Learning</h4><p>Picked up an unfamiliar technology or domain quickly.</p></div>
+    </div>
+    <div class="note"><b>Tips</b>Tailor each story to the question. Be honest, keep to about two minutes, use real numbers, and end on the learning. If you only have "we" stories, practise isolating your personal contribution. For hypothetical questions, state your assumptions and the trade-offs, then pick an option.</div>
+  </section>
+
+  <section class="topic" id="quiz" data-nav="Self-test quiz" data-group="6 · Interviews" data-level="b">
+    <h2>Self-test quiz <span class="badge b">Practice</span></h2>
+    <p>Ten scenario questions. Pick an answer, read the explanation, and keep score.</p>
+    <div class="lab quiz" data-title="Leadership quiz">
+      <script type="application/json">
+      [
+        {"q":"In the SBI feedback model, what does the 'B' describe?","o":["The person's attitude","Observable behaviour an outside observer could see or hear","The business impact","The person's background"],"a":1,"e":"Behaviour should be factual and observable ('you interrupted twice') rather than a judgement ('you are rude')."},
+        {"q":"You must send a decision request to a busy executive. What should the first line say?","o":["A long background story","The decision needed, by when, with your recommendation (BLUF)","An apology for the interruption","A list of everything you checked"],"a":1,"e":"Bottom line up front: lead with the request and recommendation, then supply the reasoning and links."},
+        {"q":"Your teammate and you disagree on a design, and the thread is 15 comments long. Best next step?","o":["Escalate to the director","Keep arguing in writing","Switch to a call, clarify interests, agree objective criteria or a spike, and record the decision","Merge your version"],"a":2,"e":"Move from text to conversation when disagreement stalls, focus on shared goals and evidence, then decide and document."},
+        {"q":"A stakeholder asks for an extra feature with no change in the deadline. Which response is most effective?","o":["Say yes and work late","Flat 'no'","'Yes, if we move X out or move the date. Which do you prefer?'","Ignore the request"],"a":2,"e":"Make the trade-off visible and let the owner choose. You get something in return instead of silently conceding."},
+        {"q":"What is the key trait of psychological safety?","o":["Everyone always agrees","People can raise concerns and mistakes without fear of punishment","There is no feedback","Managers make all decisions"],"a":1,"e":"It is about candour without fear, not comfort or lack of conflict. It was the strongest predictor in Google's Project Aristotle."},
+        {"q":"Which delegation is best?","o":["'Do exactly these 12 steps'","'Own the reporting export: goal, deadline and constraints are in the doc; check in Thursday; you decide the approach'","'Handle this' with no context","Taking the task back at the first mistake"],"a":1,"e":"Delegate outcome, authority and support with agreed check-ins, not step-by-step instructions or vague dumping."},
+        {"q":"In the Eisenhower matrix, preparing a design for next quarter's module (no deadline today) is:","o":["Q1 Do now","Q2 Schedule (important, not urgent)","Q3 Delegate","Q4 Drop"],"a":1,"e":"Important but not urgent work is where growth and prevention live; protect time for it so it does not become a Q1 crisis."},
+        {"q":"A junior developer asks you how to fix a bug they are stuck on. Which approach best matches coaching?","o":["Fix it for them","Ask what they have tried and what they think the cause is, and guide with questions","Tell them to read the docs","Assign it to someone else"],"a":1,"e":"Coaching builds problem-solving. Offer direct help if they are blocked after a sensible time-box, but start with questions."},
+        {"q":"Which STAR answer is weakest?","o":["Specific action by 'I' and a metric in the result","Mostly describes the context, says 'we' for all actions, and has no result","Ends with what was learned","Takes about two minutes"],"a":1,"e":"Too much situation, no personal action and no measurable result are the classic weaknesses interviewers notice."},
+        {"q":"You will miss a milestone. What should you do?","o":["Wait and hope to recover quietly","Tell stakeholders early with impact, options and a recommendation","Cut testing silently","Blame the dependency team in the update"],"a":1,"e":"Early, transparent communication with options keeps trust. Surprises, not problems, damage relationships."}
+      ]
+      </script>
+    </div>
+  </section>
+
+  <section class="topic" id="interview-qa" data-nav="Interview questions & answers" data-group="6 · Interviews" data-level="a">
+    <h2>Leadership and communication interview questions <span class="badge a">Prep</span></h2>
+    <p>Filter by topic, expand a question and answer it aloud before reading the guidance.</p>
+    <div class="qfilter" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
+      <button class="btn primary" data-f="all" type="button">All</button><button class="btn" data-f="comm" type="button">Communication</button><button class="btn" data-f="conf" type="button">Conflict &amp; feedback</button><button class="btn" data-f="lead" type="button">Leadership</button><button class="btn" data-f="team" type="button">Teamwork</button><button class="btn" data-f="self" type="button">Self &amp; growth</button>
+    </div>
+
+    <details class="qa" data-tag="comm"><summary>How do you explain a complex technical issue to a non-technical stakeholder? <span class="qtag">comm</span></summary><div class="dbody"><p>Start from their goal, state the impact in business terms (time, cost, risk, customers), use one analogy and numbers, offer options with a recommendation, and check understanding by asking them to restate the decision. Give more detail only on request.</p></div></details>
+    <details class="qa" data-tag="comm"><summary>How do you keep stakeholders informed on a long project? <span class="qtag">comm</span></summary><div class="dbody"><p>Agree the audience and cadence upfront; short written updates with status colour, progress, risks, asks and dates; demos each sprint; early flags for slips with options; a single source of truth (board/dashboard).</p></div></details>
+    <details class="qa" data-tag="comm"><summary>Tell me about a time you had to deliver bad news. <span class="qtag">comm</span></summary><div class="dbody"><p>Choose a real case. Show you acted early, shared facts and impact, brought options and a recommendation, stayed calm, and followed through with regular updates. End with the outcome and what you changed to detect the issue sooner.</p></div></details>
+    <details class="qa" data-tag="comm"><summary>How do you run an effective meeting? <span class="qtag">comm</span></summary><div class="dbody"><p>Clear purpose and outcome, only needed attendees, an agenda and pre-read, timekeeping, inclusion of quiet voices, parking lot for tangents, and notes with decisions and owners sent the same day. Cancel it if a message would do.</p></div></details>
+
+    <details class="qa" data-tag="conf"><summary>Describe a time you disagreed with your manager or a teammate. <span class="qtag">conf</span></summary><div class="dbody"><p>Show respect and curiosity: you sought to understand their constraints, presented data or a prototype, proposed options, and accepted the final decision (disagree and commit) or changed your mind. Give the result and what you learned. Avoid painting the other person as wrong.</p></div></details>
+    <details class="qa" data-tag="conf"><summary>How do you give difficult feedback? <span class="qtag">conf</span></summary><div class="dbody"><p>Promptly, privately, using SBI: situation, observable behaviour, impact; then ask for their view and agree on next steps and a follow-up. Be specific, kind and direct; do not bury it in praise or attack character.</p></div></details>
+    <details class="qa" data-tag="conf"><summary>How do you respond to criticism you disagree with? <span class="qtag">conf</span></summary><div class="dbody"><p>Listen without defending, thank them, ask for examples, reflect on the part that may be valid, and then give your perspective calmly. Follow up later to show you acted on what was useful.</p></div></details>
+    <details class="qa" data-tag="conf"><summary>A team member is consistently underperforming. What do you do? <span class="qtag">conf</span></summary><div class="dbody"><p>Find facts and causes first (clarity, skills, workload, personal issues). Have a private conversation with specific examples, clear expectations and support (pairing, training), agree a time-bound plan with check-ins, document progress, and involve your manager or HR if it does not improve. Stay fair and respectful throughout.</p></div></details>
+
+    <details class="qa" data-tag="lead"><summary>What does leadership mean to you, and how have you shown it without a title? <span class="qtag">lead</span></summary><div class="dbody"><p>Setting direction, enabling others and taking ownership. Example angles: initiated a design doc or standard, mentored juniors, improved CI time, unblocked another team. Show the impact on others and the outcome.</p></div></details>
+    <details class="qa" data-tag="lead"><summary>How do you delegate and avoid micromanaging? <span class="qtag">lead</span></summary><div class="dbody"><p>Match the task to the person's skill, explain the outcome, constraints and why, set authority level and check-ins, then let them choose the approach. Check results, not keystrokes, and coach instead of taking over.</p></div></details>
+    <details class="qa" data-tag="lead"><summary>How do you motivate a demotivated team? <span class="qtag">lead</span></summary><div class="dbody"><p>Find the cause through 1:1s (unclear purpose, overload, recognition, conflict, tooling pain). Reconnect the work with user impact, give autonomy and growth opportunities, remove the top blockers, celebrate progress, and keep the pace sustainable.</p></div></details>
+    <details class="qa" data-tag="lead"><summary>How do you make a decision with incomplete information? <span class="qtag">lead</span></summary><div class="dbody"><p>Decide whether it is reversible. If so, move quickly with an explicit assumption list and a way to measure; if not, time-box a spike or gather targeted data. Name the decider, communicate the reasoning, and set a date to review the outcome.</p></div></details>
+    <details class="qa" data-tag="lead"><summary>How do you mentor someone more junior? <span class="qtag">lead</span></summary><div class="dbody"><p>Agree goals, pair on real work, then hand over progressively harder tasks. Ask questions to build thinking, review kindly with the "why", encourage safe failure, and review progress regularly.</p></div></details>
+
+    <details class="qa" data-tag="team"><summary>How do you handle a team member who dominates discussions or never speaks? <span class="qtag">team</span></summary><div class="dbody"><p>Use structure: round-robin, written input before discussion, time-boxed turns. Speak privately with the dominant person about the impact and with the quiet person about what helps them contribute. Build safety so all views are heard.</p></div></details>
+    <details class="qa" data-tag="team"><summary>Tell me about a time you helped a struggling teammate. <span class="qtag">team</span></summary><div class="dbody"><p>Show that you noticed, asked how to help, offered concrete support (pairing, resources, shifting tasks), respected their autonomy, and the outcome for the individual and the project.</p></div></details>
+    <details class="qa" data-tag="team"><summary>How do you work with a team in a different time zone or culture? <span class="qtag">team</span></summary><div class="dbody"><p>Write clear context-rich handovers, agree overlap hours, record decisions in shared docs, avoid idioms, confirm understanding explicitly, and invest in relationship-building video calls.</p></div></details>
+    <details class="qa" data-tag="team"><summary>What do you do when priorities from two stakeholders conflict? <span class="qtag">team</span></summary><div class="dbody"><p>Bring both together or to the Product Owner with the facts: value, deadlines, cost of delay and capacity. Let the decision owner prioritise, make the trade-off visible, and communicate the outcome to both.</p></div></details>
+
+    <details class="qa" data-tag="self"><summary>Tell me about a failure and what you learned. <span class="qtag">self</span></summary><div class="dbody"><p>Pick a real, moderate failure. Own it (no blame), explain the cause, how you contained it, and the lasting change (test, checklist, monitoring, process). Interviewers look for accountability and learning.</p></div></details>
+    <details class="qa" data-tag="self"><summary>What are your strengths and weaknesses? <span class="qtag">self</span></summary><div class="dbody"><p>Strengths: 2-3 relevant, each backed by evidence. Weakness: a real one that is not core to the job, plus concrete steps you are taking and progress so far. Avoid clichés such as "I work too hard".</p></div></details>
+    <details class="qa" data-tag="self"><summary>How do you prioritise when everything is urgent? <span class="qtag">self</span></summary><div class="dbody"><p>Clarify impact and deadlines, use urgent/important and cost-of-delay thinking, ask the decision owner to rank, communicate what will slip, and protect time for important non-urgent work to reduce future fires.</p></div></details>
+    <details class="qa" data-tag="self"><summary>Where do you see yourself in 3-5 years? <span class="qtag">self</span></summary><div class="dbody"><p>Describe growth in scope and impact (deeper technical ownership, mentoring or leading a team) that matches what the role offers, and name the skills you are building now. Show ambition without sounding like the role is a stepping stone.</p></div></details>
+    <details class="qa" data-tag="self"><summary>Do you have any questions for us? <span class="qtag">self</span></summary><div class="dbody"><p>Always ask. Examples: "What does success look like in the first 90 days?", "How does the team handle disagreement or incidents?", "How are decisions documented?", "What is the biggest challenge the team faces?", "How do people grow here?"</p></div></details>
+  </section>
+
+</main>
+</div>
+
+<script src="assets/guide.js"></script>
+<script src="assets/concepts.js"></script>
+<script src="assets/leadership.js"></script>
+</body>
+</html>

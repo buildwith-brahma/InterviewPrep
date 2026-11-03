@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C# Concepts - Complete Learning Guide</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="brand"><h1>C# Concepts</h1><small>Language &rarr; OOP &rarr; Generics &amp; LINQ &rarr; Async &amp; Memory &rarr; Interview prep</small></div>
+  <div class="search"><input id="search" type="search" placeholder="Search concepts ( press / )" autocomplete="off"><div id="search-results"></div></div>
+  <nav id="nav"></nav>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    <button id="menu-btn" type="button">Menu</button>
+    <div class="prog"><i id="progress"></i></div>
+    <button id="expand-all" type="button">Expand all</button>
+    <button id="collapse-all" type="button">Collapse all</button>
+    <button id="theme-btn" type="button">Dark / Light</button>
+  </div>
+
+  <main id="content">
+
+  <div class="hero" id="top">
+    <h1>C# Concepts &ndash; The Complete Learning Guide</h1>
+    <p>Every important C# concept explained the same way: <b>why it exists</b>, <b>how it works internally</b>, <b>when to use it</b> and <b>how to write it</b> &ndash; from variables and classes to generics, LINQ, async/await, memory management and modern C# 12/13 features. Includes live labs, quizzes and a full interview section.</p>
+    <div class="chips"><span>C# 12 / 13</span><span>.NET 8+</span><span>OOP &amp; SOLID</span><span>Generics &middot; LINQ</span><span>async / await</span><span>GC &amp; memory</span><span>Interview Q&amp;A + quizzes</span></div>
+  </div>
+
+  <section class="topic" id="how-to-use" data-nav="How to use this guide" data-group="Start here">
+    <h2>How to use this guide</h2>
+    <div class="grid3">
+      <div class="card"><h4>1. Learn in order</h4><p>Sidebar items are tagged <span class="badge b">Basic</span> <span class="badge i">Mid</span> <span class="badge a">Adv</span>. Top to bottom is a beginner-to-advanced path.</p></div>
+      <div class="card"><h4>2. Predict, then run</h4><p>Dashed boxes are live labs (value vs reference types, LINQ deferred execution, async timing, garbage collector). Predict the result first &ndash; that is how concepts stick.</p></div>
+      <div class="card"><h4>3. Revise</h4><p>Press <span class="kbd">/</span> to search. Use <i>Expand all</i> for folded details. Finish with the quizzes and the filterable interview Q&amp;A.</p></div>
+    </div>
+    <h3>Roadmap</h3>
+    <div class="diagram"><div class="dtitle">Beginner &rarr; Advanced progression</div>
+      <div class="flow">
+        <div class="node ok">Stage 1<small>Types, strings, control flow,<br>methods, nullability, exceptions</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Stage 2<small>Classes, inheritance,<br>interfaces, records, SOLID</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Stage 3<small>Generics, collections,<br>delegates, events, LINQ</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Stage 4<small>async/await, threads,<br>GC, Span, reflection</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">Stage 5<small>Modern C#, patterns,<br>interview scenarios</small></div>
+      </div>
+    </div>
+    <div class="note"><b>Running the code</b>Create a console project with <code>dotnet new console -n Demo</code>. Snippets use top-level statements and implicit usings (the default since .NET 6). Copy any block with its <i>Copy</i> button. The companion <a href="ASP.NET-Core-Concepts-Guide.html">ASP.NET Core Concepts</a> and <a href="ASP.NET-Core-Web-API-Guide.html">Web API</a> guides build on this one.</div>
+  </section>
+
+  <div class="part-title">Part 1 &mdash; Language fundamentals</div>
+
+  <section class="topic" id="intro" data-nav="C#, CLR and .NET: the big picture" data-group="1 · Fundamentals" data-level="b">
+    <h2>C#, the CLR and .NET: the big picture <span class="badge b">Basic</span></h2>
+    <p><b>C#</b> is a statically typed, object-oriented, multi-paradigm language (it also supports functional and generic programming). <b>.NET</b> is the platform that compiles, runs and supplies the libraries for it. Understanding the layers explains most "why does it behave like this?" questions.</p>
+    <div class="why"><b>Why does it matter?</b>C# source is not machine code. It is compiled to a portable <b>Intermediate Language (IL)</b> and then <b>JIT-compiled</b> to native code at run time. That is why the same assembly runs on Windows, Linux and macOS, why reflection is possible (metadata ships with the IL), and why startup and memory behave the way they do.</div>
+    <div class="diagram"><div class="dtitle">From source code to running program</div>
+      <div class="flow">
+        <div class="node">C# source<small>.cs files</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Roslyn compiler<small>syntax + semantic checks</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Assembly (.dll / .exe)<small>IL + metadata</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">CLR loads it<small>JIT: IL &rarr; machine code</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">CPU executes<small>GC manages memory</small></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Term</th><th>What it is</th></tr>
+      <tr><td><b>CLR</b> (Common Language Runtime)</td><td>The execution engine: JIT compiler, garbage collector, type safety, exception handling, threading.</td></tr>
+      <tr><td><b>BCL</b> (Base Class Library)</td><td><code>System.*</code> types: strings, collections, IO, LINQ, Tasks.</td></tr>
+      <tr><td><b>IL</b> / <b>MSIL</b></td><td>CPU-independent instruction set the compiler emits.</td></tr>
+      <tr><td><b>Assembly</b></td><td>The deployable unit (.dll/.exe) containing IL, metadata and a manifest.</td></tr>
+      <tr><td><b>Namespace</b></td><td>Logical grouping of types to avoid name clashes (not a physical container).</td></tr>
+      <tr><td><b>SDK vs Runtime</b></td><td>SDK = compiler + CLI to build; Runtime = what is needed to run.</td></tr>
+      <tr><td><b>ReadyToRun / Native AOT</b></td><td>Pre-compile to native code to cut startup time (AOT also removes the JIT, with some reflection limits).</td></tr>
+      <tr><td><b>.NET Framework vs .NET (Core)</b></td><td>Framework: Windows-only, legacy. Modern .NET (5+): cross-platform, open source, faster; this is what new work targets.</td></tr>
+    </table></div>
+    <h3>Hello, modern C#</h3>
+    <pre data-lang="csharp" data-file="Program.cs">// Top-level statements: the compiler generates the Main method for you
+Console.WriteLine("Hello, C#!");
+
+var name = args.Length > 0 ? args[0] : "world";     // 'var' = compiler infers the type (still static!)
+Console.WriteLine($"Hello, {name}. Today is {DateTime.Now:dddd}.");   // string interpolation</pre>
+    <div class="tip"><b>Static typing</b><code>var x = 5;</code> is NOT dynamic. The compiler infers <code>int</code> and the type is fixed forever. Real dynamic typing exists only with the <code>dynamic</code> keyword (resolved at run time, avoid it).</div>
+  </section>
+
+  <section class="topic" id="types" data-nav="Types: value vs reference" data-group="1 · Fundamentals" data-level="b">
+    <h2>Types: value types vs reference types <span class="badge b">Basic</span></h2>
+    <p>Every C# type is either a <b>value type</b> (stores the data itself) or a <b>reference type</b> (stores a reference to an object on the managed heap). This single distinction explains copying, equality, null, performance and many bugs.</p>
+    <div class="grid2">
+      <div class="card"><h4>Value types</h4><p><code>int, long, double, decimal, bool, char</code>, <code>enum</code>, <code>struct</code> (incl. <code>DateTime</code>, <code>Guid</code>, <code>ValueTuple</code>).</p><ul><li>Assignment <b>copies the data</b>.</li><li>Cannot be <code>null</code> (unless <code>Nullable&lt;T&gt;</code>).</li><li>Stored inline: in a local variable on the <b>stack</b>, or inside the object that contains them on the heap.</li><li>Cheap for small, short-lived data.</li></ul></div>
+      <div class="card"><h4>Reference types</h4><p><code>class, interface, delegate, record (class), string, object, arrays</code>, <code>dynamic</code>.</p><ul><li>Assignment <b>copies the reference</b>; both variables point to one object.</li><li>Can be <code>null</code>.</li><li>Object lives on the <b>heap</b> and is reclaimed by the garbage collector.</li><li>Identity matters (<code>ReferenceEquals</code>).</li></ul></div>
+    </div>
+    <div class="diagram"><div class="dtitle">Memory picture for: <code>int n = 5; var p = new Person("Ann"); var q = p;</code></div>
+      <div class="grid2">
+        <div class="layers"><div class="layer l3">Stack (locals)<small>n = 5<br>p &rarr; 0x1A40<br>q &rarr; 0x1A40</small></div></div>
+        <div class="layers"><div class="layer l2">Managed heap<small>0x1A40: Person { Name = "Ann" }<br>(one object, two references)</small></div></div>
+      </div>
+    </div>
+    <div class="lab" id="valref-lab"></div>
+    <h3>Boxing and unboxing</h3>
+    <p><b>Boxing</b> wraps a value type in an <code>object</code> on the heap; <b>unboxing</b> extracts it again with a cast. It allocates, so it is a hidden performance cost &ndash; mostly avoided by generics.</p>
+    <pre data-lang="csharp" data-file="Boxing.cs">int i = 42;
+object o = i;          // BOXING: heap allocation, value copied into the box
+int j = (int)o;        // UNBOXING: type check + copy back
+// long k = (long)o;   // InvalidCastException! The box holds an int, not a long
+
+var list = new System.Collections.ArrayList();   // old, non-generic
+list.Add(1);                                     // boxes every int
+var good = new List&lt;int&gt;();                       // generic: no boxing
+good.Add(1);</pre>
+    <h3>Built-in types cheat sheet</h3>
+    <div class="tblwrap"><table><tr><th>Type</th><th>Size</th><th>Notes</th></tr>
+      <tr><td><code>byte / sbyte</code></td><td>1 byte</td><td>0..255 / -128..127</td></tr>
+      <tr><td><code>short / ushort</code></td><td>2 bytes</td><td></td></tr>
+      <tr><td><code>int / uint</code></td><td>4 bytes</td><td>Default integer type; &plusmn;2.1 billion</td></tr>
+      <tr><td><code>long / ulong</code></td><td>8 bytes</td><td>Use for large counters, file sizes, ids</td></tr>
+      <tr><td><code>float / double</code></td><td>4 / 8 bytes</td><td>Binary floating point: fast but inexact (<code>0.1 + 0.2 != 0.3</code>)</td></tr>
+      <tr><td><code>decimal</code></td><td>16 bytes</td><td>Base-10 floating point: <b>use for money</b></td></tr>
+      <tr><td><code>bool</code></td><td>1 byte</td><td>true / false</td></tr>
+      <tr><td><code>char</code></td><td>2 bytes</td><td>One UTF-16 code unit</td></tr>
+      <tr><td><code>nint / nuint</code></td><td>pointer-sized</td><td>Native-sized integers for interop</td></tr>
+    </table></div>
+    <details><summary>struct vs class: how to choose</summary><div class="dbody">
+      <p>Choose a <b>struct</b> only when all are true: it represents a single logical value (like a coordinate), is small (about 16 bytes or less), is immutable, and is short-lived. Otherwise use a class.</p>
+      <ul><li>Structs are copied on every assignment and method call &ndash; large structs are slower, not faster.</li><li>Mutable structs are a classic bug source: you mutate a <i>copy</i>.</li><li>Use <code>readonly struct</code> / <code>record struct</code> to get immutability and value equality.</li><li>A struct inside a class lives inline in that object; a struct in an <code>object</code> variable is boxed.</li></ul>
+      <pre data-lang="csharp" data-file="Structs.cs">public readonly record struct Money(decimal Amount, string Currency)
+{
+    public Money Add(Money other) =&gt; Currency == other.Currency
+        ? this with { Amount = Amount + other.Amount }
+        : throw new InvalidOperationException("Currency mismatch");
+}</pre></div></details>
+  </section>
+
+  <section class="topic" id="strings" data-nav="Strings and text" data-group="1 · Fundamentals" data-level="b">
+    <h2>Strings and text <span class="badge b">Basic</span></h2>
+    <p><code>string</code> is a reference type that behaves like a value: it is <b>immutable</b>. Every "modification" creates a new string. It is a sequence of UTF-16 <code>char</code>s.</p>
+    <div class="why"><b>Why immutable?</b>Safety (a string used as a dictionary key or in a security check cannot change underneath you), thread-safety without locks, and string <b>interning</b> (identical literals share one object). The price: repeated concatenation in a loop allocates many strings.</div>
+    <pre data-lang="csharp" data-file="Strings.cs">string a = "hello";
+string b = "hel" + "lo";                        // compile-time constant: same literal
+Console.WriteLine(ReferenceEquals(a, b));        // True (interned)
+Console.WriteLine(a == b);                       // True: == on string compares CONTENT (operator overloaded)
+
+// Building strings in a loop
+var sb = new System.Text.StringBuilder();       // mutable buffer: O(n) total instead of O(n^2)
+for (int i = 0; i &lt; 1000; i++) sb.Append(i).Append(',');
+string csv = sb.ToString();
+
+// Formatting
+string s1 = $"Total: {1234.5m:C2}";             // interpolation with format specifier
+string s2 = string.Format("{0:N2}", 1234.5);
+string raw = """
+    {"name": "Ann", "age": 30}
+    """;                                         // raw string literal (C# 11): no escaping needed
+
+// Comparing - pick the right comparison
+bool same = string.Equals("Straße", "STRASSE", StringComparison.OrdinalIgnoreCase);
+bool empty = string.IsNullOrWhiteSpace("   ");  // true</pre>
+    <div class="tblwrap"><table><tr><th>Need</th><th>Use</th><th>Why</th></tr>
+      <tr><td>Concatenate a few values</td><td><code>$"..."</code> or <code>+</code></td><td>Readable; compiler optimises</td></tr>
+      <tr><td>Concatenate in a loop</td><td><code>StringBuilder</code> / <code>string.Join</code></td><td>Avoids O(n&sup2;) allocations</td></tr>
+      <tr><td>Compare identifiers, keys, protocol text</td><td><code>StringComparison.Ordinal[IgnoreCase]</code></td><td>Fast, culture-independent</td></tr>
+      <tr><td>Compare text shown to users</td><td><code>CurrentCulture</code> comparisons</td><td>Culture-aware sorting</td></tr>
+      <tr><td>Slice without copying</td><td><code>ReadOnlySpan&lt;char&gt;</code> / <code>AsSpan()</code></td><td>No allocation</td></tr>
+    </table></div>
+    <div class="warn"><b>Common mistakes</b><ul><li><code>ToLower() == ToLower()</code> for comparisons allocates and is culture-sensitive; use <code>Equals(..., OrdinalIgnoreCase)</code>.</li><li>Using <code>string.Concat</code> in a loop with thousands of iterations.</li><li>Forgetting that <code>Substring</code> and <code>Replace</code> return new strings (they do not modify the original).</li></ul></div>
+  </section>
+
+  <section class="topic" id="control-flow" data-nav="Operators and control flow" data-group="1 · Fundamentals" data-level="b">
+    <h2>Operators and control flow <span class="badge b">Basic</span></h2>
+    <pre data-lang="csharp" data-file="ControlFlow.cs">// if / else, ternary
+string label = score &gt;= 50 ? "pass" : "fail";
+
+// switch statement and switch EXPRESSION (C# 8+)
+string Describe(int n) =&gt; n switch
+{
+    &lt; 0           =&gt; "negative",
+    0             =&gt; "zero",
+    &gt; 0 and &lt; 10  =&gt; "small",
+    _             =&gt; "large"          // discard = default
+};
+
+// loops
+for (int i = 0; i &lt; 3; i++) Console.Write(i);
+foreach (var item in new[] { "a", "b" }) Console.Write(item);   // works on anything with GetEnumerator()
+int k = 0; while (k &lt; 3) k++;
+do { k--; } while (k &gt; 0);
+
+// jump statements
+foreach (var n in Enumerable.Range(1, 10))
+{
+    if (n % 2 == 0) continue;     // next iteration
+    if (n &gt; 7) break;             // leave loop
+}
+
+// operators worth knowing
+int x = 7 / 2;         // 3  (integer division)
+double y = 7 / 2.0;    // 3.5
+int m = -7 % 3;        // -1 (sign follows the dividend)
+bool b = (x &amp; 1) == 1; // bitwise AND
+x &lt;&lt;= 2;               // compound assignment
+string s = null ?? "default";   // null-coalescing
+int? maybe = null; maybe ??= 5; // null-coalescing assignment
+Index last = ^1; var tail = new[] {1,2,3}[last];   // index-from-end, range operator: arr[1..^1]</pre>
+    <div class="tblwrap"><table><tr><th>Precedence (high &rarr; low)</th><th>Operators</th></tr>
+      <tr><td>Primary</td><td><code>x.y  f(x)  a[i]  x?.y  new  typeof  x++</code></td></tr>
+      <tr><td>Unary</td><td><code>+ - ! ~ ++x (T)x await</code></td></tr>
+      <tr><td>Multiplicative / additive</td><td><code>* / %</code> then <code>+ -</code></td></tr>
+      <tr><td>Shift / relational / equality</td><td><code>&lt;&lt; &gt;&gt;</code>, <code>&lt; &gt; &lt;= &gt;= is as</code>, <code>== !=</code></td></tr>
+      <tr><td>Logical</td><td><code>&amp;</code> then <code>^</code> then <code>|</code> then <code>&amp;&amp;</code> then <code>||</code></td></tr>
+      <tr><td>Conditional / assignment</td><td><code>?? ?: = += ??= =&gt;</code></td></tr>
+    </table></div>
+    <div class="note"><b>Short-circuiting</b><code>a &amp;&amp; b</code> and <code>a || b</code> skip <code>b</code> when the result is already known. <code>&amp;</code> and <code>|</code> on bools always evaluate both sides. This is why <code>if (obj != null &amp;&amp; obj.Value &gt; 0)</code> is safe.</div>
+  </section>
+
+  <section class="topic" id="methods" data-nav="Methods and parameters" data-group="1 · Fundamentals" data-level="b">
+    <h2>Methods and parameters <span class="badge b">Basic</span></h2>
+    <p>By default C# passes arguments <b>by value</b>: the parameter is a copy. For a reference type, the copy is of the <i>reference</i>, so the method can change the object (but not re-point the caller's variable).</p>
+    <div class="tblwrap"><table><tr><th>Modifier</th><th>Meaning</th><th>Must the caller initialise it?</th><th>Typical use</th></tr>
+      <tr><td><i>(none)</i></td><td>Copy of the value / reference</td><td>yes</td><td>Almost always</td></tr>
+      <tr><td><code>ref</code></td><td>Alias to the caller's variable; read + write</td><td>yes</td><td>Swap, in-place update of a struct</td></tr>
+      <tr><td><code>out</code></td><td>Method must assign it before returning</td><td>no</td><td><code>TryParse</code> pattern, extra return values</td></tr>
+      <tr><td><code>in</code></td><td>Read-only reference (no copy)</td><td>yes</td><td>Passing large <code>readonly struct</code>s cheaply</td></tr>
+      <tr><td><code>params</code></td><td>Variable number of arguments as an array/span</td><td>-</td><td><code>string.Format</code>, <code>Path.Combine</code></td></tr>
+    </table></div>
+    <pre data-lang="csharp" data-file="Methods.cs">// out + TryParse pattern: avoids exceptions for expected failures
+if (int.TryParse("123", out var number)) Console.WriteLine(number + 1);
+
+// optional + named arguments
+void Send(string to, string subject = "(none)", bool urgent = false) { }
+Send("a@x.com", urgent: true);
+
+// params
+int Sum(params int[] values) =&gt; values.Sum();
+Sum(1, 2, 3);
+
+// expression-bodied, local functions, static local functions
+int Square(int n) =&gt; n * n;
+int Fact(int n)
+{
+    return Inner(n);
+    static int Inner(int k) =&gt; k &lt;= 1 ? 1 : k * Inner(k - 1);   // cannot capture outer variables
+}
+
+// returning multiple values with tuples
+(int Min, int Max) Range(int[] a) =&gt; (a.Min(), a.Max());
+var (lo, hi) = Range(new[] { 3, 1, 9 });          // deconstruction
+
+// overloading: same name, different signature (return type alone does not count)
+double Area(double r) =&gt; Math.PI * r * r;
+double Area(double w, double h) =&gt; w * h;</pre>
+    <div class="warn"><b>Gotcha</b>Optional parameter default values are baked into the <i>caller's</i> compiled code. Changing a default in a library does not change already-compiled callers until they are recompiled. Prefer overloads for public library APIs.</div>
+  </section>
+
+  <section class="topic" id="nullability" data-nav="Null handling and nullable types" data-group="1 · Fundamentals" data-level="b">
+    <h2>Null handling and nullable types <span class="badge b">Basic</span></h2>
+    <div class="why"><b>The billion-dollar mistake</b>Tony Hoare called null references his "billion-dollar mistake": any reference can secretly be null and <code>NullReferenceException</code> appears at run time. C# gives two separate tools: <b>nullable value types</b> and <b>nullable reference types</b>.</div>
+    <h3>1. Nullable value types: <code>int?</code></h3>
+    <p><code>int?</code> is <code>Nullable&lt;int&gt;</code>, a struct holding a value plus a <code>HasValue</code> flag.</p>
+    <h3>2. Nullable reference types (C# 8+, <code>&lt;Nullable&gt;enable&lt;/Nullable&gt;</code>)</h3>
+    <p>A compile-time <i>annotation</i> system. <code>string</code> means "should never be null"; <code>string?</code> means "may be null". The compiler warns when you dereference a maybe-null value. Nothing changes at run time &ndash; it is static flow analysis.</p>
+    <pre data-lang="csharp" data-file="Nulls.cs">int? age = null;
+Console.WriteLine(age.HasValue);            // False
+int a = age ?? 18;                          // default when null
+int b = age.GetValueOrDefault(18);
+
+string? name = GetNameOrNull();
+Console.WriteLine(name?.Length);            // null-conditional: null if name is null
+Console.WriteLine(name?.Length ?? 0);       // combine with ??
+int len = name!.Length;                     // '!' null-forgiving: "trust me" (no check - can still crash)
+
+ArgumentNullException.ThrowIfNull(name);    // guard clause (C# 11 / .NET 6+)
+
+if (name is not null) Console.WriteLine(name.Length);   // flow analysis now knows it's non-null
+
+public class Person
+{
+    public required string Name { get; init; }   // C# 11: must be set by the initializer
+    public string? Nickname { get; set; }        // explicitly optional
+}</pre>
+    <div class="tip"><b>Rule of thumb</b>Turn on nullable reference types in every project, treat warnings as errors in new code, validate at the boundary (public methods, controllers) and keep the interior non-null.</div>
+  </section>
+
+  <section class="topic" id="exceptions" data-nav="Exception handling" data-group="1 · Fundamentals" data-level="i">
+    <h2>Exception handling <span class="badge i">Mid</span></h2>
+    <p>An exception is an object (derived from <code>System.Exception</code>) representing an error. When thrown, the CLR <b>unwinds the stack</b> looking for a matching <code>catch</code>; <code>finally</code> blocks run on the way.</p>
+    <pre data-lang="csharp" data-file="Exceptions.cs">try
+{
+    var text = await File.ReadAllTextAsync(path);
+    var cfg = JsonSerializer.Deserialize&lt;Config&gt;(text) ?? throw new InvalidDataException("empty config");
+}
+catch (FileNotFoundException ex) when (ex.FileName?.EndsWith(".json") == true)   // exception FILTER: no unwinding if false
+{
+    logger.LogWarning(ex, "Config missing, using defaults");
+}
+catch (JsonException ex)
+{
+    throw new ConfigurationException("Config is not valid JSON", ex);   // wrap + keep InnerException
+}
+finally
+{
+    Cleanup();         // always runs (except process crash / Environment.FailFast)
+}
+
+// rethrow correctly
+try { Work(); }
+catch (Exception ex) { Log(ex); throw; }        // 'throw;' keeps the original stack trace
+// catch (Exception ex) { throw ex; }           // BAD: resets stack trace
+
+// custom exception
+public class OrderNotFoundException : Exception
+{
+    public int OrderId { get; }
+    public OrderNotFoundException(int id) : base($"Order {id} not found") =&gt; OrderId = id;
+}</pre>
+    <div class="grid2">
+      <div class="card"><h4>Do</h4><ul class="pros"><li>Catch only what you can handle.</li><li>Use <code>using</code>/<code>finally</code> for cleanup.</li><li>Use <code>TryXxx</code> for expected failures.</li><li>Throw specific types with clear messages; keep <code>InnerException</code>.</li><li>Log once at the boundary.</li></ul></div>
+      <div class="card"><h4>Don't</h4><ul class="cons"><li><code>catch (Exception) { }</code> (swallowing).</li><li>Use exceptions for normal control flow (slow: throwing costs microseconds).</li><li><code>throw ex;</code> (loses the stack).</li><li>Return error codes AND throw.</li><li>Catch <code>OutOfMemoryException</code> and carry on.</li></ul></div>
+    </div>
+    <details><summary>Exception hierarchy and async exceptions</summary><div class="dbody">
+      <p><code>Exception</code> &rarr; <code>SystemException</code> (<code>NullReferenceException</code>, <code>ArgumentException</code> &rarr; <code>ArgumentNullException</code>/<code>ArgumentOutOfRangeException</code>, <code>InvalidOperationException</code>, <code>IndexOutOfRangeException</code>, <code>InvalidCastException</code>, <code>DivideByZeroException</code>) and <code>ApplicationException</code> (obsolete advice; derive from <code>Exception</code>).</p>
+      <p>In <code>async</code> methods, an exception is captured in the returned <code>Task</code> and rethrown when you <code>await</code> it. With <code>Task.WhenAll</code>, <code>await</code> rethrows only the <i>first</i> exception; inspect <code>task.Exception.InnerExceptions</code> to see all of them. An un-awaited faulted task can go unobserved &ndash; always await or handle it.</p></div></details>
+  </section>
+
+
+  <div class="part-title">Part 2 &mdash; Object-oriented programming</div>
+
+  <section class="topic" id="classes" data-nav="Classes, objects and members" data-group="2 · OOP" data-level="b">
+    <h2>Classes, objects and members <span class="badge b">Basic</span></h2>
+    <p>A <b>class</b> is a blueprint that bundles <b>state</b> (fields/properties) and <b>behaviour</b> (methods). An <b>object</b> is an instance created with <code>new</code>. Object-oriented design exists to keep related data and rules together and hide internals behind a stable surface.</p>
+    <pre data-lang="csharp" data-file="BankAccount.cs">public class BankAccount
+{
+    // FIELD: private storage (convention: _camelCase)
+    private decimal _balance;
+
+    // static member: belongs to the TYPE, shared by all instances
+    private static int _created;
+    public static int Created =&gt; _created;
+
+    // constant (compile-time) vs readonly (set once at run time)
+    public const int MaxOwnerLength = 50;
+    public readonly Guid Id = Guid.NewGuid();
+
+    // PROPERTIES: field access with logic
+    public string Owner { get; }                              // read-only auto-property (set in ctor only)
+    public decimal Balance =&gt; _balance;                       // computed / expression-bodied
+    public string? Note { get; set; }                         // auto-property
+    public DateTime OpenedUtc { get; init; } = DateTime.UtcNow;   // init-only: set at construction only
+
+    // CONSTRUCTORS
+    public BankAccount(string owner, decimal opening = 0)
+    {
+        if (string.IsNullOrWhiteSpace(owner)) throw new ArgumentException("Owner required", nameof(owner));
+        Owner = owner;
+        _balance = opening;
+        _created++;
+    }
+    static BankAccount() { /* static ctor: runs once, before first use */ }
+
+    // METHODS
+    public void Deposit(decimal amount)
+    {
+        if (amount &lt;= 0) throw new ArgumentOutOfRangeException(nameof(amount));
+        _balance += amount;
+    }
+    public bool TryWithdraw(decimal amount)
+    {
+        if (amount &lt;= 0 || amount &gt; _balance) return false;
+        _balance -= amount;
+        return true;
+    }
+
+    public override string ToString() =&gt; $"{Owner}: {_balance:C}";
+}
+
+var acc = new BankAccount("Ann", 100) { Note = "savings" };   // object initializer</pre>
+    <div class="tblwrap"><table><tr><th>Access modifier</th><th>Visible to</th></tr>
+      <tr><td><code>public</code></td><td>Everyone</td></tr>
+      <tr><td><code>private</code></td><td>Same class only (default for members)</td></tr>
+      <tr><td><code>protected</code></td><td>Same class and derived classes</td></tr>
+      <tr><td><code>internal</code></td><td>Same assembly (default for top-level types)</td></tr>
+      <tr><td><code>protected internal</code></td><td>Same assembly OR derived classes</td></tr>
+      <tr><td><code>private protected</code></td><td>Derived classes AND same assembly</td></tr>
+      <tr><td><code>file</code> (C# 11)</td><td>Same source file only</td></tr>
+    </table></div>
+    <details><summary>const vs readonly vs static readonly; fields vs properties</summary><div class="dbody">
+      <ul><li><code>const</code>: value substituted into callers at compile time. Only primitives/strings. Changing it requires recompiling every consumer.</li><li><code>readonly</code>: assigned in declaration or constructor; evaluated at run time; can hold any type (but a readonly reference still points to a mutable object).</li><li><b>Property vs field:</b> a property is a pair of methods (<code>get</code>/<code>set</code>). It allows validation, lazy loading, change notification, different accessibility per accessor, interface implementation and data binding &ndash; fields allow none of these. Expose properties, keep fields private.</li><li><b>Auto-property</b> = compiler-generated hidden backing field. <code>field</code> keyword (C# 13 preview) lets you add logic without declaring it.</li></ul></div></details>
+    <details><summary>Constructor chaining, primary constructors and object lifecycle</summary><div class="dbody">
+      <pre data-lang="csharp" data-file="Constructors.cs">public class Product
+{
+    public string Name { get; }
+    public decimal Price { get; }
+    public Product(string name) : this(name, 0m) { }              // chain to another ctor
+    public Product(string name, decimal price) { Name = name; Price = price; }
+}
+
+// Primary constructor (C# 12): parameters are in scope throughout the class
+public class OrderService(IOrderRepository repo, ILogger&lt;OrderService&gt; log)
+{
+    public Task&lt;Order?&gt; Get(int id) { log.LogInformation("Get {Id}", id); return repo.FindAsync(id); }
+}</pre>
+      <p>Creation order for <code>new Derived()</code>: field initializers (derived) &rarr; base constructor chain (base first) &rarr; derived constructor body. Never call a virtual method from a constructor: the derived override runs before the derived constructor has finished.</p></div></details>
+    <details><summary>static classes, extension methods, partial and sealed</summary><div class="dbody">
+      <pre data-lang="csharp" data-file="Extensions.cs">public static class StringExtensions               // static class: cannot be instantiated or inherited
+{
+    public static string Truncate(this string s, int max) =&gt; s.Length &lt;= max ? s : s[..max] + "...";
+}
+// usage: "long text".Truncate(4)  =&gt; "long..."
+
+public partial class Customer { }                 // class split across files (used by code generators)
+public sealed class Money { }                     // cannot be inherited (enables JIT devirtualisation)</pre></div></details>
+  </section>
+
+  <section class="topic" id="pillars" data-nav="The four pillars of OOP" data-group="2 · OOP" data-level="b">
+    <h2>The four pillars: encapsulation, inheritance, polymorphism, abstraction <span class="badge b">Basic</span></h2>
+    <div class="grid2">
+      <div class="card"><h4>Encapsulation</h4><p>Hide internal state; expose a small, safe API. The class guards its own invariants (e.g. balance never negative).</p></div>
+      <div class="card"><h4>Abstraction</h4><p>Expose <i>what</i> something does, hide <i>how</i>. Done with abstract classes and interfaces.</p></div>
+      <div class="card"><h4>Inheritance</h4><p>A derived class reuses and extends a base class (<i>is-a</i> relationship). Single class inheritance, multiple interface implementation.</p></div>
+      <div class="card"><h4>Polymorphism</h4><p>One interface, many behaviours: calling the same method on a base-type reference executes the derived implementation.</p></div>
+    </div>
+    <pre data-lang="csharp" data-file="Shapes.cs">public abstract class Shape                         // abstract: cannot be instantiated; may have abstract members
+{
+    public string Name { get; }
+    protected Shape(string name) =&gt; Name = name;
+    public abstract double Area();                  // MUST be overridden
+    public virtual string Describe() =&gt; $"{Name} with area {Area():F2}";   // MAY be overridden
+}
+
+public class Circle(double radius) : Shape("Circle")
+{
+    public override double Area() =&gt; Math.PI * radius * radius;
+}
+public class Rect(double w, double h) : Shape("Rectangle")
+{
+    public override double Area() =&gt; w * h;
+    public override string Describe() =&gt; base.Describe() + $" ({w}x{h})";   // extend base behaviour
+}
+
+Shape[] shapes = { new Circle(1), new Rect(2, 3) };
+foreach (var s in shapes) Console.WriteLine(s.Describe());   // POLYMORPHISM: runtime type decides</pre>
+    <h3>How virtual dispatch works</h3>
+    <p>Every object has a hidden header pointing to its type's <b>method table</b>. A call to a <code>virtual</code> method looks up the slot in the table of the <i>actual</i> runtime type (late binding). Non-virtual calls are resolved at compile time (fast, inlinable).</p>
+    <div class="tblwrap"><table><tr><th>Keyword</th><th>Meaning</th></tr>
+      <tr><td><code>virtual</code></td><td>Base member that can be overridden</td></tr>
+      <tr><td><code>override</code></td><td>Replaces a virtual/abstract member (polymorphic)</td></tr>
+      <tr><td><code>new</code> (member hiding)</td><td>Hides a base member &ndash; <b>not</b> polymorphic: the called version depends on the variable's static type</td></tr>
+      <tr><td><code>sealed override</code></td><td>Override that cannot be overridden further</td></tr>
+      <tr><td><code>abstract</code></td><td>No implementation; derived non-abstract classes must provide one</td></tr>
+      <tr><td><code>base</code></td><td>Access the base class implementation / constructor</td></tr>
+    </table></div>
+    <pre data-lang="csharp" data-file="Hiding.cs">class A { public virtual string Who() =&gt; "A"; public string Name() =&gt; "A"; }
+class B : A { public override string Who() =&gt; "B"; public new string Name() =&gt; "B"; }
+
+A x = new B();
+Console.WriteLine(x.Who());     // B  (override: runtime type)
+Console.WriteLine(x.Name());    // A  (hidden member: static type A)</pre>
+    <div class="warn"><b>Prefer composition over inheritance</b>Deep hierarchies are rigid: a change in the base breaks every child (the <i>fragile base class</i> problem). Use inheritance only for a genuine is-a relationship with substitutable behaviour; otherwise hold a collaborator (<i>has-a</i>) and delegate to it.</div>
+  </section>
+
+  <section class="topic" id="interfaces" data-nav="Interfaces vs abstract classes" data-group="2 · OOP" data-level="i">
+    <h2>Interfaces vs abstract classes <span class="badge i">Mid</span></h2>
+    <p>An <b>interface</b> is a contract: a set of members a type promises to provide, with no (or only default) state. It decouples <i>what</i> a consumer needs from <i>who</i> provides it &ndash; the foundation of dependency injection and testing.</p>
+    <pre data-lang="csharp" data-file="Interfaces.cs">public interface IPaymentGateway
+{
+    Task&lt;PaymentResult&gt; ChargeAsync(decimal amount, string token);
+    string Name { get; }
+
+    // default interface method (C# 8): lets you add members without breaking implementers
+    string Describe() =&gt; $"Gateway {Name}";
+
+    static IPaymentGateway Null =&gt; new NullGateway();       // static members allowed
+}
+
+public class StripeGateway : IPaymentGateway { /* ... */ public string Name =&gt; "Stripe"; public Task&lt;PaymentResult&gt; ChargeAsync(decimal a, string t) =&gt; throw new NotImplementedException(); }
+
+// EXPLICIT interface implementation: only visible through the interface type
+public class Logger : IDisposable
+{
+    void IDisposable.Dispose() { /* ... */ }
+}</pre>
+    <div class="tblwrap"><table><tr><th></th><th>Interface</th><th>Abstract class</th></tr>
+      <tr><td>Multiple inheritance</td><td>A class can implement many</td><td>Only one base class</td></tr>
+      <tr><td>State (fields)</td><td>No instance fields</td><td>Yes</td></tr>
+      <tr><td>Constructors</td><td>No</td><td>Yes</td></tr>
+      <tr><td>Default implementation</td><td>Yes (default interface methods)</td><td>Yes (virtual / concrete members)</td></tr>
+      <tr><td>Access modifiers on members</td><td>Public by default (can be restricted since C# 8)</td><td>Any</td></tr>
+      <tr><td>Best for</td><td>Capabilities and contracts (<code>IDisposable</code>, <code>IRepository</code>)</td><td>Shared base behaviour/state for a family of related types</td></tr>
+      <tr><td>Versioning</td><td>Adding a member used to break all implementers</td><td>Adding a concrete member is safe</td></tr>
+    </table></div>
+    <details><summary>Common built-in interfaces you must know</summary><div class="dbody">
+      <div class="tblwrap"><table><tr><th>Interface</th><th>Purpose</th></tr>
+        <tr><td><code>IDisposable</code> / <code>IAsyncDisposable</code></td><td>Deterministic cleanup of unmanaged resources (<code>using</code>)</td></tr>
+        <tr><td><code>IEnumerable&lt;T&gt;</code> / <code>IEnumerator&lt;T&gt;</code></td><td>Allows <code>foreach</code>; LINQ works on it</td></tr>
+        <tr><td><code>IQueryable&lt;T&gt;</code></td><td>Query translated to another language (SQL) via expression trees</td></tr>
+        <tr><td><code>IComparable&lt;T&gt;</code> / <code>IComparer&lt;T&gt;</code></td><td>Natural ordering / external comparer</td></tr>
+        <tr><td><code>IEquatable&lt;T&gt;</code></td><td>Strongly typed, boxing-free equality</td></tr>
+        <tr><td><code>ICloneable</code></td><td>Clone (ambiguous deep/shallow; usually avoided)</td></tr>
+        <tr><td><code>INotifyPropertyChanged</code></td><td>UI data binding notifications</td></tr>
+        <tr><td><code>IFormattable</code>, <code>IConvertible</code></td><td>Formatting/conversion support</td></tr>
+      </table></div></div></details>
+  </section>
+
+  <section class="topic" id="records" data-nav="Records, enums, tuples and structs" data-group="2 · OOP" data-level="i">
+    <h2>Records, enums, tuples and structs <span class="badge i">Mid</span></h2>
+    <p>A <b>record</b> (C# 9) is a type designed for <b>immutable data with value-based equality</b>. The compiler generates equality, <code>GetHashCode</code>, <code>ToString</code>, deconstruction and a <code>with</code>-expression copy method.</p>
+    <pre data-lang="csharp" data-file="Records.cs">public record Person(string First, string Last);                // positional record (class)
+public record struct Point(int X, int Y);                      // record struct (value type)
+public readonly record struct Money(decimal Amount, string Currency);
+
+var a = new Person("Ann", "Lee");
+var b = new Person("Ann", "Lee");
+Console.WriteLine(a == b);                    // True  (value equality; a class would give False)
+Console.WriteLine(ReferenceEquals(a, b));     // False (still two objects)
+var c = a with { Last = "Kim" };              // non-destructive mutation: copy + change
+Console.WriteLine(a);                         // Person { First = Ann, Last = Lee }
+var (first, last) = a;                        // deconstruction
+
+// Enums
+[Flags] public enum Permissions { None = 0, Read = 1, Write = 2, Delete = 4, All = Read | Write | Delete }
+var p = Permissions.Read | Permissions.Write;
+bool canWrite = p.HasFlag(Permissions.Write);
+
+// Tuples
+(string Name, int Age) person = ("Ann", 30);
+Console.WriteLine(person.Name);</pre>
+    <div class="tblwrap"><table><tr><th></th><th>class</th><th>record</th><th>struct</th><th>record struct</th></tr>
+      <tr><td>Kind</td><td>reference</td><td>reference</td><td>value</td><td>value</td></tr>
+      <tr><td>Equality</td><td>reference</td><td>value (members)</td><td>value (slow reflection default unless overridden)</td><td>value (generated)</td></tr>
+      <tr><td>Immutability by default</td><td>no</td><td>init-only (positional)</td><td>no</td><td>mutable unless <code>readonly</code></td></tr>
+      <tr><td>Inheritance</td><td>yes</td><td>from other records</td><td>no</td><td>no</td></tr>
+      <tr><td>Use for</td><td>entities with identity, services</td><td>DTOs, messages, value objects</td><td>small values</td><td>small immutable values</td></tr>
+    </table></div>
+    <div class="note"><b>Records and EF Core</b>Entities need identity and change tracking, so classes are normally used for them. Records are excellent for DTOs, commands and value objects.</div>
+  </section>
+
+  <section class="topic" id="equality" data-nav="Equality, hashing and object members" data-group="2 · OOP" data-level="i">
+    <h2>Equality, hashing and object members <span class="badge i">Mid</span></h2>
+    <p>Every type derives from <code>System.Object</code>, which gives it <code>Equals</code>, <code>GetHashCode</code>, <code>ToString</code> and <code>GetType</code>. Getting equality right matters because collections like <code>Dictionary</code> and <code>HashSet</code> rely on it.</p>
+    <div class="tblwrap"><table><tr><th>Operation</th><th>Default for class</th><th>Default for struct</th></tr>
+      <tr><td><code>==</code></td><td>Reference equality (unless overloaded)</td><td>Not defined until you overload it</td></tr>
+      <tr><td><code>Equals(object)</code></td><td>Reference equality</td><td>Field-by-field (reflection, slow)</td></tr>
+      <tr><td><code>GetHashCode()</code></td><td>Identity based</td><td>Based on fields</td></tr>
+    </table></div>
+    <div class="why"><b>The contract</b>If <code>a.Equals(b)</code> then <code>a.GetHashCode() == b.GetHashCode()</code>. Break it and a <code>Dictionary</code> will not find the key you put in it. Also: the hash must not change while the object is a key (use immutable members).</div>
+    <pre data-lang="csharp" data-file="Equality.cs">public sealed class Sku : IEquatable&lt;Sku&gt;
+{
+    public string Code { get; }
+    public Sku(string code) =&gt; Code = code.ToUpperInvariant();
+
+    public bool Equals(Sku? other) =&gt; other is not null &amp;&amp; Code == other.Code;      // typed, no boxing
+    public override bool Equals(object? obj) =&gt; Equals(obj as Sku);
+    public override int GetHashCode() =&gt; Code.GetHashCode();
+    public static bool operator ==(Sku? a, Sku? b) =&gt; a is null ? b is null : a.Equals(b);
+    public static bool operator !=(Sku? a, Sku? b) =&gt; !(a == b);
+}
+
+var set = new HashSet&lt;Sku&gt; { new("ab-1") };
+Console.WriteLine(set.Contains(new Sku("AB-1")));    // True (value equality + consistent hash)
+
+// Combining several fields
+public override int GetHashCode() =&gt; HashCode.Combine(First, Last, Age);</pre>
+    <pre data-lang="csharp" data-file="Is.cs">object o = "text";
+if (o is string s &amp;&amp; s.Length &gt; 2) { }          // type pattern + variable
+var t = o as int?;                                  // 'as': null instead of exception
+var n = (int)(o is int i ? i : 0);                  // explicit cast throws InvalidCastException on mismatch
+Console.WriteLine(o.GetType().Name);                // exact runtime type: "String"</pre>
+  </section>
+
+  <section class="topic" id="solid" data-nav="SOLID principles with C#" data-group="2 · OOP" data-level="a">
+    <h2>SOLID principles with C# <span class="badge a">Adv</span></h2>
+    <p>Five design guidelines that keep object-oriented code flexible. Each solves a specific kind of change-induced pain.</p>
+    <div class="tblwrap"><table><tr><th>Principle</th><th>Statement</th><th>Smell it fixes</th></tr>
+      <tr><td><b>S</b>ingle Responsibility</td><td>A class has one reason to change</td><td>"God" class doing validation + DB + email</td></tr>
+      <tr><td><b>O</b>pen/Closed</td><td>Open for extension, closed for modification</td><td>Growing <code>switch</code> on type</td></tr>
+      <tr><td><b>L</b>iskov Substitution</td><td>Subtypes must be usable wherever the base type is</td><td>Overrides that throw <code>NotSupportedException</code></td></tr>
+      <tr><td><b>I</b>nterface Segregation</td><td>Many small interfaces beat one fat one</td><td>Empty method implementations</td></tr>
+      <tr><td><b>D</b>ependency Inversion</td><td>Depend on abstractions, not concretions</td><td><code>new SqlRepo()</code> inside business code</td></tr>
+    </table></div>
+    <h3>Example: Open/Closed + Dependency Inversion</h3>
+    <pre data-lang="csharp" data-file="Discounts.cs">// BEFORE: every new customer type edits this method (violates O/C)
+decimal Price(Customer c, decimal amount) =&gt; c.Type switch
+{
+    "Regular" =&gt; amount,
+    "Gold"    =&gt; amount * 0.9m,
+    _         =&gt; amount
+};
+
+// AFTER: add a new strategy class, change nothing else
+public interface IDiscountPolicy { bool AppliesTo(Customer c); decimal Apply(decimal amount); }
+public class GoldDiscount : IDiscountPolicy
+{
+    public bool AppliesTo(Customer c) =&gt; c.Type == "Gold";
+    public decimal Apply(decimal amount) =&gt; amount * 0.9m;
+}
+
+public class PricingService(IEnumerable&lt;IDiscountPolicy&gt; policies)   // depends on abstraction (DIP), injected
+{
+    public decimal Price(Customer c, decimal amount) =&gt;
+        policies.FirstOrDefault(p =&gt; p.AppliesTo(c))?.Apply(amount) ?? amount;
+}</pre>
+    <details><summary>Liskov Substitution: the classic Rectangle/Square trap</summary><div class="dbody">
+      <pre data-lang="csharp" data-file="Liskov.cs">class Rectangle { public virtual int Width { get; set; } public virtual int Height { get; set; } public int Area =&gt; Width * Height; }
+class Square : Rectangle
+{
+    public override int Width  { set { base.Width = base.Height = value; } }   // surprising side effect
+    public override int Height { set { base.Width = base.Height = value; } }
+}
+void Resize(Rectangle r) { r.Width = 4; r.Height = 5; Debug.Assert(r.Area == 20); }   // FAILS for Square</pre>
+      <p>Mathematically a square is a rectangle, but <i>behaviourally</i> a mutable square cannot replace a mutable rectangle. Fix: model them as separate immutable shapes sharing an <code>IShape.Area</code> interface.</p></div></details>
+    <details><summary>Common design patterns in C# (names to recognise)</summary><div class="dbody">
+      <ul><li><b>Creational:</b> Factory Method, Abstract Factory, Builder, Singleton (prefer DI singleton lifetime), Prototype.</li><li><b>Structural:</b> Adapter, Decorator (e.g. wrapping a repository with caching), Facade, Proxy, Composite.</li><li><b>Behavioural:</b> Strategy, Observer (events, <code>IObservable</code>), Command, Mediator, Chain of Responsibility (ASP.NET middleware!), Template Method, State, Iterator (<code>yield</code>).</li></ul></div></details>
+  </section>
+
+
+  <div class="part-title">Part 3 &mdash; Generics, collections, delegates and LINQ</div>
+
+  <section class="topic" id="generics" data-nav="Generics" data-group="3 · Generics & LINQ" data-level="i">
+    <h2>Generics <span class="badge i">Mid</span></h2>
+    <p><b>Generics</b> let you write a type or method once with a placeholder type (<code>T</code>) and get compile-time type safety for every concrete type, without casting or boxing.</p>
+    <div class="why"><b>Why do they exist?</b>Before generics (C# 1.0) collections stored <code>object</code>: every read needed a cast (run-time errors) and every value type was boxed (slow). <code>List&lt;int&gt;</code> is checked at compile time and stores raw ints.</div>
+    <pre data-lang="csharp" data-file="Generics.cs">// Generic class with constraints
+public class Repository&lt;T&gt; where T : class, IEntity, new()
+{
+    private readonly List&lt;T&gt; _items = new();
+    public void Add(T item) =&gt; _items.Add(item);
+    public T? Find(int id) =&gt; _items.FirstOrDefault(x =&gt; x.Id == id);
+    public T CreateEmpty() =&gt; new T();                 // possible only because of new() constraint
+}
+
+// Generic method with type inference
+static T Max&lt;T&gt;(T a, T b) where T : IComparable&lt;T&gt; =&gt; a.CompareTo(b) &gt;= 0 ? a : b;
+Console.WriteLine(Max(3, 7));          // T inferred as int
+Console.WriteLine(Max("a", "b"));      // T inferred as string
+
+// Generic interface + covariance/contravariance
+IEnumerable&lt;string&gt; strings = new List&lt;string&gt;();
+IEnumerable&lt;object&gt; objects = strings;       // covariance (out T): reading only, safe
+Action&lt;object&gt; actObj = o =&gt; Console.WriteLine(o);
+Action&lt;string&gt; actStr = actObj;              // contravariance (in T): consuming only, safe
+
+// default / typeof with generics
+T? Fallback&lt;T&gt;() =&gt; default;               // null for references, 0/false for value types
+Console.WriteLine(typeof(List&lt;int&gt;));        // System.Collections.Generic.List`1[System.Int32]</pre>
+    <div class="tblwrap"><table><tr><th>Constraint</th><th>Requires T to be...</th></tr>
+      <tr><td><code>where T : struct</code></td><td>a non-nullable value type</td></tr>
+      <tr><td><code>where T : class</code></td><td>a reference type</td></tr>
+      <tr><td><code>where T : notnull</code></td><td>non-nullable (value or reference)</td></tr>
+      <tr><td><code>where T : new()</code></td><td>has a public parameterless constructor</td></tr>
+      <tr><td><code>where T : BaseClass / IFoo</code></td><td>derived from / implementing it</td></tr>
+      <tr><td><code>where T : unmanaged</code></td><td>a blittable struct (no references) &ndash; used with pointers/Span</td></tr>
+      <tr><td><code>where T : INumber&lt;T&gt;</code></td><td>generic math (static abstract interface members, .NET 7+)</td></tr>
+    </table></div>
+    <details><summary>How the runtime implements generics (reified generics)</summary><div class="dbody">
+      <p>Unlike Java's type erasure, .NET keeps generic type information at run time (<i>reification</i>). The JIT creates specialised native code for each <b>value type</b> instantiation (<code>List&lt;int&gt;</code>, <code>List&lt;double&gt;</code> are separate, fully optimised) but shares one version for all <b>reference type</b> instantiations (<code>List&lt;string&gt;</code>, <code>List&lt;Person&gt;</code>) because references are all pointer-sized. Result: no boxing for value types and the ability to ask <code>typeof(T)</code> and use <code>new T()</code> at run time.</p></div></details>
+  </section>
+
+  <section class="topic" id="collections" data-nav="Collections and data structures" data-group="3 · Generics & LINQ" data-level="i">
+    <h2>Collections and data structures <span class="badge i">Mid</span></h2>
+    <p>Choosing the right collection is mostly about the <b>operations you perform most</b> (lookup, insert, order, uniqueness) and their algorithmic cost.</p>
+    <div class="tblwrap"><table><tr><th>Type</th><th>Backed by</th><th>Lookup</th><th>Add</th><th>Insert/Remove middle</th><th>Use when</th></tr>
+      <tr><td><code>T[]</code></td><td>contiguous memory</td><td>O(1) by index</td><td>fixed size</td><td>O(n)</td><td>Fixed-size data, performance-critical code</td></tr>
+      <tr><td><code>List&lt;T&gt;</code></td><td>resizable array</td><td>O(1) index, O(n) search</td><td>amortised O(1)</td><td>O(n)</td><td>Default sequence</td></tr>
+      <tr><td><code>LinkedList&lt;T&gt;</code></td><td>doubly-linked nodes</td><td>O(n)</td><td>O(1) at ends</td><td>O(1) with node</td><td>Rarely; many middle insertions</td></tr>
+      <tr><td><code>Dictionary&lt;K,V&gt;</code></td><td>hash table</td><td>O(1) avg by key</td><td>O(1) avg</td><td>O(1) avg</td><td>Key &rarr; value lookup</td></tr>
+      <tr><td><code>HashSet&lt;T&gt;</code></td><td>hash table</td><td>O(1) avg</td><td>O(1) avg</td><td>O(1) avg</td><td>Uniqueness, set math (union/intersect)</td></tr>
+      <tr><td><code>SortedDictionary&lt;K,V&gt;</code> / <code>SortedSet&lt;T&gt;</code></td><td>red-black tree</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td><td>Need items kept in key order</td></tr>
+      <tr><td><code>Queue&lt;T&gt;</code></td><td>circular buffer</td><td>-</td><td>O(1) enqueue</td><td>-</td><td>FIFO</td></tr>
+      <tr><td><code>Stack&lt;T&gt;</code></td><td>array</td><td>-</td><td>O(1) push</td><td>-</td><td>LIFO, undo, parsing</td></tr>
+      <tr><td><code>PriorityQueue&lt;T,P&gt;</code></td><td>binary heap</td><td>-</td><td>O(log n)</td><td>-</td><td>Scheduling, Dijkstra</td></tr>
+    </table></div>
+    <pre data-lang="csharp" data-file="Collections.cs">var scores = new Dictionary&lt;string, int&gt; { ["ann"] = 90, ["bob"] = 75 };
+if (scores.TryGetValue("ann", out var s)) Console.WriteLine(s);       // single lookup, no exception
+scores["cy"] = 60;                                                  // add or overwrite
+scores.TryAdd("ann", 1);                                            // false, does not overwrite
+// var x = scores["zed"];  // KeyNotFoundException
+
+var seen = new HashSet&lt;int&gt;();
+foreach (var n in new[] { 1, 2, 2, 3 }) if (!seen.Add(n)) Console.WriteLine($"dup {n}");   // Add returns false if present
+
+var list = new List&lt;int&gt;(capacity: 1000);         // pre-size to avoid re-allocations
+// foreach (var i in list) list.Add(1);          // InvalidOperationException: collection modified during enumeration
+list.RemoveAll(x =&gt; x % 2 == 0);                  // safe bulk removal
+
+// Immutable and read-only
+IReadOnlyList&lt;int&gt; ro = list;                     // read-only VIEW (underlying list can still change)
+var frozen = list.ToImmutableList();              // truly immutable copy (System.Collections.Immutable)
+var fd = scores.ToFrozenDictionary();             // .NET 8: fastest read-only lookups
+
+// Thread-safe collections
+var cd = new ConcurrentDictionary&lt;string, int&gt;();
+cd.AddOrUpdate("hits", 1, (key, old) =&gt; old + 1);   // atomic update</pre>
+    <details><summary>How Dictionary works (and why the hash contract matters)</summary><div class="dbody">
+      <p>A dictionary has an array of <b>buckets</b>. For a key it computes <code>GetHashCode()</code>, maps it to a bucket index (<code>hash % buckets.Length</code>), then walks a short chain comparing keys with <code>Equals</code>. When the load gets too high it <b>resizes</b> (roughly doubling to the next prime) and re-inserts everything. Cost is O(1) on average, O(n) if many keys share a hash. That is why mutable keys or a bad <code>GetHashCode</code> silently break lookups.</p></div></details>
+    <div class="tblwrap"><table><tr><th>Interface to expose</th><th>Gives the caller</th></tr>
+      <tr><td><code>IEnumerable&lt;T&gt;</code></td><td>Forward iteration only</td></tr>
+      <tr><td><code>IReadOnlyCollection&lt;T&gt;</code> / <code>IReadOnlyList&lt;T&gt;</code></td><td>Count / index access, no mutation</td></tr>
+      <tr><td><code>ICollection&lt;T&gt;</code> / <code>IList&lt;T&gt;</code></td><td>Add/Remove (mutation)</td></tr>
+    </table></div>
+    <div class="tip"><b>API design</b>Accept the <i>least specific</i> type you need (<code>IEnumerable&lt;T&gt;</code>) and return the <i>most useful read-only</i> one (<code>IReadOnlyList&lt;T&gt;</code>), not a mutable <code>List&lt;T&gt;</code> of internal state.</div>
+  </section>
+
+  <section class="topic" id="delegates" data-nav="Delegates, lambdas and events" data-group="3 · Generics & LINQ" data-level="i">
+    <h2>Delegates, lambdas and events <span class="badge i">Mid</span></h2>
+    <p>A <b>delegate</b> is a type-safe object that references a method (like a function pointer, but safe and able to hold several methods). Delegates make callbacks, strategies, LINQ and events possible.</p>
+    <pre data-lang="csharp" data-file="Delegates.cs">delegate int Operation(int a, int b);                     // custom delegate type
+
+Operation add = (a, b) =&gt; a + b;                          // lambda
+Func&lt;int, int, int&gt; mul = (a, b) =&gt; a * b;                // Func&lt;..., TResult&gt;: returns a value
+Action&lt;string&gt; print = Console.WriteLine;                 // Action&lt;...&gt;: returns void (method group conversion)
+Predicate&lt;int&gt; isEven = n =&gt; n % 2 == 0;                  // returns bool
+
+// Multicast: invocation list
+Action hello = () =&gt; Console.Write("A ");
+hello += () =&gt; Console.Write("B ");
+hello();                                                  // A B
+
+// Closure: lambda captures a VARIABLE (not its value)
+var actions = new List&lt;Action&gt;();
+for (int i = 0; i &lt; 3; i++) { int copy = i; actions.Add(() =&gt; Console.Write(copy)); }   // 'copy' per iteration
+actions.ForEach(a =&gt; a());                                // 012  (capturing 'i' directly would print 333 for a for-loop)</pre>
+    <h3>Events: delegates with encapsulation</h3>
+    <p>An <code>event</code> is a delegate field with restricted access: outside code can only subscribe (<code>+=</code>) and unsubscribe (<code>-=</code>), never invoke it or overwrite the list. This is the <b>Observer pattern</b> built into the language.</p>
+    <pre data-lang="csharp" data-file="Events.cs">public class StockTicker
+{
+    public event EventHandler&lt;PriceChangedEventArgs&gt;? PriceChanged;       // standard (object? sender, TEventArgs e)
+
+    private decimal _price;
+    public decimal Price
+    {
+        get =&gt; _price;
+        set { if (_price == value) return; var old = _price; _price = value; PriceChanged?.Invoke(this, new(old, value)); }   // ?. = thread-safe-ish null check
+    }
+}
+public record PriceChangedEventArgs(decimal Old, decimal New);
+
+var t = new StockTicker();
+EventHandler&lt;PriceChangedEventArgs&gt; h = (s, e) =&gt; Console.WriteLine($"{e.Old} -&gt; {e.New}");
+t.PriceChanged += h;
+t.Price = 10;
+t.PriceChanged -= h;      // ALWAYS unsubscribe long-lived publishers: the publisher holds a strong reference to the subscriber (memory leak)</pre>
+    <div class="warn"><b>Event memory leaks</b>A static or long-lived publisher keeps every subscriber alive through the delegate list. Unsubscribe in <code>Dispose</code>, use weak events, or scope subscriptions to the publisher's lifetime.</div>
+    <div class="tblwrap"><table><tr><th>Delegate type</th><th>Signature</th><th>Common use</th></tr>
+      <tr><td><code>Action&lt;T...&gt;</code></td><td>returns void</td><td>Callbacks, <code>List.ForEach</code></td></tr>
+      <tr><td><code>Func&lt;T..., TResult&gt;</code></td><td>returns TResult</td><td>Selectors in LINQ, factories</td></tr>
+      <tr><td><code>Predicate&lt;T&gt;</code></td><td>returns bool</td><td><code>List.FindAll</code></td></tr>
+      <tr><td><code>Expression&lt;Func&lt;T,bool&gt;&gt;</code></td><td>code as data (expression tree)</td><td>EF Core / IQueryable translation to SQL</td></tr>
+    </table></div>
+  </section>
+
+  <section class="topic" id="linq" data-nav="LINQ in depth" data-group="3 · Generics & LINQ" data-level="i">
+    <h2>LINQ in depth <span class="badge i">Mid</span></h2>
+    <p><b>LINQ</b> (Language Integrated Query) is a set of extension methods on <code>IEnumerable&lt;T&gt;</code> (in-memory) and <code>IQueryable&lt;T&gt;</code> (translated to SQL etc.) that lets you query data declaratively: <i>what</i> you want, not <i>how</i> to loop.</p>
+    <pre data-lang="csharp" data-file="Linq.cs">var employees = GetEmployees();
+
+// Method syntax (most common)
+var topIt = employees
+    .Where(e =&gt; e.Dept == "IT")             // filter
+    .OrderByDescending(e =&gt; e.Salary)       // sort
+    .Select(e =&gt; new { e.Name, e.Salary })  // project
+    .Take(3)                                // paging
+    .ToList();                              // EXECUTE
+
+// Query syntax (compiles to the same method calls)
+var q = from e in employees
+        where e.Salary &gt; 50000
+        orderby e.Name
+        select e.Name;
+
+// Aggregation and grouping
+var stats = employees.GroupBy(e =&gt; e.Dept)
+    .Select(g =&gt; new { Dept = g.Key, Count = g.Count(), Avg = g.Average(e =&gt; e.Salary), Max = g.Max(e =&gt; e.Salary) });
+
+// Joins
+var joined = employees.Join(depts, e =&gt; e.DeptId, d =&gt; d.Id, (e, d) =&gt; new { e.Name, d.Title });
+var leftJoin = employees.GroupJoin(depts, e =&gt; e.DeptId, d =&gt; d.Id, (e, ds) =&gt; new { e, ds })
+                        .SelectMany(x =&gt; x.ds.DefaultIfEmpty(), (x, d) =&gt; new { x.e.Name, Dept = d?.Title });
+
+// Quantifiers and element operators
+bool any = employees.Any(e =&gt; e.Salary &gt; 100000);
+bool all = employees.All(e =&gt; e.Salary &gt; 0);
+var first = employees.FirstOrDefault(e =&gt; e.Name == "Ann");     // null if none
+var single = employees.Single(e =&gt; e.Id == 7);                  // throws if 0 or &gt;1
+var distinct = employees.Select(e =&gt; e.Dept).Distinct();
+var chunks = Enumerable.Range(1, 10).Chunk(4);                  // .NET 6: int[][]
+var byId = employees.ToDictionary(e =&gt; e.Id);                   // throws on duplicate keys
+var lookup = employees.ToLookup(e =&gt; e.Dept);                   // multi-valued dictionary</pre>
+    <div class="lab" id="linq-lab"></div>
+    <h3>Deferred vs immediate execution</h3>
+    <p>Most LINQ operators (<code>Where, Select, OrderBy, GroupBy, Take</code>...) are <b>lazy</b>: they just build a pipeline. Nothing runs until you enumerate (<code>foreach</code>) or call an operator that returns a concrete result (<code>ToList, ToArray, ToDictionary, Count, First, Sum, Any</code>).</p>
+    <div class="warn"><b>Classic traps</b><ul>
+      <li><b>Multiple enumeration:</b> enumerating the same lazy query twice runs it twice (and may hit the database twice). Materialise with <code>ToList()</code> when reusing.</li>
+      <li><b>Captured variables:</b> the query uses the variable's value at <i>enumeration</i> time, not definition time.</li>
+      <li><b><code>IEnumerable</code> vs <code>IQueryable</code>:</b> calling <code>.AsEnumerable()</code> / <code>.ToList()</code> too early pulls the whole table into memory and filters in C#. Keep filters on <code>IQueryable</code> so SQL does the work.</li>
+      <li><b>Count() vs Any():</b> use <code>Any()</code> to test for existence; <code>Count() &gt; 0</code> may enumerate everything.</li>
+      <li><b>Order of operators:</b> filter (<code>Where</code>) before sorting/projecting to reduce the work.</li>
+    </ul></div>
+    <details><summary>How IEnumerable vs IQueryable differ internally</summary><div class="dbody">
+      <p><code>IEnumerable&lt;T&gt;</code> operators take <b>delegates</b> (<code>Func&lt;T,bool&gt;</code>) and run in your process. <code>IQueryable&lt;T&gt;</code> operators take <b>expression trees</b> (<code>Expression&lt;Func&lt;T,bool&gt;&gt;</code>): a data structure describing the lambda. A provider (EF Core) walks the tree and translates it into SQL. A lambda that calls a C# method the provider cannot translate throws (or, in old EF, silently evaluated client-side).</p>
+      <pre data-lang="csharp" data-file="IQueryable.cs">IQueryable&lt;Product&gt; q = db.Products;                          // no SQL yet
+q = q.Where(p =&gt; p.Price &gt; 10);                                 // still no SQL, expression tree grows
+if (!string.IsNullOrEmpty(term)) q = q.Where(p =&gt; p.Name.Contains(term));   // conditional composition
+var page = await q.OrderBy(p =&gt; p.Id).Skip(40).Take(20).ToListAsync();    // ONE SQL query runs here</pre></div></details>
+  </section>
+
+  <section class="topic" id="iterators" data-nav="Iterators, yield and IEnumerable" data-group="3 · Generics & LINQ" data-level="a">
+    <h2>Iterators, <code>yield</code> and <code>IEnumerable</code> <span class="badge a">Adv</span></h2>
+    <p><code>foreach</code> is syntax sugar: it calls <code>GetEnumerator()</code> and loops on <code>MoveNext()</code>/<code>Current</code>. A method that uses <code>yield return</code> becomes an <b>iterator</b>: the compiler rewrites it into a hidden state-machine class that produces values one at a time, on demand.</p>
+    <pre data-lang="csharp" data-file="Yield.cs">static IEnumerable&lt;int&gt; Fibonacci()
+{
+    int a = 0, b = 1;
+    while (true)                       // infinite sequence is fine: values are produced lazily
+    {
+        yield return a;                // pause here, hand a value to the caller
+        (a, b) = (b, a + b);
+    }
+}
+
+foreach (var f in Fibonacci().Take(8)) Console.Write(f + " ");     // 0 1 1 2 3 5 8 13
+
+static IEnumerable&lt;string&gt; ReadLines(string path)
+{
+    using var reader = File.OpenText(path);             // disposed when enumeration ends/aborts
+    string? line;
+    while ((line = reader.ReadLine()) is not null) yield return line;      // streams a huge file with constant memory
+}
+
+// What foreach really does
+var e = ReadLines("data.txt").GetEnumerator();
+try { while (e.MoveNext()) { var item = e.Current; } }
+finally { e.Dispose(); }</pre>
+    <div class="note"><b>Argument validation in iterators</b>The body of an iterator method does not run until the first <code>MoveNext()</code>, so argument checks are delayed. Validate in a normal wrapper method and call a private iterator.</div>
+  </section>
+
+
+  <div class="part-title">Part 4 &mdash; Asynchronous programming, memory and the runtime</div>
+
+  <section class="topic" id="async" data-nav="async / await and Tasks" data-group="4 · Async & Memory" data-level="i">
+    <h2>async / await and Tasks <span class="badge i">Mid</span></h2>
+    <p><b>Asynchronous programming</b> lets a method wait for slow work (disk, network, database) <i>without blocking a thread</i>. <code>async/await</code> lets you write that code in a straight-line style while the compiler builds a state machine behind the scenes.</p>
+    <div class="why"><b>Why does it exist?</b>A thread costs about 1 MB of stack and scheduling time. If every waiting request holds a thread, a server runs out of threads long before it runs out of CPU. With <code>await</code>, the thread returns to the pool during the wait and any free thread resumes the method afterwards. Async is about <b>scalability</b>, not about making a single call faster.</div>
+    <pre data-lang="csharp" data-file="Async.cs">public async Task&lt;string&gt; GetTitleAsync(string url, CancellationToken ct = default)
+{
+    using var http = new HttpClient();
+    string html = await http.GetStringAsync(url, ct);        // thread is released here
+    // ... continuation resumes here when the response arrives (maybe on a different thread)
+    var m = Regex.Match(html, "&lt;title&gt;(.*?)&lt;/title&gt;");
+    return m.Success ? m.Groups[1].Value : "(none)";
+}
+
+// Sequential: total time = a + b
+var user = await GetUserAsync(id);
+var orders = await GetOrdersAsync(id);
+
+// Concurrent: total time = max(a, b)
+var userTask = GetUserAsync(id);
+var ordersTask = GetOrdersAsync(id);
+await Task.WhenAll(userTask, ordersTask);
+var result = (userTask.Result, ordersTask.Result);       // already complete: no blocking
+
+// First to finish / timeouts
+var winner = await Task.WhenAny(work, Task.Delay(TimeSpan.FromSeconds(5)));
+await work.WaitAsync(TimeSpan.FromSeconds(5), ct);       // .NET 6: throws TimeoutException</pre>
+    <div class="lab" id="async-lab"></div>
+    <h3>What the compiler generates</h3>
+    <div class="diagram"><div class="dtitle">An async method is a state machine</div>
+      <div class="flow">
+        <div class="node">Call method<small>runs synchronously<br>until first incomplete await</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Returns a Task<small>caller gets a promise</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">I/O completes<small>OS signals completion port</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">MoveNext() resumes<small>on captured context or pool thread</small></div><span class="arrow">&rarr;</span>
+        <div class="node">Task completes<small>result / exception stored</small></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Type</th><th>Meaning</th><th>Use</th></tr>
+      <tr><td><code>Task</code></td><td>Async operation without a result</td><td>Return type for <code>async</code> methods that return nothing</td></tr>
+      <tr><td><code>Task&lt;T&gt;</code></td><td>Async operation producing <code>T</code></td><td>Default for most async methods</td></tr>
+      <tr><td><code>ValueTask&lt;T&gt;</code></td><td>Struct that may avoid allocating when the result is already available</td><td>Hot paths with frequent synchronous completion (cache hits). Await it once only.</td></tr>
+      <tr><td><code>async void</code></td><td>Fire-and-forget; cannot be awaited; exceptions crash the process</td><td><b>Only</b> for event handlers</td></tr>
+      <tr><td><code>IAsyncEnumerable&lt;T&gt;</code></td><td>Async stream: <code>await foreach</code></td><td>Paged APIs, streaming results</td></tr>
+    </table></div>
+    <h3>CPU-bound vs I/O-bound</h3>
+    <ul><li><b>I/O-bound</b> (HTTP, DB, files): use the async API directly. No thread is used while waiting.</li><li><b>CPU-bound</b> (hashing, image processing): <code>await Task.Run(() =&gt; Compute())</code> offloads work to the pool to keep a UI responsive. In ASP.NET Core do <b>not</b> wrap work in <code>Task.Run</code> &ndash; it just moves it to another thread and adds overhead.</li></ul>
+    <div class="warn"><b>Mistakes that cause real outages</b><ul>
+      <li><b>Sync-over-async:</b> <code>.Result</code> / <code>.Wait()</code> / <code>.GetAwaiter().GetResult()</code> blocks a thread &rarr; thread-pool starvation, and <b>deadlocks</b> in UI/legacy ASP.NET where a <code>SynchronizationContext</code> is captured.</li>
+      <li><b><code>async void</code></b> methods: you cannot await them or catch their exceptions.</li>
+      <li><b>Forgetting <code>await</code></b>: the task runs unobserved; errors vanish and the code after it runs too early.</li>
+      <li><b>Not passing <code>CancellationToken</code></b>: abandoned requests keep consuming resources.</li>
+      <li><b><code>Task.Run</code> in server code</b> and <code>lock</code> around an <code>await</code> (not allowed).</li>
+    </ul></div>
+    <details><summary>ConfigureAwait, SynchronizationContext and the classic deadlock</summary><div class="dbody">
+      <p>By default <code>await</code> captures the current <code>SynchronizationContext</code> (UI thread in WPF/WinForms, request context in classic ASP.NET) and resumes there. If that thread is blocked waiting for the same task (<code>.Result</code>), the continuation can never run &rarr; <b>deadlock</b>. <code>await task.ConfigureAwait(false)</code> says "I don't need the original context", so the continuation runs on the pool.</p>
+      <p><b>ASP.NET Core has no SynchronizationContext</b>, so the classic deadlock does not occur there (but blocking still starves the pool). Guidance: library code should use <code>ConfigureAwait(false)</code>; application code (controllers, UI) normally should not.</p>
+      <pre data-lang="csharp" data-file="Deadlock.cs">// WinForms/WPF button handler
+void Button_Click(object s, EventArgs e)
+{
+    var text = LoadAsync().Result;     // UI thread blocks here...
+}
+async Task&lt;string&gt; LoadAsync()
+{
+    await Task.Delay(100);             // ...continuation wants the UI thread -&gt; DEADLOCK
+    return "done";
+}</pre></div></details>
+    <details><summary>Cancellation, progress and async streams</summary><div class="dbody">
+      <pre data-lang="csharp" data-file="Cancellation.cs">using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));    // auto-cancel after 3s
+try
+{
+    await foreach (var page in ReadPagesAsync(cts.Token).WithCancellation(cts.Token))
+        Console.WriteLine(page.Count);
+}
+catch (OperationCanceledException) { Console.WriteLine("cancelled"); }
+
+async IAsyncEnumerable&lt;List&lt;int&gt;&gt; ReadPagesAsync([EnumeratorCancellation] CancellationToken ct = default)
+{
+    for (int p = 0; p &lt; 10; p++)
+    {
+        ct.ThrowIfCancellationRequested();                 // cooperative cancellation: code must check the token
+        await Task.Delay(500, ct);
+        yield return Enumerable.Range(p * 10, 10).ToList();
+    }
+}</pre></div></details>
+  </section>
+
+  <section class="topic" id="threading" data-nav="Threads, locks and concurrency" data-group="4 · Async & Memory" data-level="a">
+    <h2>Threads, locks and concurrency <span class="badge a">Adv</span></h2>
+    <p>A <b>thread</b> is an independent path of execution. The <b>ThreadPool</b> keeps a set of reusable worker threads so you do not pay thread-creation costs. Concurrency is hard because threads share memory: two threads changing the same variable produce <b>race conditions</b>.</p>
+    <pre data-lang="csharp" data-file="Concurrency.cs">// Race condition: counter++ is read-modify-write, NOT atomic
+int counter = 0;
+Parallel.For(0, 100_000, _ =&gt; counter++);                 // result &lt; 100000, unpredictable
+
+// Fix 1: lock (mutual exclusion)
+object gate = new();
+Parallel.For(0, 100_000, _ =&gt; { lock (gate) counter++; });
+
+// Fix 2: atomic operation (faster for single variables)
+Parallel.For(0, 100_000, _ =&gt; Interlocked.Increment(ref counter));
+
+// Fix 3: avoid sharing - thread-safe collection / immutable data / message passing
+var bag = new ConcurrentBag&lt;int&gt;();
+var ch = System.Threading.Channels.Channel.CreateBounded&lt;string&gt;(100);   // producer/consumer queue
+await ch.Writer.WriteAsync("job-1");
+var job = await ch.Reader.ReadAsync();
+
+// Async-friendly lock: lock() cannot contain await
+var sem = new SemaphoreSlim(1, 1);
+await sem.WaitAsync();
+try { await DoWorkAsync(); } finally { sem.Release(); }
+
+// Lazy and thread-safe singletons
+private static readonly Lazy&lt;Service&gt; _inst = new(() =&gt; new Service());   // thread-safe by default</pre>
+    <div class="tblwrap"><table><tr><th>Primitive</th><th>Use for</th></tr>
+      <tr><td><code>lock</code> / <code>Monitor</code></td><td>Short critical sections in-process (no await inside)</td></tr>
+      <tr><td><code>Interlocked</code></td><td>Lock-free atomic increments, compare-exchange</td></tr>
+      <tr><td><code>SemaphoreSlim</code></td><td>Limit concurrency; async-compatible (<code>WaitAsync</code>)</td></tr>
+      <tr><td><code>ReaderWriterLockSlim</code></td><td>Many readers, few writers</td></tr>
+      <tr><td><code>Mutex</code></td><td>Cross-process locking</td></tr>
+      <tr><td><code>volatile</code></td><td>Ensure latest value is read (rarely the right tool)</td></tr>
+      <tr><td><code>Channel&lt;T&gt;</code></td><td>Async producer-consumer pipelines</td></tr>
+      <tr><td><code>Parallel.ForEach / PLINQ</code></td><td>Data-parallel CPU-bound work</td></tr>
+    </table></div>
+    <div class="warn"><b>Deadlock recipe</b>Thread 1 locks A then waits for B; thread 2 locks B then waits for A. Always acquire multiple locks in the same global order, hold locks for the shortest time, never call unknown code (callbacks, virtual methods) while holding a lock, and never <code>lock(this)</code> or <code>lock(typeof(X))</code> (public objects anyone else can lock).</div>
+  </section>
+
+  <section class="topic" id="memory" data-nav="Memory: stack, heap and the garbage collector" data-group="4 · Async & Memory" data-level="a">
+    <h2>Memory: stack, heap and the garbage collector <span class="badge a">Adv</span></h2>
+    <p>.NET manages memory automatically. Understanding <i>how</i> explains performance problems (allocation pressure, GC pauses) and leaks.</p>
+    <div class="grid2">
+      <div class="card"><h4>The stack</h4><ul><li>Per-thread, LIFO, very fast (move a pointer).</li><li>Holds locals, parameters, return addresses, and value-type data declared locally.</li><li>Memory freed automatically when the method returns.</li><li>Limited size (about 1 MB): deep recursion &rarr; <code>StackOverflowException</code> (cannot be caught).</li></ul></div>
+      <div class="card"><h4>The managed heap</h4><ul><li>Shared; holds reference-type objects (and boxed values, closures, arrays).</li><li>Allocation is cheap (bump a pointer); <b>cleanup</b> is done by the GC.</li><li>Divided into <b>generations</b> 0, 1, 2 and the Large Object Heap (LOH, objects &ge; 85,000 bytes).</li></ul></div>
+    </div>
+    <h3>How the garbage collector works</h3>
+    <ol>
+      <li><b>Mark:</b> starting from <i>roots</i> (static fields, locals on stacks, CPU registers, GC handles) trace every reachable object.</li>
+      <li><b>Sweep/Compact:</b> reclaim the space of unreachable objects and (usually) slide survivors together to avoid fragmentation.</li>
+      <li><b>Generational:</b> new objects go to Gen 0. Survivors are promoted to Gen 1, then Gen 2. Most objects die young, so frequent cheap Gen 0 collections reclaim most memory. Gen 2 (full) collections are rare and expensive.</li>
+    </ol>
+    <div class="lab" id="gc-lab"></div>
+    <div class="tblwrap"><table><tr><th>GC mode</th><th>Notes</th></tr>
+      <tr><td>Workstation (default for desktop/console) vs Server</td><td>Server GC uses a heap and thread per core: higher throughput for services, higher memory use. ASP.NET Core defaults to Server GC where appropriate.</td></tr>
+      <tr><td>Concurrent / background GC</td><td>Gen 2 marking runs while your threads continue, shortening pauses.</td></tr>
+      <tr><td>LOH</td><td>Large arrays/strings; collected only with Gen 2 and (by default) not compacted &rarr; fragmentation. Pool large buffers (<code>ArrayPool&lt;T&gt;</code>).</td></tr>
+    </table></div>
+    <h3>IDisposable, finalizers and <code>using</code></h3>
+    <p>The GC reclaims <i>memory</i> but knows nothing about <b>unmanaged resources</b> (file handles, sockets, DB connections). Types that own them implement <code>IDisposable</code>; <code>using</code> guarantees <code>Dispose()</code> runs even if an exception occurs. A <b>finalizer</b> (<code>~Class</code>) is a safety net run by the GC at some unpredictable time &ndash; it also delays collection of the object, so avoid them.</p>
+    <pre data-lang="csharp" data-file="Dispose.cs">using var file = File.OpenRead("data.bin");        // using declaration: disposed at end of scope
+using (var conn = new SqlConnection(cs)) { /* ... */ }   // classic using block
+await using var ctx = new AppDbContext();          // IAsyncDisposable
+
+public class ResourceHolder : IDisposable
+{
+    private IntPtr _handle = Native.Open();              // unmanaged resource
+    private readonly Stream _stream = File.OpenRead("x"); // managed disposable field
+    private bool _disposed;
+
+    public void Dispose() { Dispose(true); GC.SuppressFinalize(this); }   // dispose pattern
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        if (disposing) _stream.Dispose();     // only touch other managed objects when called explicitly
+        Native.Close(_handle);                // always free unmanaged resources
+        _disposed = true;
+    }
+    ~ResourceHolder() =&gt; Dispose(false);      // only needed when directly owning an unmanaged handle
+}</pre>
+    <details><summary>Memory leaks in a garbage-collected language</summary><div class="dbody">
+      <p>A leak means an object is still <i>reachable</i> though no longer needed. Typical causes:</p>
+      <ul><li>Events not unsubscribed (publisher holds subscriber).</li><li>Static collections/caches that only grow (use <code>MemoryCache</code> with size limits/expiry).</li><li>Captured variables in long-lived lambdas.</li><li>Not disposing <code>IDisposable</code>s (handles, <code>HttpClient</code> misuse, timers).</li><li>Thread-static/closures keeping large graphs alive.</li></ul>
+      <p>Tools: <code>dotnet-counters</code>, <code>dotnet-gcdump</code>, <code>dotnet-dump</code>, Visual Studio memory profiler, PerfView. WeakReference lets you reference an object without keeping it alive.</p></div></details>
+    <details><summary>Span&lt;T&gt;, Memory&lt;T&gt;, stackalloc and ref structs</summary><div class="dbody">
+      <p><code>Span&lt;T&gt;</code> is a <b>ref struct</b>: a pointer + length over contiguous memory (array, stack, native). Slicing creates a new view <i>without copying or allocating</i>. Because it can point to the stack it can only live on the stack: it cannot be a field of a class, be boxed, or cross an <code>await</code> (use <code>Memory&lt;T&gt;</code> for that).</p>
+      <pre data-lang="csharp" data-file="Span.cs">ReadOnlySpan&lt;char&gt; text = "key=value".AsSpan();
+int eq = text.IndexOf('=');
+ReadOnlySpan&lt;char&gt; key = text[..eq];            // no allocation (string.Substring would allocate)
+ReadOnlySpan&lt;char&gt; val = text[(eq + 1)..];
+
+Span&lt;int&gt; buffer = stackalloc int[64];          // stack memory, no GC involvement
+buffer.Fill(7);
+
+int Sum(ReadOnlySpan&lt;int&gt; xs) { int s = 0; foreach (var x in xs) s += x; return s; }
+Sum(new[] { 1, 2, 3 });    // works with arrays, stackalloc, slices - one API</pre></div></details>
+  </section>
+
+  <section class="topic" id="reflection" data-nav="Reflection, attributes and dynamic" data-group="4 · Async & Memory" data-level="a">
+    <h2>Reflection, attributes and <code>dynamic</code> <span class="badge a">Adv</span></h2>
+    <p><b>Reflection</b> reads type metadata at run time: discover types, members and attributes, create instances and call methods by name. It powers serialization, dependency injection, ORMs, MVC model binding and test runners.</p>
+    <pre data-lang="csharp" data-file="Reflection.cs">Type t = typeof(Person);                              // or obj.GetType()
+foreach (var p in t.GetProperties())
+    Console.WriteLine($"{p.Name}: {p.PropertyType.Name}");
+
+object? instance = Activator.CreateInstance(t);       // runtime construction
+t.GetProperty("Name")!.SetValue(instance, "Ann");
+var m = t.GetMethod("Greet");  m?.Invoke(instance, new object[] { "Hi" });
+
+// Custom attribute (metadata) + reading it
+[AttributeUsage(AttributeTargets.Property)]
+public class RequiredLengthAttribute(int min) : Attribute { public int Min { get; } = min; }
+
+public class Signup { [RequiredLength(8)] public string Password { get; set; } = ""; }
+
+foreach (var prop in typeof(Signup).GetProperties())
+    if (prop.GetCustomAttribute&lt;RequiredLengthAttribute&gt;() is { } rule)
+        Console.WriteLine($"{prop.Name} needs at least {rule.Min} chars");</pre>
+    <div class="grid2">
+      <div class="card"><h4>Costs of reflection</h4><ul class="cons"><li>10-100x slower than direct calls</li><li>No compile-time safety (strings)</li><li>Breaks with trimming/Native AOT</li></ul></div>
+      <div class="card"><h4>Mitigations</h4><ul class="pros"><li>Cache <code>MethodInfo</code>/delegates</li><li>Compile expression trees to delegates once</li><li><b>Source generators</b> produce the code at compile time (System.Text.Json, regex, logging)</li></ul></div>
+    </div>
+    <details><summary><code>dynamic</code> and the DLR</summary><div class="dbody">
+      <p><code>dynamic</code> turns off compile-time checking for that variable; member access is resolved at run time via the Dynamic Language Runtime. Useful for COM interop or <code>ExpandoObject</code>, but you lose IntelliSense and type safety, and typos become <code>RuntimeBinderException</code>s. Prefer <code>object</code> + pattern matching or generics.</p></div></details>
+  </section>
+
+
+  <div class="part-title">Part 5 &mdash; Modern C# (versions 8 to 13)</div>
+
+  <section class="topic" id="patterns" data-nav="Pattern matching" data-group="5 · Modern C#" data-level="i">
+    <h2>Pattern matching <span class="badge i">Mid</span></h2>
+    <p>Pattern matching tests a value's <b>shape</b> (type, property values, position, range) and extracts parts of it in one expression. It replaces chains of <code>if</code>/<code>as</code>/casts and makes intent explicit.</p>
+    <pre data-lang="csharp" data-file="Patterns.cs">object o = GetValue();
+
+// Type + declaration pattern
+if (o is string s &amp;&amp; s.Length &gt; 0) Console.WriteLine(s.ToUpper());
+
+// switch expression with many pattern kinds
+string Describe(object o) =&gt; o switch
+{
+    null                          =&gt; "nothing",
+    int n when n &lt; 0               =&gt; "negative int",           // 'when' guard
+    int and (&gt;= 1 and &lt;= 9)       =&gt; "single digit",           // relational + logical patterns
+    string { Length: 0 }          =&gt; "empty string",           // property pattern
+    string { Length: &gt; 10 } long  =&gt; $"long string {long[..10]}...",
+    Person { Age: &gt;= 18, Name: var n } =&gt; $"adult {n}",       // nested property + var capture
+    (int x, int y)                =&gt; $"pair {x},{y}",          // positional (tuple) pattern
+    [1, 2, ..]                    =&gt; "list starting 1,2",      // list pattern (C# 11)
+    IEnumerable&lt;int&gt; seq          =&gt; $"sequence of {seq.Count()}",
+    _                             =&gt; o.GetType().Name          // discard = default
+};
+
+// is not null / not pattern
+if (o is not null and not "") { }
+
+// Tuple switch: combine states
+string Door(bool locked, bool open) =&gt; (locked, open) switch
+{
+    (true, _)      =&gt; "locked",
+    (false, true)  =&gt; "open",
+    (false, false) =&gt; "closed"
+};</pre>
+    <div class="tblwrap"><table><tr><th>Pattern</th><th>Example</th><th>Added in</th></tr>
+      <tr><td>Type / declaration</td><td><code>o is string s</code></td><td>C# 7</td></tr>
+      <tr><td>Constant, null</td><td><code>x is 5</code>, <code>x is null</code></td><td>C# 7</td></tr>
+      <tr><td>Property</td><td><code>p is { Age: 18 }</code></td><td>C# 8 (extended 10)</td></tr>
+      <tr><td>Positional / deconstruct</td><td><code>pt is (0, 0)</code></td><td>C# 8</td></tr>
+      <tr><td>Relational, logical (<code>and or not</code>)</td><td><code>n is &gt; 0 and &lt; 10</code></td><td>C# 9</td></tr>
+      <tr><td>List</td><td><code>arr is [var first, .., var last]</code></td><td>C# 11</td></tr>
+    </table></div>
+  </section>
+
+  <section class="topic" id="modern" data-nav="Modern language features by version" data-group="5 · Modern C#" data-level="i">
+    <h2>Modern language features by version <span class="badge i">Mid</span></h2>
+    <div class="tblwrap"><table><tr><th>Version</th><th>Highlights</th></tr>
+      <tr><td>C# 6</td><td>String interpolation, <code>?.</code>, expression-bodied members, <code>nameof</code>, auto-property initializers</td></tr>
+      <tr><td>C# 7</td><td>Tuples, <code>out var</code>, pattern matching, local functions, <code>ref</code> returns, <code>Span</code> support</td></tr>
+      <tr><td>C# 8</td><td>Nullable reference types, switch expressions, ranges/indices, async streams, default interface methods, <code>using</code> declarations</td></tr>
+      <tr><td>C# 9</td><td>Records, <code>init</code> accessors, top-level statements, target-typed <code>new()</code>, relational patterns</td></tr>
+      <tr><td>C# 10</td><td>File-scoped namespaces, global usings, record structs, constant interpolated strings</td></tr>
+      <tr><td>C# 11</td><td>Raw string literals, <code>required</code> members, list patterns, generic math, UTF-8 literals (<code>"abc"u8</code>), <code>file</code> types</td></tr>
+      <tr><td>C# 12</td><td>Primary constructors for classes/structs, collection expressions, inline arrays, <code>using</code> aliases for any type, default lambda params</td></tr>
+      <tr><td>C# 13</td><td><code>params</code> collections (Span/IEnumerable), new <code>Lock</code> type, <code>field</code> keyword (preview), <code>\e</code> escape</td></tr>
+    </table></div>
+    <pre data-lang="csharp" data-file="Modern.cs">// File-scoped namespace (C# 10): no extra indentation
+namespace Shop.Domain;
+
+// Target-typed new, collection expressions (C# 12)
+List&lt;int&gt; nums = [1, 2, 3];
+int[] more = [..nums, 4, 5];               // spread operator
+Dictionary&lt;string, int&gt; map = new() { ["a"] = 1 };
+
+// Required members + init: forces callers to set values, keeps objects immutable afterwards
+public class Customer
+{
+    public required string Name { get; init; }
+    public string? Email { get; init; }
+}
+var c = new Customer { Name = "Ann" };       // compile error if Name is omitted
+
+// Lambda improvements: natural type, default values
+var greet = (string name = "world") =&gt; $"Hello {name}";
+
+// Generic math (C# 11 / .NET 7)
+static T Sum&lt;T&gt;(IEnumerable&lt;T&gt; values) where T : INumber&lt;T&gt; =&gt; values.Aggregate(T.Zero, (a, b) =&gt; a + b);
+
+// Global usings: put once in GlobalUsings.cs
+global using System.Text.Json;
+
+// Extension members, alias any type (C# 12)
+using Point = (int X, int Y);</pre>
+    <div class="tip"><b>Adopt gradually</b>Set <code>&lt;LangVersion&gt;</code> and <code>&lt;Nullable&gt;enable&lt;/Nullable&gt;</code> in the project file, enable <code>&lt;ImplicitUsings&gt;</code>, and let analyzers/IDE refactorings (<code>IDE0xxx</code>) modernise old code in small commits.</div>
+  </section>
+
+  <section class="topic" id="attributes-ops" data-nav="Operator overloading, indexers, conversions" data-group="5 · Modern C#" data-level="a">
+    <h2>Operator overloading, indexers and conversions <span class="badge a">Adv</span></h2>
+    <pre data-lang="csharp" data-file="Operators.cs">public readonly struct Vector2(double x, double y) : IEquatable&lt;Vector2&gt;
+{
+    public double X { get; } = x;
+    public double Y { get; } = y;
+
+    public static Vector2 operator +(Vector2 a, Vector2 b) =&gt; new(a.X + b.X, a.Y + b.Y);
+    public static Vector2 operator *(Vector2 v, double k) =&gt; new(v.X * k, v.Y * k);
+    public static bool operator ==(Vector2 a, Vector2 b) =&gt; a.Equals(b);
+    public static bool operator !=(Vector2 a, Vector2 b) =&gt; !a.Equals(b);
+
+    public bool Equals(Vector2 o) =&gt; X == o.X &amp;&amp; Y == o.Y;
+    public override bool Equals(object? o) =&gt; o is Vector2 v &amp;&amp; Equals(v);
+    public override int GetHashCode() =&gt; HashCode.Combine(X, Y);
+
+    // implicit: safe, never loses data. explicit: may lose data or throw (needs a cast).
+    public static implicit operator Vector2((double, double) t) =&gt; new(t.Item1, t.Item2);
+    public static explicit operator double(Vector2 v) =&gt; Math.Sqrt(v.X * v.X + v.Y * v.Y);
+}
+
+public class Matrix
+{
+    private readonly double[,] _d = new double[3, 3];
+    public double this[int r, int c] { get =&gt; _d[r, c]; set =&gt; _d[r, c] = value; }   // indexer
+}
+
+Vector2 v = (1, 2) + new Vector2(3, 4) * 2;      // implicit conversion + overloaded operators
+double length = (double)v;                       // explicit conversion</pre>
+    <div class="note"><b>Rules</b>Overloaded operators must be <code>public static</code>. If you overload <code>==</code> you must overload <code>!=</code>, and should override <code>Equals</code>/<code>GetHashCode</code> to match. Use sparingly: only where the operator's meaning is obvious (math types, money, vectors).</div>
+  </section>
+
+  <div class="part-title">Part 6 &mdash; Interview preparation &amp; revision</div>
+
+  <section class="topic" id="quiz" data-nav="Self-test quiz" data-group="6 · Resources" data-level="b">
+    <h2>Self-test quiz <span class="badge b">Practice</span></h2>
+    <p>Ten code-reading questions that interviewers love. Pick an answer, read the explanation, and keep score.</p>
+    <div class="lab quiz" data-title="C# quiz">
+      <script type="application/json">
+      [
+        {"q":"What does this print?","code":"struct P { public int X; }\nvar a = new P { X = 1 };\nvar b = a;\nb.X = 2;\nConsole.WriteLine(a.X);","o":["1","2","0","Compile error"],"a":0,"e":"P is a struct (value type), so `var b = a` copies the data. Changing b does not affect a."},
+        {"q":"What is the output?","code":"string s = \"a\";\nstring t = s;\ns += \"b\";\nConsole.WriteLine(t);","o":["ab","a","b","null"],"a":1,"e":"Strings are immutable. `s += \"b\"` creates a NEW string and re-points s; t still references the original \"a\"."},
+        {"q":"What does this print?","code":"var list = new List<Action>();\nfor (int i = 0; i < 3; i++) list.Add(() => Console.Write(i));\nlist.ForEach(a => a());","o":["012","333","321","Compile error"],"a":1,"e":"All lambdas capture the SAME loop variable i (one variable for the whole for loop). After the loop it is 3. Copy it into a local inside the loop to get 012. (A foreach loop variable is per-iteration since C# 5.)"},
+        {"q":"Which statement about `throw ex;` vs `throw;` is correct?","o":["They behave identically","`throw;` preserves the original stack trace; `throw ex;` resets it","`throw ex;` preserves the stack trace","`throw;` can only be used in finally"],"a":1,"e":"Inside a catch, `throw;` rethrows the same exception with its original stack trace. `throw ex;` restarts the trace at the rethrow line and hides the real origin."},
+        {"q":"Why can `.Result` on a Task cause a deadlock in a WPF button handler?","o":["Because Task.Result is not thread-safe","The UI thread blocks while the continuation needs the UI thread to resume","Because async methods are always synchronous","It cannot; .Result is always safe"],"a":1,"e":"`await` captured the UI SynchronizationContext. The UI thread is blocked in .Result waiting for the task, and the task's continuation is waiting for the UI thread: circular wait."},
+        {"q":"When does this LINQ query actually execute?","code":"var q = numbers.Where(n => n > 5).Select(n => n * 2);\nnumbers.Add(100);\nvar first = q.First();","o":["On the Where line","On the Select line","On q.First(), and it sees the added 100","Never"],"a":2,"e":"Where/Select are deferred; they only describe the pipeline. Execution happens at enumeration (First). It reads the CURRENT contents of `numbers`, including the added item."},
+        {"q":"Which collection gives average O(1) lookup by key?","o":["List<T>","SortedDictionary<K,V>","Dictionary<K,V>","LinkedList<T>"],"a":2,"e":"Dictionary is a hash table: average O(1). SortedDictionary is O(log n), List search is O(n)."},
+        {"q":"A class overrides Equals but not GetHashCode. What is the likely problem?","o":["Nothing; hash codes are optional","Objects that are Equal can land in different buckets, so Dictionary/HashSet lookups fail","Equals will throw","The compiler refuses to build"],"a":1,"e":"Equal objects must have equal hash codes. Otherwise a Dictionary/HashSet looks in the wrong bucket and cannot find an item that equals the one you stored. (The compiler only warns.)"},
+        {"q":"What is the best use of `async void`?","o":["Any method that does not return a value","Event handlers only","Controller actions","Unit tests"],"a":1,"e":"async void cannot be awaited and its exceptions go to the synchronization context (often crashing the process). Use it only where the signature is forced, i.e. event handlers. Otherwise return Task."},
+        {"q":"What is the difference between `IEnumerable<T>` and `IQueryable<T>` in EF Core?","o":["None","IEnumerable filters in memory using delegates; IQueryable builds expression trees that are translated to SQL","IQueryable is for async only","IEnumerable can only read 1 row"],"a":1,"e":"With IQueryable the Where lambda becomes an expression tree translated to SQL, so the database filters. Converting to IEnumerable early (AsEnumerable/ToList) filters in your process after loading everything."}
+      ]
+      </script>
+    </div>
+  </section>
+
+  <section class="topic" id="interview-qa" data-nav="Interview questions & answers" data-group="6 · Resources" data-level="a">
+    <h2>Common C# interview questions <span class="badge a">Prep</span></h2>
+    <p>Filter by topic, expand a question and try to answer it aloud first.</p>
+    <div class="qfilter" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
+      <button class="btn primary" data-f="all" type="button">All</button><button class="btn" data-f="core" type="button">Language</button><button class="btn" data-f="oop" type="button">OOP</button><button class="btn" data-f="coll" type="button">Collections/LINQ</button><button class="btn" data-f="async" type="button">Async/Threads</button><button class="btn" data-f="mem" type="button">Memory/Runtime</button><button class="btn" data-f="design" type="button">Design</button>
+    </div>
+
+    <details class="qa" data-tag="core"><summary>What is the difference between value types and reference types? <span class="qtag">core</span></summary><div class="dbody"><p>Value types (<code>struct</code>, <code>enum</code>, primitives) hold their data directly and are copied on assignment; reference types (<code>class</code>, <code>string</code>, arrays, delegates) hold a reference to a heap object, so assignment copies the reference. Value types cannot be null (without <code>Nullable&lt;T&gt;</code>). Value locals live on the stack; value fields live inside their containing object.</p></div></details>
+    <details class="qa" data-tag="core"><summary>What is boxing and why is it expensive? <span class="qtag">core</span></summary><div class="dbody"><p>Converting a value type to <code>object</code>/interface allocates a heap object and copies the value into it; unboxing type-checks and copies back. It causes allocations and GC pressure. Avoid with generics (<code>List&lt;int&gt;</code>) and by not passing value types to <code>object</code> parameters in hot paths.</p></div></details>
+    <details class="qa" data-tag="core"><summary>string vs StringBuilder? <span class="qtag">core</span></summary><div class="dbody"><p><code>string</code> is immutable, so each concatenation allocates a new string (O(n&sup2;) in a loop). <code>StringBuilder</code> appends into a growable buffer and creates the string once. Use the builder for many appends; use interpolation or <code>+</code> for a few.</p></div></details>
+    <details class="qa" data-tag="core"><summary>const vs readonly vs static readonly? <span class="qtag">core</span></summary><div class="dbody"><p><code>const</code> is a compile-time literal baked into callers (changing it requires recompiling dependants). <code>readonly</code> fields are assigned at declaration or in the constructor and can be any type. <code>static readonly</code> is a run-time constant shared by the type, initialised in the static constructor.</p></div></details>
+    <details class="qa" data-tag="core"><summary>ref vs out vs in? <span class="qtag">core</span></summary><div class="dbody"><p><code>ref</code>: pass by reference, must be initialised, can be read/written. <code>out</code>: callee must assign, caller need not initialise. <code>in</code>: pass by read-only reference to avoid copying large structs.</p></div></details>
+    <details class="qa" data-tag="core"><summary>What are nullable reference types? Do they prevent NullReferenceException at run time? <span class="qtag">core</span></summary><div class="dbody"><p>A compile-time annotation/flow analysis feature (<code>string</code> vs <code>string?</code>) that warns about possible null dereferences. It does not change run-time behaviour, so nulls can still sneak in from unannotated libraries, reflection, JSON deserialisation or the null-forgiving operator <code>!</code>.</p></div></details>
+    <details class="qa" data-tag="core"><summary>What is the difference between <code>==</code> and <code>Equals()</code>? <span class="qtag">core</span></summary><div class="dbody"><p>For reference types <code>==</code> compares references unless the operator is overloaded (<code>string</code> overloads it to compare content); <code>Equals</code> is a virtual method that types override to define value equality. <code>ReferenceEquals</code> always checks identity.</p></div></details>
+    <details class="qa" data-tag="core"><summary>What is the difference between <code>is</code>, <code>as</code> and a cast? <span class="qtag">core</span></summary><div class="dbody"><p><code>is</code> tests type (and with patterns binds a variable). <code>as</code> returns the converted reference or <code>null</code> (never throws; reference/nullable types only). A cast <code>(T)x</code> throws <code>InvalidCastException</code> on failure.</p></div></details>
+
+    <details class="qa" data-tag="oop"><summary>Abstract class vs interface &ndash; when do you use each? <span class="qtag">oop</span></summary><div class="dbody"><p>Interface: a capability contract that unrelated types can implement; multiple per class; no instance state. Abstract class: a shared base with state, constructors and partial implementation for closely related types; single inheritance. Prefer interfaces for dependencies and testing; abstract classes for template-method style bases.</p></div></details>
+    <details class="qa" data-tag="oop"><summary>virtual vs override vs new? <span class="qtag">oop</span></summary><div class="dbody"><p><code>virtual</code> allows overriding. <code>override</code> replaces it and participates in polymorphism (dispatched on runtime type). <code>new</code> hides a member: the version called depends on the compile-time variable type, which is usually a bug source.</p></div></details>
+    <details class="qa" data-tag="oop"><summary>What is polymorphism? Compile-time vs run-time. <span class="qtag">oop</span></summary><div class="dbody"><p>Run-time (subtype) polymorphism: a base reference invokes the derived override through virtual dispatch. Compile-time: method overloading, operator overloading and generics resolved by the compiler.</p></div></details>
+    <details class="qa" data-tag="oop"><summary>What is the difference between a class and a record? <span class="qtag">oop</span></summary><div class="dbody"><p>Records are classes (or structs) with compiler-generated value equality, <code>ToString</code>, deconstruction and <code>with</code> copying, meant for immutable data. Classes use reference equality and suit entities with identity and behaviour.</p></div></details>
+    <details class="qa" data-tag="oop"><summary>Explain SOLID briefly. <span class="qtag">oop</span></summary><div class="dbody"><p>Single responsibility; Open/closed (extend without editing); Liskov substitution (subtypes honour the base contract); Interface segregation (small focused interfaces); Dependency inversion (depend on abstractions, inject dependencies). They reduce coupling and make code testable.</p></div></details>
+    <details class="qa" data-tag="oop"><summary>Composition vs inheritance? <span class="qtag">oop</span></summary><div class="dbody"><p>Inheritance models is-a and creates tight coupling to the base. Composition (has-a) assembles behaviour from collaborators, is easier to change and test. Favour composition; use inheritance for true substitutable hierarchies.</p></div></details>
+    <details class="qa" data-tag="oop"><summary>What does <code>sealed</code> do and why use it? <span class="qtag">oop</span></summary><div class="dbody"><p>It prevents inheritance (or further overriding). It communicates design intent, protects invariants, and lets the JIT devirtualise/inline calls for a small speed gain.</p></div></details>
+
+    <details class="qa" data-tag="coll"><summary>Array vs List&lt;T&gt;? <span class="qtag">coll</span></summary><div class="dbody"><p>Arrays are fixed-size contiguous blocks (fast, covariant). <code>List&lt;T&gt;</code> wraps an array and grows (doubling capacity) with amortised O(1) append; use arrays for fixed data and hot loops, lists otherwise.</p></div></details>
+    <details class="qa" data-tag="coll"><summary>How does a Dictionary work internally and when does it degrade? <span class="qtag">coll</span></summary><div class="dbody"><p>Hashes the key to a bucket, then compares keys with <code>Equals</code> in the chain; resizes when it grows. Degrades towards O(n) with many hash collisions (poor <code>GetHashCode</code>) and breaks if a key's hash changes after insertion.</p></div></details>
+    <details class="qa" data-tag="coll"><summary>IEnumerable vs ICollection vs IList vs IReadOnlyList? <span class="qtag">coll</span></summary><div class="dbody"><p>IEnumerable: forward iteration. ICollection: adds Count/Add/Remove/Contains. IList: adds index access. IReadOnlyList: Count + index without mutation. Accept the narrowest abstraction, return a read-only one.</p></div></details>
+    <details class="qa" data-tag="coll"><summary>First vs FirstOrDefault vs Single vs SingleOrDefault? <span class="qtag">coll</span></summary><div class="dbody"><p><code>First</code> throws if empty; <code>FirstOrDefault</code> returns default. <code>Single</code> throws if there are zero or more than one; <code>SingleOrDefault</code> throws on more than one but returns default on zero. Use Single when more than one is a bug you want detected.</p></div></details>
+    <details class="qa" data-tag="coll"><summary>What is deferred execution in LINQ? <span class="qtag">coll</span></summary><div class="dbody"><p>Query operators build a pipeline and run only when enumerated, each time you enumerate. Operators like <code>ToList</code>, <code>Count</code>, <code>First</code> force execution. Beware multiple enumeration and queries observing later source changes.</p></div></details>
+    <details class="qa" data-tag="coll"><summary>Select vs SelectMany? <span class="qtag">coll</span></summary><div class="dbody"><p><code>Select</code> maps each element to one result. <code>SelectMany</code> maps each element to a sequence and flattens them into one (like flat-map): <code>orders.SelectMany(o =&gt; o.Lines)</code>.</p></div></details>
+    <details class="qa" data-tag="coll"><summary>What is yield return? <span class="qtag">coll</span></summary><div class="dbody"><p>It turns a method into a lazy iterator: the compiler generates a state machine that returns one element per <code>MoveNext()</code>, retaining local state between calls. Good for streaming large or infinite sequences with minimal memory.</p></div></details>
+
+    <details class="qa" data-tag="async"><summary>How does async/await work? <span class="qtag">async</span></summary><div class="dbody"><p>The compiler converts the method into a state machine. At an <code>await</code> on an incomplete task it registers the rest of the method as a continuation and returns to the caller, freeing the thread. When the awaited operation completes the continuation resumes (on the captured context or a pool thread). No thread is blocked while waiting for I/O.</p></div></details>
+    <details class="qa" data-tag="async"><summary>Task vs Thread? <span class="qtag">async</span></summary><div class="dbody"><p>A thread is an OS execution resource. A Task is an abstraction of a unit of work/promise, usually scheduled on pool threads, composable (<code>WhenAll</code>, continuations), able to return results and exceptions, and for I/O often using no thread at all.</p></div></details>
+    <details class="qa" data-tag="async"><summary>What is ConfigureAwait(false)? <span class="qtag">async</span></summary><div class="dbody"><p>It tells <code>await</code> not to resume on the captured <code>SynchronizationContext</code>. Libraries use it to avoid deadlocks and context switches. ASP.NET Core has no context, so it matters mainly for library code and UI apps.</p></div></details>
+    <details class="qa" data-tag="async"><summary>Task.WhenAll vs sequential awaits; Task.WhenAny? <span class="qtag">async</span></summary><div class="dbody"><p>Sequential awaits add durations; <code>WhenAll</code> starts all operations and completes after the slowest (time = max). <code>WhenAny</code> completes when the first finishes (timeouts, racing replicas). Only run tasks concurrently when they are independent.</p></div></details>
+    <details class="qa" data-tag="async"><summary>lock vs Monitor vs SemaphoreSlim vs Interlocked? <span class="qtag">async</span></summary><div class="dbody"><p><code>lock</code> is sugar over <code>Monitor</code> for short critical sections (cannot await inside). <code>SemaphoreSlim</code> limits concurrency and supports <code>WaitAsync</code>. <code>Interlocked</code> performs lock-free atomic operations on single variables.</p></div></details>
+    <details class="qa" data-tag="async"><summary>What is a race condition vs a deadlock? <span class="qtag">async</span></summary><div class="dbody"><p>A race condition is when correctness depends on the timing of concurrent accesses to shared state (lost updates). A deadlock is when threads wait on each other forever (circular lock acquisition, or blocking on async code with a captured context). Fix with consistent lock order, immutability, atomic ops, or avoiding blocking.</p></div></details>
+    <details class="qa" data-tag="async"><summary>ValueTask vs Task? <span class="qtag">async</span></summary><div class="dbody"><p><code>ValueTask&lt;T&gt;</code> avoids a heap allocation when the result is already available synchronously. It has restrictions (await once, do not store/await multiple times) so use it only on measured hot paths; default to <code>Task</code>.</p></div></details>
+
+    <details class="qa" data-tag="mem"><summary>How does the garbage collector work? <span class="qtag">mem</span></summary><div class="dbody"><p>A generational, mark-and-compact collector. It marks objects reachable from roots, reclaims the rest and compacts survivors. Gen 0 holds new objects and is collected often; survivors are promoted to Gen 1 and Gen 2. Large objects (85 KB+) go to the LOH. Concurrent/background GC reduces pause times.</p></div></details>
+    <details class="qa" data-tag="mem"><summary>IDisposable vs finalizer; what is the dispose pattern? <span class="qtag">mem</span></summary><div class="dbody"><p><code>Dispose</code> releases resources deterministically (<code>using</code>). A finalizer is a non-deterministic safety net run by the GC and costs extra GC cycles. The pattern: public <code>Dispose()</code> calls <code>Dispose(true)</code> and <code>GC.SuppressFinalize</code>; the finalizer calls <code>Dispose(false)</code> and touches only unmanaged resources.</p></div></details>
+    <details class="qa" data-tag="mem"><summary>Stack vs heap? <span class="qtag">mem</span></summary><div class="dbody"><p>Stack: per-thread LIFO for call frames and local value data; automatic cleanup, fast, small. Heap: shared memory for objects, collected by the GC. "Value types go on the stack" is an oversimplification: they live wherever their container lives (a field of a heap object is on the heap).</p></div></details>
+    <details class="qa" data-tag="mem"><summary>What causes memory leaks in .NET? <span class="qtag">mem</span></summary><div class="dbody"><p>Unwanted references: event handlers never unsubscribed, static collections/caches that grow, long-lived closures, undisposed unmanaged resources, timers. Diagnose with a heap dump and find the GC roots retaining the objects.</p></div></details>
+    <details class="qa" data-tag="mem"><summary>What are Span&lt;T&gt; and why are they fast? <span class="qtag">mem</span></summary><div class="dbody"><p>A stack-only view over contiguous memory with pointer + length. Slicing makes no copy or allocation, so parsing and buffer manipulation avoid GC pressure. Restrictions: cannot be stored in fields of classes, boxed, or used across await.</p></div></details>
+    <details class="qa" data-tag="mem"><summary>What is the difference between .NET Framework, .NET Core, .NET Standard and .NET 5+? <span class="qtag">mem</span></summary><div class="dbody"><p>.NET Framework: Windows-only legacy. .NET Core: cross-platform rewrite. .NET Standard: an API specification for sharing libraries across them (superseded). .NET 5+ unified everything under one cross-platform platform ("just .NET"); target <code>net8.0</code> or later for new work.</p></div></details>
+
+    <details class="qa" data-tag="design"><summary>How do you design for testability in C#? <span class="qtag">design</span></summary><div class="dbody"><p>Depend on interfaces, inject dependencies via constructors (DI), keep logic out of static/global state, separate pure logic from I/O, wrap time/randomness (<code>TimeProvider</code>), and write small focused classes so unit tests can substitute fakes.</p></div></details>
+    <details class="qa" data-tag="design"><summary>Singleton in C# &ndash; how and should you? <span class="qtag">design</span></summary><div class="dbody"><p>Thread-safe options: <code>Lazy&lt;T&gt;</code> or a static readonly field. In modern apps prefer registering the service with a singleton lifetime in the DI container; it is testable and avoids hidden global state.</p></div></details>
+    <details class="qa" data-tag="design"><summary>How would you remove duplicates from a list while preserving order? <span class="qtag">design</span></summary><div class="dbody"><p><code>list.Distinct()</code> keeps the first occurrence in order (uses a hash set internally). For custom key: <code>DistinctBy(x =&gt; x.Id)</code> (.NET 6). Manually: iterate with a <code>HashSet&lt;T&gt;</code> and add to the result when <code>seen.Add(item)</code> returns true.</p></div></details>
+    <details class="qa" data-tag="design"><summary>How do you detect a duplicate or find the first non-repeating character? <span class="qtag">design</span></summary><div class="dbody"><p>Count with a dictionary in one pass, then scan in original order: <code>s.GroupBy(c =&gt; c).Where(g =&gt; g.Count() == 1).Select(g =&gt; g.Key).FirstOrDefault()</code> is clear; a <code>Dictionary&lt;char,int&gt;</code> plus second loop is O(n) with no LINQ overhead.</p></div></details>
+  </section>
+
+  <section class="topic" id="mistakes" data-nav="Common mistakes & best practices" data-group="6 · Resources" data-level="i">
+    <h2>Common mistakes &amp; best practices <span class="badge i">Mid</span></h2>
+    <div class="tblwrap"><table>
+      <tr><th>Mistake</th><th>Why it hurts</th><th>Do this instead</th></tr>
+      <tr><td><code>catch (Exception) { }</code></td><td>Hides bugs</td><td>Catch specific exceptions; log or rethrow</td></tr>
+      <tr><td><code>throw ex;</code></td><td>Loses the stack trace</td><td><code>throw;</code></td></tr>
+      <tr><td>String concatenation in loops</td><td>O(n&sup2;) allocations</td><td><code>StringBuilder</code>, <code>string.Join</code></td></tr>
+      <tr><td><code>.Result</code>/<code>.Wait()</code> on tasks</td><td>Deadlocks, thread starvation</td><td><code>await</code> end-to-end</td></tr>
+      <tr><td><code>async void</code></td><td>Unobservable failures</td><td><code>async Task</code></td></tr>
+      <tr><td>Multiple enumeration of lazy queries</td><td>Repeated DB calls or expensive work</td><td>Materialise once with <code>ToList()</code></td></tr>
+      <tr><td>Mutable struct</td><td>Mutating a copy</td><td><code>readonly struct</code> / record struct</td></tr>
+      <tr><td>Overriding <code>Equals</code> without <code>GetHashCode</code></td><td>Broken dictionaries/sets</td><td>Override both (or use a record)</td></tr>
+      <tr><td>Not disposing <code>IDisposable</code></td><td>Leaked handles/connections</td><td><code>using</code></td></tr>
+      <tr><td>Exposing <code>List&lt;T&gt;</code> internals publicly</td><td>Callers break invariants</td><td>Return <code>IReadOnlyList&lt;T&gt;</code></td></tr>
+      <tr><td><code>DateTime.Now</code> for stored/compared times</td><td>Time zone and DST bugs</td><td><code>DateTimeOffset.UtcNow</code> / <code>TimeProvider</code></td></tr>
+      <tr><td><code>float</code>/<code>double</code> for money</td><td>Binary rounding errors</td><td><code>decimal</code></td></tr>
+      <tr><td>Magic strings/numbers</td><td>Typos, hard to refactor</td><td>Constants, enums, <code>nameof</code></td></tr>
+      <tr><td>Giant methods/classes</td><td>Untestable</td><td>Small focused units (SRP)</td></tr>
+      <tr><td>Using exceptions for control flow</td><td>Slow</td><td><code>TryParse</code>-style methods, result types</td></tr>
+      <tr><td>Ignoring nullable warnings</td><td>NullReferenceExceptions</td><td>Enable nullable; fix warnings</td></tr>
+    </table></div>
+    <h3>Naming and style conventions</h3>
+    <ul><li><code>PascalCase</code> for types, methods, properties, public fields; <code>camelCase</code> for locals/parameters; <code>_camelCase</code> for private fields; <code>IName</code> for interfaces; <code>Async</code> suffix for async methods.</li><li>One public type per file; file-scoped namespaces; <code>var</code> when the type is obvious from the right-hand side.</li><li>Prefer expression-bodied members for trivial members, guard clauses over deep nesting, and immutability by default.</li></ul>
+  </section>
+
+  <section class="topic" id="summary" data-nav="Summary cheat sheet" data-group="6 · Resources" data-level="b">
+    <h2>Summary cheat sheet <span class="badge b">Recap</span></h2>
+    <div class="tblwrap"><table><tr><th>Topic</th><th>Remember</th></tr>
+      <tr><td>Compilation</td><td>C# &rarr; IL (Roslyn) &rarr; JIT native code (CLR). Assemblies carry IL + metadata.</td></tr>
+      <tr><td>Types</td><td>Value types copy data; reference types copy references. string is an immutable reference type. Avoid boxing.</td></tr>
+      <tr><td>Nulls</td><td><code>T?</code> for value types is <code>Nullable&lt;T&gt;</code>; reference nullability is compile-time analysis. Use <code>?.</code>, <code>??</code>, <code>is not null</code>.</td></tr>
+      <tr><td>OOP</td><td>Encapsulate, abstract, inherit sparingly, rely on polymorphism; program to interfaces; SOLID.</td></tr>
+      <tr><td>Members</td><td>Fields private, expose properties; <code>init</code>/<code>required</code>/records for immutability; static belongs to the type.</td></tr>
+      <tr><td>Generics</td><td>Compile-time safety, no boxing, reified at run time; constraints (<code>where</code>); variance with <code>in</code>/<code>out</code>.</td></tr>
+      <tr><td>Collections</td><td>List (default), Dictionary (key lookup, O(1)), HashSet (uniqueness), Queue/Stack, Sorted* (ordered), Concurrent* (threads), Immutable/Frozen (read-only).</td></tr>
+      <tr><td>Delegates/events</td><td>Func/Action/Predicate; closures capture variables; events = restricted delegates; unsubscribe to avoid leaks.</td></tr>
+      <tr><td>LINQ</td><td>Deferred execution; IEnumerable (delegates, in memory) vs IQueryable (expression trees, SQL); materialise once.</td></tr>
+      <tr><td>Async</td><td>Scalability not speed; await frees the thread; never block; pass CancellationToken; WhenAll for independent work.</td></tr>
+      <tr><td>Concurrency</td><td>Shared mutable state needs lock/Interlocked/Channel; avoid deadlocks via consistent ordering.</td></tr>
+      <tr><td>Memory</td><td>Stack for frames, heap for objects, generational GC; IDisposable for unmanaged resources; Span avoids allocations.</td></tr>
+      <tr><td>Exceptions</td><td>Specific catches, <code>throw;</code>, finally/using for cleanup, TryXxx for expected failures.</td></tr>
+      <tr><td>Modern C#</td><td>Records, pattern matching, switch expressions, primary constructors, collection expressions, <code>required</code>.</td></tr>
+    </table></div>
+    <div class="tip"><b>Next step</b>Continue with the <a href="ASP.NET-Core-Concepts-Guide.html">ASP.NET Core Concepts guide</a> to see these language features at work in a web framework, then the <a href="ASP.NET-Core-Web-API-Guide.html">Web API guide</a> for authentication, Swagger and a full project.</div>
+  </section>
+
+</main>
+</div>
+
+<script src="assets/guide.js"></script>
+<script src="assets/concepts.js"></script>
+</body>
+</html>

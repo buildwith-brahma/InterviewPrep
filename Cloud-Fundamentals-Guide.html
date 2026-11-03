@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Fundamentals - Azure and AWS Basics</title>
+<link rel="stylesheet" href="assets/guide.css">
+<style>
+:root{--accent:#1565c0;--accent-soft:#dbe8fa}
+body.dark{--accent:#6aa9f5;--accent-soft:#12253f}
+.hero{background:linear-gradient(135deg,#0a2447,#1565c0 55%,#f29900)}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="brand"><h1>Cloud Fundamentals</h1><small>Concepts &rarr; Compute &rarr; Storage &rarr; Data &rarr; Network &rarr; Security &rarr; DevOps &rarr; Cost</small></div>
+  <div class="search"><input id="search" type="search" placeholder="Search concepts ( press / )" autocomplete="off"><div id="search-results"></div></div>
+  <nav id="nav"></nav>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    <button id="menu-btn" type="button">Menu</button>
+    <div class="prog"><i id="progress"></i></div>
+    <button id="expand-all" type="button">Expand all</button>
+    <button id="collapse-all" type="button">Collapse all</button>
+    <button id="theme-btn" type="button">Dark / Light</button>
+  </div>
+
+  <main id="content">
+
+  <div class="hero" id="top">
+    <h1>Cloud Fundamentals &ndash; Azure and AWS Side by Side</h1>
+    <p>What every developer should know about the cloud: the <b>service and deployment models</b>, global infrastructure, <b>compute</b> options (VMs, containers, serverless), <b>storage and databases</b>, <b>networking</b>, <b>identity and security</b>, <b>reliability and scaling</b>, <b>DevOps and infrastructure as code</b>, monitoring and <b>cost management</b>, and how to deploy an ASP.NET Core API plus a SPA. Every concept is mapped to Azure and AWS, with three labs.</p>
+    <div class="chips"><span>IaaS &middot; PaaS &middot; SaaS &middot; FaaS</span><span>Regions &middot; Zones</span><span>VMs &middot; Containers &middot; Serverless</span><span>Blob / S3 &middot; SQL &middot; NoSQL</span><span>VNet / VPC &middot; Load balancing</span><span>IAM &middot; Entra ID &middot; Key Vault</span><span>IaC &middot; CI/CD</span><span>FinOps</span></div>
+  </div>
+
+  <section class="topic" id="how-to-use" data-nav="How to use this guide" data-group="Start here">
+    <h2>How to use this guide</h2>
+    <div class="grid3">
+      <div class="card"><h4>1. Learn the vocabulary</h4><p>Part 1 gives the models (IaaS/PaaS/SaaS), the shared-responsibility model and global infrastructure. Everything else builds on it.</p></div>
+      <div class="card"><h4>2. Map Azure &harr; AWS</h4><p>Learn each idea once, then use the service-finder lab to translate. Interviews often ask for either provider; the concepts are the same.</p></div>
+      <div class="card"><h4>3. Try the labs and a free tier</h4><p>SLA calculator, cost estimator and the service finder run offline. Then create a free Azure or AWS account and deploy something real (see the project). Press <span class="kbd">/</span> to search.</p></div>
+    </div>
+    <div class="note"><b>Prices and limits</b>Service names, free tiers and limits change. The cost lab uses illustrative rates only; always check the provider's pricing calculator and documentation before decisions or exams (AZ-900, AWS Cloud Practitioner are good first certifications).</div>
+  </section>
+
+  <div class="part-title">Part 1 &mdash; Cloud concepts</div>
+
+  <section class="topic" id="what-is-cloud" data-nav="What is cloud computing" data-group="1 · Concepts" data-level="b">
+    <h2>What cloud computing is <span class="badge b">Basic</span></h2>
+    <p><b>Cloud computing</b> is on-demand access to computing resources (servers, storage, databases, networking, software) over the internet with <b>pay-as-you-go</b> pricing. You rent capacity from a provider instead of buying and running hardware.</p>
+    <div class="tblwrap"><table><tr><th>Characteristic (NIST)</th><th>Meaning</th></tr>
+      <tr><td><b>On-demand self-service</b></td><td>Provision resources yourself in minutes through portal, CLI or API</td></tr>
+      <tr><td><b>Broad network access</b></td><td>Available over the network from many device types</td></tr>
+      <tr><td><b>Resource pooling</b></td><td>Providers serve many customers from shared hardware (multi-tenancy)</td></tr>
+      <tr><td><b>Rapid elasticity</b></td><td>Scale out and in quickly, even automatically</td></tr>
+      <tr><td><b>Measured service</b></td><td>Usage is metered and billed</td></tr></table></div>
+    <h3>Benefits and trade-offs</h3>
+    <div class="grid2">
+      <div class="card"><h4>Benefits</h4><ul><li>No upfront capital cost (CapEx &rarr; OpEx)</li><li>Elastic scale and global reach</li><li>Managed services reduce operations work</li><li>Built-in resilience and security tooling</li><li>Fast experimentation</li></ul></div>
+      <div class="card"><h4>Trade-offs</h4><ul><li>Costs can grow unnoticed without governance</li><li>Vendor lock-in and skills dependency</li><li>Shared responsibility: misconfiguration is your risk</li><li>Latency and egress fees for chatty designs</li><li>Compliance and data-residency questions</li></ul></div>
+    </div>
+  </section>
+
+  <section class="topic" id="models" data-nav="IaaS, PaaS, SaaS, FaaS and shared responsibility" data-group="1 · Concepts" data-level="b">
+    <h2>Service models and the shared responsibility model <span class="badge b">Basic</span></h2>
+    <div class="tblwrap"><table><tr><th>Model</th><th>You manage</th><th>Provider manages</th><th>Examples</th></tr>
+      <tr><td><b>On-premises</b></td><td>Everything</td><td>Nothing</td><td>Your data centre</td></tr>
+      <tr><td><b>IaaS</b> (infrastructure)</td><td>OS, runtime, app, data, patching</td><td>Hardware, virtualisation, network</td><td>Azure VMs, EC2</td></tr>
+      <tr><td><b>PaaS</b> (platform)</td><td>App and data</td><td>OS, runtime, scaling, patching</td><td>App Service, Elastic Beanstalk, Azure SQL, RDS</td></tr>
+      <tr><td><b>FaaS / serverless</b></td><td>Function code only</td><td>Servers, scaling to zero, availability</td><td>Azure Functions, Lambda</td></tr>
+      <tr><td><b>SaaS</b> (software)</td><td>Configuration and users</td><td>Entire application</td><td>Microsoft 365, Salesforce, Jira Cloud</td></tr></table></div>
+    <div class="diagram"><div class="dtitle">Shared responsibility: who secures what</div>
+      <div class="flow">
+        <div class="node bad">Always you<small>data, identities, access, config</small></div><span class="arrow">&larr;</span>
+        <div class="node warn">Depends on model<small>OS, network controls, app</small></div><span class="arrow">&larr;</span>
+        <div class="node ok">Always the provider<small>physical data centre, hardware, host, global network</small></div>
+      </div>
+    </div>
+    <h3>Deployment models</h3>
+    <ul><li><b>Public cloud:</b> shared provider infrastructure (Azure, AWS, GCP).</li><li><b>Private cloud:</b> dedicated to one organisation (on-prem or hosted).</li><li><b>Hybrid:</b> on-premises plus public cloud connected (Azure Arc, AWS Outposts, VPN/ExpressRoute/Direct Connect).</li><li><b>Multi-cloud:</b> more than one provider; adds portability but also complexity.</li></ul>
+  </section>
+
+  <section class="topic" id="global-infra" data-nav="Regions, zones and edge" data-group="1 · Concepts" data-level="b">
+    <h2>Global infrastructure: regions, availability zones, edge <span class="badge b">Basic</span></h2>
+    <div class="tblwrap"><table><tr><th>Concept</th><th>Meaning</th><th>Use it for</th></tr>
+      <tr><td><b>Region</b></td><td>A geographic area with several data centres (e.g. West Europe, <code>us-east-1</code>)</td><td>Latency to users, data residency/compliance, price, service availability</td></tr>
+      <tr><td><b>Availability Zone (AZ)</b></td><td>Physically separate data centre(s) within a region with independent power/cooling/network</td><td>Survive a data-centre failure: spread instances across zones</td></tr>
+      <tr><td><b>Region pair / multi-region</b></td><td>Two regions for disaster recovery</td><td>Survive a regional outage; geo-replication</td></tr>
+      <tr><td><b>Edge / CDN POP</b></td><td>Many small locations close to users</td><td>Cache static content, terminate TLS, accelerate</td></tr></table></div>
+    <div class="tip"><b>Rule of thumb</b>Pick a region near most users and compliant with data laws; deploy across 2-3 zones for high availability; add a second region only if the business requires protection from a full regional outage (RTO/RPO driven).</div>
+    <h3>Accounts and organisation</h3>
+    <div class="tblwrap"><table><tr><th>Azure</th><th>AWS</th><th>Purpose</th></tr>
+      <tr><td>Tenant (Entra ID) &rarr; Management groups &rarr; <b>Subscriptions</b> &rarr; <b>Resource groups</b> &rarr; resources</td><td>Organization &rarr; OUs &rarr; <b>Accounts</b> &rarr; resources (tags, stacks)</td><td>Isolation, billing boundaries, policy scope. Use separate subscriptions/accounts for prod and non-prod.</td></tr>
+      <tr><td>Azure Policy, RBAC, tags, budgets</td><td>SCPs, IAM, tags, Budgets</td><td>Governance guardrails</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="svc-map" data-nav="Azure and AWS service finder" data-group="1 · Concepts" data-level="b">
+    <h2>Azure &harr; AWS equivalents <span class="badge b">Lab</span></h2>
+    <div class="lab" id="svc-lab"></div>
+  </section>
+
+  <div class="part-title">Part 2 &mdash; Compute, storage and data</div>
+
+  <section class="topic" id="compute" data-nav="Compute: VMs, containers, serverless" data-group="2 · Building blocks" data-level="b">
+    <h2>Compute options <span class="badge b">Basic</span></h2>
+    <div class="tblwrap"><table><tr><th>Option</th><th>Best for</th><th>You handle</th><th>Scaling</th></tr>
+      <tr><td><b>Virtual machine</b> (Azure VM / EC2)</td><td>Legacy apps, custom OS needs, lift-and-shift</td><td>OS patching, runtime, scaling config</td><td>VM Scale Sets / Auto Scaling groups</td></tr>
+      <tr><td><b>PaaS web hosting</b> (App Service / Beanstalk / App Runner)</td><td>Standard web apps and APIs (ASP.NET Core, Node, Java)</td><td>App code and settings</td><td>Scale up/out rules; deployment slots</td></tr>
+      <tr><td><b>Containers</b> (AKS / EKS, Container Apps / Fargate)</td><td>Microservices, portable packaging, consistent environments</td><td>Images, manifests, cluster config (less with Fargate/Container Apps)</td><td>Horizontal pod/replica autoscaling</td></tr>
+      <tr><td><b>Serverless functions</b> (Azure Functions / Lambda)</td><td>Event-driven glue, webhooks, scheduled jobs, spiky workloads</td><td>Function code</td><td>Automatic, to zero; pay per execution</td></tr>
+      <tr><td><b>Batch / HPC</b></td><td>Large parallel jobs</td><td>Job definitions</td><td>Pools of cheap/spot VMs</td></tr></table></div>
+    <div class="diagram"><div class="dtitle">Choosing compute (a practical order)</div>
+      <div class="flow">
+        <div class="node ok">1. Can a SaaS/PaaS do it?<small>use it</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">2. Event-driven & short?<small>serverless function</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">3. Containerised service?<small>Container Apps / Fargate, AKS/EKS at scale</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">4. Needs full OS control?<small>virtual machine</small></div>
+      </div>
+    </div>
+    <pre data-lang="bash" data-file="terminal (Azure CLI)">az login
+az group create -n shop-rg -l westeurope
+az appservice plan create -g shop-rg -n shop-plan --sku B1 --is-linux
+az webapp create -g shop-rg -p shop-plan -n shop-api-12345 --runtime "DOTNETCORE:8.0"
+az webapp config appsettings set -g shop-rg -n shop-api-12345 --settings ASPNETCORE_ENVIRONMENT=Production
+az webapp deploy -g shop-rg -n shop-api-12345 --src-path publish.zip --type zip</pre>
+    <pre data-lang="bash" data-file="terminal (AWS CLI)">aws configure
+aws s3 mb s3://shop-assets-12345
+aws lambda create-function --function-name hello --runtime dotnet8 --role arn:aws:iam::123456789012:role/lambda-role \
+  --handler MyApp::MyApp.Function::Handler --zip-file fileb://function.zip
+aws ec2 describe-instances --query "Reservations[].Instances[].InstanceId"</pre>
+    <details><summary>Containers in two minutes (Docker)</summary><div class="dbody">
+      <p>A <b>container</b> packages an app and its dependencies into an image that runs the same everywhere, sharing the host kernel (lighter than a VM). A <b>registry</b> stores images; an <b>orchestrator</b> (Kubernetes) schedules, scales and heals containers.</p>
+      <pre data-lang="plain" data-file="Dockerfile (ASP.NET Core, multi-stage)">FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY . .
+RUN dotnet publish -c Release -o /out
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+COPY --from=build /out .
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "ShopApi.dll"]</pre></div></details>
+  </section>
+
+  <section class="topic" id="storage" data-nav="Storage types" data-group="2 · Building blocks" data-level="b">
+    <h2>Storage <span class="badge b">Basic</span></h2>
+    <div class="tblwrap"><table><tr><th>Type</th><th>Azure / AWS</th><th>Use</th><th>Notes</th></tr>
+      <tr><td><b>Object</b></td><td>Blob Storage / S3</td><td>Images, documents, backups, logs, static websites, data lakes</td><td>Flat namespace, HTTP API, virtually unlimited, cheap, eventually/strongly consistent per provider</td></tr>
+      <tr><td><b>Block</b></td><td>Managed Disks / EBS</td><td>VM system and data disks, databases on VMs</td><td>Low latency, attached to one VM</td></tr>
+      <tr><td><b>File</b></td><td>Azure Files / EFS, FSx</td><td>Shared network drives (SMB/NFS)</td><td>Lift-and-shift of file servers</td></tr>
+      <tr><td><b>Archive</b></td><td>Archive tier / Glacier</td><td>Compliance and long-term backups</td><td>Very cheap; retrieval takes hours</td></tr></table></div>
+    <h3>Object storage essentials</h3>
+    <ul>
+      <li><b>Access tiers:</b> hot, cool/infrequent, archive. Use <b>lifecycle rules</b> to move or delete data automatically.</li>
+      <li><b>Redundancy:</b> LRS/ZRS/GRS (Azure) or single-AZ/multi-AZ/cross-region replication (S3). Choose by RPO and cost.</li>
+      <li><b>Access:</b> keep buckets private. Share with <b>pre-signed URLs / SAS tokens</b> (time-limited) or managed identities, never with public containers by default.</li>
+      <li><b>Versioning, soft delete, immutability (WORM)</b> protect against deletion and ransomware.</li>
+    </ul>
+    <pre data-lang="csharp" data-file="Upload.cs">// Azure.Storage.Blobs, using a managed identity (no secrets in code)
+var svc = new BlobServiceClient(new Uri("https://shopstore.blob.core.windows.net"), new DefaultAzureCredential());
+var container = svc.GetBlobContainerClient("invoices");
+await container.UploadBlobAsync($"{orderId}.pdf", pdfStream);
+
+// Time-limited download link (SAS) instead of making the container public
+var sas = container.GetBlobClient($"{orderId}.pdf")
+                   .GenerateSasUri(Azure.Storage.Sas.BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddMinutes(15));</pre>
+  </section>
+
+  <section class="topic" id="databases" data-nav="Managed databases and caching" data-group="2 · Building blocks" data-level="i">
+    <h2>Managed databases and caching <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th>Need</th><th>Azure</th><th>AWS</th><th>Notes</th></tr>
+      <tr><td>Relational (SQL Server)</td><td>Azure SQL Database / Managed Instance</td><td>RDS for SQL Server</td><td>Managed backups, patching, HA, geo-replication</td></tr>
+      <tr><td>Relational (open source)</td><td>Azure Database for PostgreSQL/MySQL</td><td>RDS / Aurora</td><td>Aurora offers cloud-native scaling</td></tr>
+      <tr><td>Document / key-value, global scale</td><td>Cosmos DB</td><td>DynamoDB</td><td>Partition-key design drives performance and cost</td></tr>
+      <tr><td>Cache</td><td>Azure Cache for Redis</td><td>ElastiCache</td><td>Cache-aside, sessions, rate limiting</td></tr>
+      <tr><td>Search</td><td>Azure AI Search</td><td>OpenSearch Service</td><td>Full-text and facets</td></tr>
+      <tr><td>Analytics</td><td>Synapse / Fabric</td><td>Redshift / Athena</td><td>Warehouses and lakes</td></tr></table></div>
+    <div class="why"><b>Why managed?</b>Backups, patching, failover and monitoring are done for you. You still design the schema, indexes, connection handling (pooling, retries for transient faults) and security (private endpoints, least-privilege access). See the SQL guide for schema and tuning.</div>
+  </section>
+
+  <div class="part-title">Part 3 &mdash; Networking and security</div>
+
+  <section class="topic" id="networking" data-nav="Cloud networking" data-group="3 · Network & security" data-level="i">
+    <h2>Virtual networks, load balancing and DNS <span class="badge i">Intermediate</span></h2>
+    <p>A <b>virtual network</b> (VNet / VPC) is your private, isolated network in the cloud, split into <b>subnets</b>. You control routing, firewalls and which resources are reachable from the internet.</p>
+    <div class="diagram"><div class="dtitle">A typical three-tier layout</div>
+      <div class="flow">
+        <div class="node">Internet users<small>DNS &rarr; CDN / WAF</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Public subnet<small>load balancer / gateway</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Private app subnet<small>web/API instances in 2-3 zones</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Private data subnet<small>database, cache (no public IP)</small></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Concept</th><th>Azure / AWS</th><th>Detail</th></tr>
+      <tr><td>Firewall rules</td><td>Network Security Group (NSG) / Security Group + NACL</td><td>Allow only needed ports and sources; default deny</td></tr>
+      <tr><td>Outbound internet for private subnets</td><td>NAT Gateway</td><td>Private resources call out without being reachable</td></tr>
+      <tr><td>Private access to PaaS</td><td>Private Endpoint / VPC Endpoint (PrivateLink)</td><td>Keep database/storage traffic off the public internet</td></tr>
+      <tr><td>Load balancer</td><td>Application Gateway, Front Door / ALB, NLB</td><td>L7 (HTTP routing, TLS, WAF) vs L4 (TCP/UDP)</td></tr>
+      <tr><td>Hybrid connectivity</td><td>VPN Gateway, ExpressRoute / Site-to-Site VPN, Direct Connect</td><td>Connect on-premises securely</td></tr>
+      <tr><td>DNS</td><td>Azure DNS, Traffic Manager / Route 53</td><td>Names, health-based and geo routing</td></tr>
+      <tr><td>CIDR</td><td><code>10.0.0.0/16</code> VNet; <code>10.0.1.0/24</code> subnet</td><td>Plan non-overlapping ranges before connecting networks</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="iam" data-nav="Identity and access (IAM, RBAC)" data-group="3 · Network & security" data-level="i">
+    <h2>Identity and access management <span class="badge i">Intermediate</span></h2>
+    <p>In the cloud, <b>identity is the new perimeter</b>. Every request is authenticated (who?) and authorised (allowed to do what, on which resource?).</p>
+    <div class="tblwrap"><table><tr><th>Concept</th><th>Azure</th><th>AWS</th></tr>
+      <tr><td>Directory / users</td><td>Microsoft Entra ID</td><td>IAM users, IAM Identity Center (SSO)</td></tr>
+      <tr><td>Authorisation model</td><td><b>RBAC</b>: role + scope (subscription, resource group, resource)</td><td><b>IAM policies</b> (JSON) attached to roles/users/groups</td></tr>
+      <tr><td>Workload identity (no passwords)</td><td><b>Managed Identity</b></td><td><b>IAM role</b> for EC2/Lambda/ECS</td></tr>
+      <tr><td>Secrets, keys, certificates</td><td>Key Vault</td><td>Secrets Manager, KMS, Parameter Store</td></tr>
+      <tr><td>Security posture</td><td>Defender for Cloud, Policy</td><td>Security Hub, GuardDuty, Config</td></tr></table></div>
+    <pre data-lang="json" data-file="aws-policy.json">{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": ["s3:GetObject", "s3:PutObject"],
+    "Resource": "arn:aws:s3:::shop-assets-12345/uploads/*"
+  }]
+}</pre>
+    <ul>
+      <li><b>Least privilege:</b> grant the minimum actions on the narrowest scope; review regularly.</li>
+      <li><b>No long-lived keys in code or repos.</b> Use managed identities/roles locally with <code>DefaultAzureCredential</code>/SSO, and secret stores in CI.</li>
+      <li><b>MFA</b> for all humans, <b>break-glass</b> accounts protected, and separate admin and daily accounts.</li>
+      <li><b>Encrypt</b> in transit (TLS) and at rest (provider-managed or customer-managed keys). Audit with activity logs (Azure Activity Log, CloudTrail).</li>
+    </ul>
+    <pre data-lang="csharp" data-file="Program.cs (App Service + Key Vault with Managed Identity)">builder.Configuration.AddAzureKeyVault(
+    new Uri("https://shop-kv.vault.azure.net/"), new DefaultAzureCredential());   // no connection strings in code
+var cs = builder.Configuration["Sql--ConnectionString"];</pre>
+    <div class="warn"><b>The usual cloud breaches</b>Public storage buckets, leaked access keys in Git, over-broad admin roles, open management ports (RDP/SSH to the internet), unpatched VMs, and databases with public endpoints. Almost all are configuration mistakes on the customer side.</div>
+  </section>
+
+  <div class="part-title">Part 4 &mdash; Reliability, scale and operations</div>
+
+  <section class="topic" id="reliability" data-nav="Availability, SLA, DR and scaling" data-group="4 · Reliability" data-level="i">
+    <h2>High availability, SLAs, disaster recovery and scaling <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th>Term</th><th>Meaning</th></tr>
+      <tr><td><b>Availability</b></td><td>Share of time a service works (99.9% = about 43 min/month down; 99.99% about 4.3 min)</td></tr>
+      <tr><td><b>SLA / SLO / SLI</b></td><td>Contractual promise (credits) / internal target / measured indicator</td></tr>
+      <tr><td><b>RTO</b></td><td>Recovery Time Objective: how long you can be down</td></tr>
+      <tr><td><b>RPO</b></td><td>Recovery Point Objective: how much data you can lose</td></tr>
+      <tr><td><b>Scale up (vertical)</b></td><td>Bigger instance: simple, has a ceiling and usually a restart</td></tr>
+      <tr><td><b>Scale out (horizontal)</b></td><td>More instances behind a load balancer: needs stateless apps</td></tr>
+      <tr><td><b>Autoscaling</b></td><td>Rules on CPU, requests, queue length or schedule add/remove instances</td></tr></table></div>
+    <div class="lab" id="sla-lab"></div>
+    <h3>Disaster-recovery strategies (cheapest to fastest)</h3>
+    <div class="tblwrap"><table><tr><th>Strategy</th><th>What runs in the second region</th><th>RTO / RPO</th><th>Cost</th></tr>
+      <tr><td><b>Backup &amp; restore</b></td><td>Nothing; backups copied across regions</td><td>Hours / hours</td><td>$</td></tr>
+      <tr><td><b>Pilot light</b></td><td>Data replicated; core services off</td><td>Tens of minutes</td><td>$$</td></tr>
+      <tr><td><b>Warm standby</b></td><td>Scaled-down full stack running</td><td>Minutes</td><td>$$$</td></tr>
+      <tr><td><b>Active-active</b></td><td>Full stack serving traffic in both</td><td>Near zero</td><td>$$$$</td></tr></table></div>
+    <div class="tip"><b>Design principles (Well-Architected)</b>Design for failure; keep apps stateless and store sessions/state externally; use queues to decouple; retry transient faults with exponential back-off and jitter; use health probes and circuit breakers; automate everything; test failover (chaos / game days).</div>
+    <pre data-lang="csharp" data-file="Resilience.cs">// Polly via Microsoft.Extensions.Http.Resilience: retry + circuit breaker + timeout for outbound calls
+builder.Services.AddHttpClient("payments", c =&gt; c.BaseAddress = new Uri("https://pay.example.com"))
+    .AddStandardResilienceHandler();</pre>
+  </section>
+
+  <section class="topic" id="devops" data-nav="DevOps, IaC and deployment" data-group="4 · Reliability" data-level="i">
+    <h2>DevOps, infrastructure as code and deployment strategies <span class="badge i">Intermediate</span></h2>
+    <p><b>Infrastructure as Code</b> describes environments in versioned files so they are reviewed, repeatable and recoverable, instead of clicked together in the portal.</p>
+    <div class="tblwrap"><table><tr><th>Tool</th><th>Notes</th></tr>
+      <tr><td><b>Bicep / ARM</b></td><td>Azure-native declarative templates</td></tr>
+      <tr><td><b>CloudFormation / CDK</b></td><td>AWS-native templates / code that generates them</td></tr>
+      <tr><td><b>Terraform / OpenTofu, Pulumi</b></td><td>Multi-cloud; state file tracks what exists, <code>plan</code> shows the diff before <code>apply</code></td></tr></table></div>
+    <pre data-lang="plain" data-file="main.bicep">param location string = resourceGroup().location
+param appName string
+
+resource plan 'Microsoft.Web/serverfarms@2023-01-01' = {
+  name: '${appName}-plan'
+  location: location
+  sku: { name: 'B1' }
+  kind: 'linux'
+  properties: { reserved: true }
+}
+resource app 'Microsoft.Web/sites@2023-01-01' = {
+  name: appName
+  location: location
+  identity: { type: 'SystemAssigned' }
+  properties: { serverFarmId: plan.id, httpsOnly: true, siteConfig: { linuxFxVersion: 'DOTNETCORE|8.0' } }
+}</pre>
+    <pre data-lang="yaml" data-file=".github/workflows/deploy.yml (OIDC, no stored secret)">name: deploy
+on: { push: { branches: [main] } }
+permissions: { id-token: write, contents: read }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: 8.0.x }
+      - run: dotnet publish -c Release -o publish
+      - uses: azure/login@v2
+        with: { client-id: ${{ vars.AZURE_CLIENT_ID }}, tenant-id: ${{ vars.AZURE_TENANT_ID }}, subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }} }
+      - uses: azure/webapps-deploy@v3
+        with: { app-name: shop-api-12345, package: publish }</pre>
+    <h3>Release strategies</h3>
+    <div class="tblwrap"><table><tr><th>Strategy</th><th>How</th><th>Risk / rollback</th></tr>
+      <tr><td><b>Rolling</b></td><td>Replace instances gradually</td><td>Mixed versions briefly; roll back by redeploying</td></tr>
+      <tr><td><b>Blue-green</b></td><td>Full new environment, switch traffic (App Service slots swap)</td><td>Instant rollback; double capacity temporarily</td></tr>
+      <tr><td><b>Canary</b></td><td>Send 1-10% of traffic to the new version, watch metrics</td><td>Small blast radius; needs good telemetry</td></tr>
+      <tr><td><b>Feature flags</b></td><td>Deploy dark, enable per user/segment</td><td>Decouples deploy from release</td></tr></table></div>
+    <div class="note"><b>Database changes</b>Use backward-compatible, expand-then-contract migrations so old and new app versions can run against the same schema during a rollout.</div>
+  </section>
+
+  <section class="topic" id="monitoring" data-nav="Monitoring, logging and alerting" data-group="4 · Reliability" data-level="i">
+    <h2>Observability: metrics, logs, traces <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th>Pillar</th><th>Azure</th><th>AWS</th><th>Question answered</th></tr>
+      <tr><td><b>Metrics</b></td><td>Azure Monitor metrics</td><td>CloudWatch metrics</td><td>Is it healthy? (CPU, latency, error rate)</td></tr>
+      <tr><td><b>Logs</b></td><td>Log Analytics (KQL)</td><td>CloudWatch Logs Insights</td><td>What happened?</td></tr>
+      <tr><td><b>Traces</b></td><td>Application Insights</td><td>X-Ray</td><td>Where is the time spent across services?</td></tr>
+      <tr><td><b>Alerts</b></td><td>Alert rules + action groups</td><td>CloudWatch alarms + SNS</td><td>Notify before users complain</td></tr></table></div>
+    <pre data-lang="plain" data-file="KQL: failed requests per hour">requests
+| where timestamp &gt; ago(24h) and success == false
+| summarize failures = count() by bin(timestamp, 1h), resultCode
+| order by timestamp desc</pre>
+    <ul><li>Alert on <b>symptoms</b> (error rate, latency SLO burn) rather than only causes (CPU).</li><li>Use correlation ids and structured logging; never log secrets or personal data.</li><li>Dashboards for the four golden signals: latency, traffic, errors, saturation.</li></ul>
+  </section>
+
+  <div class="part-title">Part 5 &mdash; Cost, architecture and practice</div>
+
+  <section class="topic" id="cost" data-nav="Cost management (FinOps)" data-group="5 · Cost & practice" data-level="i">
+    <h2>Cost management <span class="badge i">Intermediate</span></h2>
+    <div class="lab" id="cost-lab"></div>
+    <div class="tblwrap"><table><tr><th>Lever</th><th>How</th></tr>
+      <tr><td>Right-size</td><td>Match instance size to measured CPU/memory; downsize idle resources</td></tr>
+      <tr><td>Schedule &amp; autoscale</td><td>Stop dev/test at night; scale to demand</td></tr>
+      <tr><td>Commitments</td><td>Reserved instances / savings plans for steady baselines (1-3 years)</td></tr>
+      <tr><td>Spot / low-priority</td><td>Interruptible batch and CI workers at large discounts</td></tr>
+      <tr><td>Storage tiers &amp; lifecycle</td><td>Move cold data to cool/archive; delete old snapshots</td></tr>
+      <tr><td>Data transfer</td><td>Keep traffic in-region, use CDN, avoid cross-region chatter</td></tr>
+      <tr><td>Governance</td><td>Tags (owner, env, cost-centre), budgets and alerts, policy to block expensive SKUs, delete orphaned disks/IPs</td></tr></table></div>
+    <div class="tip"><b>Serverless is not always cheaper</b>It excels for spiky or idle-heavy workloads. Constant high load is usually cheaper on reserved VMs or containers. Estimate with the provider's pricing calculator using real request counts.</div>
+  </section>
+
+  <section class="topic" id="architecture" data-nav="Reference architecture and well-architected" data-group="5 · Cost & practice" data-level="a">
+    <h2>A reference architecture and the Well-Architected pillars <span class="badge a">Advanced</span></h2>
+    <div class="seq" data-title="Request through a typical cloud web app">
+<script type="text/seq">
+participants: User | CDN / WAF | App Gateway | App Service (2 zones) | Key Vault | Azure SQL | Queue / Worker
+User -> CDN / WAF : HTTPS request
+CDN / WAF -> App Gateway : cache miss, filtered traffic
+App Gateway -> App Service (2 zones) : route to healthy instance
+App Service (2 zones) -> Key Vault : get secrets (managed identity)
+App Service (2 zones) -> Azure SQL : query over private endpoint
+App Service (2 zones) -> Queue / Worker : enqueue slow work (email, report)
+App Service (2 zones) --> User : 200 JSON (fast), work continues async
+</script>
+    </div>
+    <div class="tblwrap"><table><tr><th>Pillar</th><th>Ask</th></tr>
+      <tr><td><b>Reliability</b></td><td>Does it survive component, zone and region failures? Tested?</td></tr>
+      <tr><td><b>Security</b></td><td>Least privilege, private networking, encryption, secrets, monitoring?</td></tr>
+      <tr><td><b>Cost optimisation</b></td><td>Are we paying only for what delivers value?</td></tr>
+      <tr><td><b>Operational excellence</b></td><td>IaC, CI/CD, runbooks, observability, game days?</td></tr>
+      <tr><td><b>Performance efficiency</b></td><td>Right sizes, caching, CDN, scaling?</td></tr>
+      <tr><td><b>Sustainability</b> (AWS/Azure added)</td><td>Efficient utilisation, right region, less waste?</td></tr></table></div>
+    <h3>Common patterns</h3>
+    <ul><li><b>Queue-based load levelling:</b> producers enqueue; workers drain at their own pace.</li><li><b>Cache-aside:</b> read cache, on miss read DB and populate; set TTLs.</li><li><b>Strangler fig:</b> migrate a legacy app piece by piece behind a proxy (useful for AngularJS or monolith modernisation).</li><li><b>Circuit breaker, bulkhead, retry with jitter</b> for resilience.</li><li><b>Event-driven:</b> publish events; consumers react independently (Service Bus/Event Grid, SNS/SQS).</li></ul>
+  </section>
+
+  <section class="topic" id="migration" data-nav="Migrating to the cloud (the 6 Rs)" data-group="5 · Cost & practice" data-level="i">
+    <h2>Migrating to the cloud <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th>Strategy</th><th>Meaning</th><th>Example</th></tr>
+      <tr><td><b>Rehost</b> (lift-and-shift)</td><td>Move as-is to VMs</td><td>Fast; few benefits</td></tr>
+      <tr><td><b>Replatform</b></td><td>Small changes to use managed services</td><td>SQL Server on VM &rarr; Azure SQL</td></tr>
+      <tr><td><b>Refactor / re-architect</b></td><td>Redesign for cloud-native</td><td>Monolith &rarr; services + queues</td></tr>
+      <tr><td><b>Repurchase</b></td><td>Replace with SaaS</td><td>Self-hosted tracker &rarr; Jira Cloud</td></tr>
+      <tr><td><b>Retire / Retain</b></td><td>Switch off unused / keep on-prem for now</td><td>Decommission unused apps</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="project" data-nav="Hands-on project" data-group="5 · Cost & practice" data-level="b">
+    <h2>Hands-on project: deploy API + SPA <span class="badge b">Practice</span></h2>
+    <ol class="steps">
+      <li>Create a free account; set a <b>budget alert</b> first. Create a resource group and tag it.</li>
+      <li>Deploy your ASP.NET Core API to App Service (or a container to Container Apps); turn on HTTPS only and a system-assigned managed identity.</li>
+      <li>Create Azure SQL (or RDS) with a private endpoint or firewall rule for your IP; keep the connection string in Key Vault, read via managed identity.</li>
+      <li>Build the React/AngularJS front end and host the static files in Blob Storage static website / Static Web Apps (or S3 + CloudFront) behind a CDN; set the API CORS origin.</li>
+      <li>Add Application Insights, an availability test and two alerts (5xx rate, response time).</li>
+      <li>Describe it in Bicep/Terraform, add a GitHub Actions pipeline with OIDC, then <b>delete the resource group</b> to stop costs.</li>
+    </ol>
+  </section>
+
+  <div class="part-title">Part 6 &mdash; Interview preparation</div>
+
+  <section class="topic" id="quiz" data-nav="Self-test quiz" data-group="6 · Resources" data-level="b">
+    <h2>Self-test quiz <span class="badge b">Practice</span></h2>
+    <p>Ten questions. Pick an answer and read the explanation.</p>
+    <div class="lab quiz" data-title="Cloud quiz">
+      <script type="application/json">
+      [
+        {"q":"In the shared responsibility model, which is ALWAYS the customer's responsibility?","o":["Physical security of the data centre","Hypervisor patching","Data, identities and access configuration","Network cables"],"a":2,"e":"Whatever the service model, you own your data and who can access it. The provider secures the underlying facilities and hardware."},
+        {"q":"Which service model gives you only function code to manage?","o":["IaaS","PaaS","FaaS / serverless","On-premises"],"a":2,"e":"With Functions/Lambda the provider manages servers, scaling and availability; you deploy code."},
+        {"q":"What is an Availability Zone?","o":["A country","One or more separate data centres within a region with independent power/network","A CDN node","A subnet"],"a":1,"e":"Spreading instances over zones protects against a data-centre failure inside one region."},
+        {"q":"Two components in series have availability 99.9% and 99.9%. Roughly what is the combined availability?","o":["99.9%","99.8%","99.99%","100%"],"a":1,"e":"Multiply: 0.999 x 0.999 = 0.998. Dependencies in series reduce availability."},
+        {"q":"Your VM needs to read a blob. What is the most secure way to authenticate?","o":["Store the storage account key in appsettings.json","Embed a SAS token in code","Use a managed identity / IAM role with a least-privilege role","Make the container public"],"a":2,"e":"Managed identities remove secrets from code and config; grant only the read role on that container."},
+        {"q":"What is the difference between RTO and RPO?","o":["Identical","RTO is acceptable downtime; RPO is acceptable data loss","RTO is cost; RPO is performance","RTO is for storage only"],"a":1,"e":"Recovery Time Objective vs Recovery Point Objective. They drive the DR strategy and its cost."},
+        {"q":"Which approach scales a stateless web tier best?","o":["Bigger VM only","Several instances behind a load balancer with autoscale rules","One instance with more memory","Manual restart"],"a":1,"e":"Horizontal scaling needs statelessness: keep sessions/state in a cache or database."},
+        {"q":"A steady 24x7 workload should most economically use...","o":["On-demand always","Reserved instances / savings plan commitment","Spot instances only","Serverless always"],"a":1,"e":"Commitments give large discounts for predictable baselines. Spot is for interruptible work."},
+        {"q":"What does a private endpoint (PrivateLink) achieve?","o":["Faster CPU","Access to a PaaS service over private IPs without public internet exposure","Free egress","Automatic backups"],"a":1,"e":"Traffic stays inside your virtual network, and public access can be disabled."},
+        {"q":"Why prefer Infrastructure as Code over portal clicks?","o":["It is required by law","Repeatable, reviewable, versioned environments and easy disaster recovery","It is always cheaper","Portal is deprecated"],"a":1,"e":"IaC gives consistency across dev/test/prod, peer review via pull requests and fast rebuilds."}
+      ]
+      </script>
+    </div>
+  </section>
+
+  <section class="topic" id="interview-qa" data-nav="Interview questions & answers" data-group="6 · Resources" data-level="a">
+    <h2>Cloud interview questions <span class="badge a">Prep</span></h2>
+    <p>Filter by topic, expand a question and try to answer it aloud first.</p>
+    <div class="qfilter" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
+      <button class="btn primary" data-f="all" type="button">All</button><button class="btn" data-f="concepts" type="button">Concepts</button><button class="btn" data-f="build" type="button">Compute &amp; data</button><button class="btn" data-f="sec" type="button">Security &amp; network</button><button class="btn" data-f="ops" type="button">Reliability &amp; ops</button><button class="btn" data-f="design" type="button">Design</button>
+    </div>
+
+    <details class="qa" data-tag="concepts"><summary>IaaS vs PaaS vs SaaS vs serverless? <span class="qtag">concepts</span></summary><div class="dbody"><p>They differ in what you manage. IaaS: OS and up. PaaS: just the app and data. Serverless/FaaS: only functions, scale-to-zero. SaaS: just configuration. More managed means less control but less operational work.</p></div></details>
+    <details class="qa" data-tag="concepts"><summary>What is the shared responsibility model? <span class="qtag">concepts</span></summary><div class="dbody"><p>The provider secures the cloud itself (facilities, hardware, hypervisor); the customer secures what they put in it (data, identities, configuration, and the OS/apps depending on the service model).</p></div></details>
+    <details class="qa" data-tag="concepts"><summary>Region vs availability zone vs edge location? <span class="qtag">concepts</span></summary><div class="dbody"><p>A region is a geographic area; zones are isolated data centres inside it for high availability; edge locations are small points of presence close to users for caching and acceleration.</p></div></details>
+    <details class="qa" data-tag="concepts"><summary>What is elasticity vs scalability? <span class="qtag">concepts</span></summary><div class="dbody"><p>Scalability is the ability to handle more load by adding resources; elasticity is doing it automatically and releasing them when load drops, so you pay for what you use.</p></div></details>
+
+    <details class="qa" data-tag="build"><summary>VM, container or serverless: how do you choose? <span class="qtag">build</span></summary><div class="dbody"><p>Prefer the most managed option that fits: SaaS/PaaS, then serverless for event-driven or spiky work, containers for portable services needing more control, VMs for legacy or OS-level needs. Consider cold starts, execution limits, cost at steady load and team skills.</p></div></details>
+    <details class="qa" data-tag="build"><summary>Blob/S3 storage vs a database? <span class="qtag">build</span></summary><div class="dbody"><p>Object storage holds large unstructured files cheaply with a simple key/HTTP API; databases handle structured data with queries and transactions. Typical design stores files in object storage and keeps metadata plus the URL/key in the database.</p></div></details>
+    <details class="qa" data-tag="build"><summary>How do you deploy an ASP.NET Core app to Azure? <span class="qtag">build</span></summary><div class="dbody"><p>Publish and deploy to App Service (or a container to Container Apps/AKS) through a CI/CD pipeline; configure settings and connection strings in app settings/Key Vault via managed identity; use deployment slots for zero-downtime swaps; enable Application Insights; scale with rules.</p></div></details>
+    <details class="qa" data-tag="build"><summary>How do you reduce serverless cold-start impact? <span class="qtag">build</span></summary><div class="dbody"><p>Smaller packages, lighter startup, provisioned/premium plans or warm instances, ReadyToRun/AOT for .NET, avoid heavy initialisation in the handler, and keep latency-sensitive paths on always-on compute.</p></div></details>
+
+    <details class="qa" data-tag="sec"><summary>How do you keep secrets out of code? <span class="qtag">sec</span></summary><div class="dbody"><p>Use a secret store (Key Vault / Secrets Manager) accessed through a managed identity or role, inject configuration at runtime, rotate regularly, scan repos for leaks, and use OIDC federation instead of stored cloud keys in CI.</p></div></details>
+    <details class="qa" data-tag="sec"><summary>What is the principle of least privilege in cloud IAM? <span class="qtag">sec</span></summary><div class="dbody"><p>Give each identity only the permissions it needs, on the smallest scope, for the shortest time. Prefer roles over users, review access, and use conditional access and MFA.</p></div></details>
+    <details class="qa" data-tag="sec"><summary>How would you secure a database in the cloud? <span class="qtag">sec</span></summary><div class="dbody"><p>Private endpoint or private subnet, no public access, firewall/NSG rules, Entra ID/IAM authentication with managed identities, TDE/encryption with managed keys, TLS, auditing, backups with restore tests, and least-privilege database roles.</p></div></details>
+    <details class="qa" data-tag="sec"><summary>Security group vs NACL (or NSG)? <span class="qtag">sec</span></summary><div class="dbody"><p>Security groups/NSGs are stateful firewalls on instances/NICs (return traffic allowed automatically). AWS NACLs are stateless subnet-level rules evaluated in order. Use security groups as the main control.</p></div></details>
+
+    <details class="qa" data-tag="ops"><summary>How do you design for high availability? <span class="qtag">ops</span></summary><div class="dbody"><p>Remove single points of failure: multiple instances across zones behind a load balancer, stateless services, zone-redundant managed databases, health probes, automatic restart/scale, and retries with circuit breakers. Test failover regularly.</p></div></details>
+    <details class="qa" data-tag="ops"><summary>Explain disaster-recovery options and how you pick one. <span class="qtag">ops</span></summary><div class="dbody"><p>Backup/restore, pilot light, warm standby, active-active: increasing cost and decreasing RTO/RPO. Pick from business-defined RTO/RPO and the cost of downtime, and rehearse the runbook.</p></div></details>
+    <details class="qa" data-tag="ops"><summary>What is blue-green vs canary deployment? <span class="qtag">ops</span></summary><div class="dbody"><p>Blue-green keeps two environments and switches all traffic at once with instant rollback. Canary sends a small percentage of traffic to the new version first, watching metrics before ramping up.</p></div></details>
+    <details class="qa" data-tag="ops"><summary>A cloud bill doubled this month. What do you do? <span class="qtag">ops</span></summary><div class="dbody"><p>Use cost analysis grouped by service, resource group and tag to find the change; check for forgotten resources, scaling loops, data egress, logging volume or a new environment; add budgets and alerts; right-size, schedule shutdowns, and assign cost owners via tags.</p></div></details>
+
+    <details class="qa" data-tag="design"><summary>Design a scalable, resilient web application on Azure or AWS. <span class="qtag">design</span></summary><div class="dbody"><p>CDN/WAF &rarr; load balancer &rarr; stateless app tier in 2-3 zones with autoscaling &rarr; managed database zone-redundant with read replicas and a cache; queue + workers for async tasks; blob/S3 for files; private networking and managed identities; IaC and CI/CD; monitoring and alerts; DR in a second region per RTO/RPO. Explain trade-offs and cost.</p></div></details>
+    <details class="qa" data-tag="design"><summary>How do you handle sessions when scaling out? <span class="qtag">design</span></summary><div class="dbody"><p>Make servers stateless: use JWT or cookie-based tokens and a shared cache (Redis) or database for server-side session data. Avoid sticky sessions unless unavoidable.</p></div></details>
+    <details class="qa" data-tag="design"><summary>How would you migrate a legacy on-premises app? <span class="qtag">design</span></summary><div class="dbody"><p>Assess and prioritise with the 6 Rs; start with rehost or replatform for quick wins, refactor where value justifies it; migrate data with minimal downtime (replication, cutover plan); establish landing zone, networking, identity and governance first; validate performance and cost; decommission the old system.</p></div></details>
+  </section>
+
+  <section class="topic" id="next" data-nav="Certifications and next steps" data-group="6 · Resources" data-level="b">
+    <h2>Certifications and next steps <span class="badge b">Roadmap</span></h2>
+    <div class="tblwrap"><table><tr><th>Level</th><th>Azure</th><th>AWS</th></tr>
+      <tr><td>Fundamentals</td><td>AZ-900 Azure Fundamentals</td><td>Cloud Practitioner</td></tr>
+      <tr><td>Developer</td><td>AZ-204 Developing Solutions for Azure</td><td>Developer Associate</td></tr>
+      <tr><td>Architect / admin</td><td>AZ-104 Administrator, AZ-305 Architect</td><td>Solutions Architect Associate</td></tr>
+      <tr><td>DevOps</td><td>AZ-400 DevOps Engineer</td><td>DevOps Engineer Professional</td></tr></table></div>
+    <p>Next: Docker and Kubernetes hands-on, Terraform, message-driven design, and the <a href="Networking-HTTP-Guide.html">Networking &amp; HTTP</a> guide for the fundamentals underneath every cloud service.</p>
+    <p><small>Companion guides: <a href="ASP.NET-Core-Web-API-Guide.html">Web API</a> &middot; <a href="SQL-Server-Database-Design-Guide.html">SQL Server</a> &middot; <a href="General-Delivery-Guide.html">Delivery</a> &middot; <a href="Networking-HTTP-Guide.html">Networking &amp; HTTP</a></small></p>
+  </section>
+
+</main>
+</div>
+
+<script src="assets/guide.js"></script>
+<script src="assets/concepts.js"></script>
+<script src="assets/cloud.js"></script>
+</body>
+</html>

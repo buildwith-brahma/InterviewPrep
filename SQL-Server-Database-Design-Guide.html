@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQL Server &amp; Database Design - Basics, Joins, Indexes, Transactions</title>
+<link rel="stylesheet" href="assets/guide.css">
+<style>
+:root{--accent:#b4531a;--accent-soft:#fbe7d9}
+body.dark{--accent:#f0a068;--accent-soft:#3a2415}
+.hero{background:linear-gradient(135deg,#4a210a,#b4531a 55%,#d9962b)}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="brand"><h1>SQL Server &amp; Database Design</h1><small>T-SQL &rarr; Joins &rarr; Design &rarr; Indexes &rarr; Transactions &rarr; Programming</small></div>
+  <div class="search"><input id="search" type="search" placeholder="Search concepts ( press / )" autocomplete="off"><div id="search-results"></div></div>
+  <nav id="nav"></nav>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    <button id="menu-btn" type="button">Menu</button>
+    <div class="prog"><i id="progress"></i></div>
+    <button id="expand-all" type="button">Expand all</button>
+    <button id="collapse-all" type="button">Collapse all</button>
+    <button id="theme-btn" type="button">Dark / Light</button>
+  </div>
+
+  <main id="content">
+
+  <div class="hero" id="top">
+    <h1>SQL Server &amp; Database Design &ndash; Basic Concepts to Interview Level</h1>
+    <p>Everything a back-end developer needs about relational databases: the <b>T-SQL</b> you write every day, <b>joins</b>, aggregation and window functions, <b>normalisation and schema design</b>, <b>indexes and execution plans</b>, <b>transactions and isolation levels</b>, stored procedures, and the operational basics (backups, security). Three live labs let you see joins, isolation anomalies and index cost for yourself.</p>
+    <div class="chips"><span>SELECT &middot; JOIN &middot; GROUP BY</span><span>CTE &middot; Window functions</span><span>Normal forms &middot; Keys</span><span>Clustered / nonclustered indexes</span><span>ACID &middot; Isolation &middot; Deadlocks</span><span>Procedures &middot; Triggers</span><span>Backups &middot; Security</span></div>
+  </div>
+
+  <section class="topic" id="how-to-use" data-nav="How to use this guide" data-group="Start here">
+    <h2>How to use this guide</h2>
+    <div class="grid3">
+      <div class="card"><h4>1. Read in order</h4><p>Parts 1-3 are the daily skills (querying, design). Parts 4-5 are what separates juniors from seniors (indexes, transactions). Part 6-7 cover code in the database and operations.</p></div>
+      <div class="card"><h4>2. Run the labs</h4><p>Join visualiser, isolation-level explorer and index seek-versus-scan estimator. They run in the browser, no database needed.</p></div>
+      <div class="card"><h4>3. Practise for real</h4><p>Install SQL Server Developer Edition or use Azure SQL free tier, load the <i>AdventureWorks</i> or <i>Northwind</i> sample and type every query. Press <span class="kbd">/</span> to search.</p></div>
+    </div>
+    <div class="note"><b>Scope</b>Examples use <b>T-SQL (SQL Server / Azure SQL)</b>. The ideas (joins, keys, normalisation, ACID, indexes) carry over to PostgreSQL, MySQL and Oracle; syntax differs (for example <code>TOP</code> vs <code>LIMIT</code>, <code>IDENTITY</code> vs <code>SERIAL</code>).</div>
+  </section>
+
+  <div class="part-title">Part 1 &mdash; Relational foundations</div>
+
+  <section class="topic" id="rdbms" data-nav="RDBMS, SQL and SQL Server" data-group="1 · Foundations" data-level="b">
+    <h2>What a relational database is <span class="badge b">Basic</span></h2>
+    <p>A <b>relational database</b> stores data in <b>tables</b> (relations) made of <b>rows</b> (records) and <b>columns</b> (attributes). Tables are linked by <b>keys</b>, and you query them with <b>SQL</b> (Structured Query Language), a declarative language: you say <i>what</i> you want and the engine's optimizer decides <i>how</i>.</p>
+    <div class="tblwrap"><table><tr><th>Term</th><th>Meaning</th></tr>
+      <tr><td><b>Instance</b></td><td>One running SQL Server service (default or named). Hosts many databases.</td></tr>
+      <tr><td><b>Database</b></td><td>Container of tables, views, procedures; stored in <code>.mdf</code> (data) and <code>.ldf</code> (transaction log) files.</td></tr>
+      <tr><td><b>Schema</b></td><td>Namespace inside a database (<code>dbo</code>, <code>sales</code>) used for grouping and permissions.</td></tr>
+      <tr><td><b>Table / row / column</b></td><td>Entity set / one entity / one attribute with a data type.</td></tr>
+      <tr><td><b>Primary key</b></td><td>Column(s) that uniquely identify a row. Not null, unique.</td></tr>
+      <tr><td><b>Foreign key</b></td><td>Column(s) referencing another table's key; enforces referential integrity.</td></tr>
+      <tr><td><b>Index</b></td><td>Extra structure (usually a B-tree) that speeds up lookups at the cost of writes and storage.</td></tr>
+      <tr><td><b>Transaction</b></td><td>A unit of work that succeeds or fails as a whole (ACID).</td></tr></table></div>
+    <h3>SQL sub-languages</h3>
+    <div class="tblwrap"><table><tr><th>Group</th><th>Purpose</th><th>Statements</th></tr>
+      <tr><td><b>DDL</b> (definition)</td><td>Create and change structure</td><td><code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>, <code>TRUNCATE</code></td></tr>
+      <tr><td><b>DML</b> (manipulation)</td><td>Change data</td><td><code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>MERGE</code></td></tr>
+      <tr><td><b>DQL</b> (query)</td><td>Read data</td><td><code>SELECT</code></td></tr>
+      <tr><td><b>DCL</b> (control)</td><td>Permissions</td><td><code>GRANT</code>, <code>REVOKE</code>, <code>DENY</code></td></tr>
+      <tr><td><b>TCL</b> (transaction)</td><td>Group statements</td><td><code>BEGIN TRAN</code>, <code>COMMIT</code>, <code>ROLLBACK</code>, <code>SAVE TRAN</code></td></tr></table></div>
+    <h3>SQL Server editions and tools</h3>
+    <ul>
+      <li><b>Editions:</b> Developer (free, full features, non-production), Express (free, 10 GB limit), Standard, Enterprise; <b>Azure SQL Database</b> and <b>Managed Instance</b> are the managed cloud versions.</li>
+      <li><b>Tools:</b> SQL Server Management Studio (SSMS), Azure Data Studio, <code>sqlcmd</code>, and Visual Studio / VS Code extensions. Use <b>Query Store</b> and <b>execution plans</b> for tuning.</li>
+      <li><b>System databases:</b> <code>master</code> (instance metadata), <code>model</code> (template for new databases), <code>msdb</code> (jobs, backups history), <code>tempdb</code> (temporary objects, sorts, row versions, recreated at every restart).</li>
+    </ul>
+  </section>
+
+  <section class="topic" id="types" data-nav="Data types and constraints" data-group="1 · Foundations" data-level="b">
+    <h2>Data types and constraints <span class="badge b">Basic</span></h2>
+    <p>Choosing the smallest correct type saves memory, I/O and index size. Constraints put the rules <i>in the database</i>, where every application and script must obey them.</p>
+    <div class="tblwrap"><table><tr><th>Need</th><th>Use</th><th>Avoid / note</th></tr>
+      <tr><td>Whole numbers</td><td><code>int</code> (4 B), <code>bigint</code> (8 B), <code>smallint</code>, <code>tinyint</code></td><td>Pick by range; <code>int</code> tops out near 2.1 billion</td></tr>
+      <tr><td>Money, exact decimals</td><td><code>decimal(19,4)</code> / <code>decimal(p,s)</code></td><td><code>float</code>/<code>real</code> are approximate: never for money</td></tr>
+      <tr><td>Text</td><td><code>nvarchar(n)</code> (Unicode), <code>varchar(n)</code> (non-Unicode, or UTF-8 collations)</td><td>Avoid <code>text</code>/<code>ntext</code> (deprecated); use <code>(max)</code> only when needed</td></tr>
+      <tr><td>Date and time</td><td><code>date</code>, <code>datetime2(n)</code>, <code>datetimeoffset</code></td><td><code>datetime</code> is legacy; store UTC or use offset</td></tr>
+      <tr><td>Yes/no</td><td><code>bit</code></td><td>Nullable bit has three states</td></tr>
+      <tr><td>Globally unique id</td><td><code>uniqueidentifier</code> (GUID)</td><td>Random GUID as clustered key fragments the index; use <code>NEWSEQUENTIALID()</code> or a sequence</td></tr>
+      <tr><td>JSON / XML</td><td><code>nvarchar(max)</code> + <code>ISJSON</code>, <code>OPENJSON</code>; <code>xml</code></td><td>Not a replacement for modelling real columns</td></tr>
+      <tr><td>Binary / files</td><td><code>varbinary(max)</code>, or blob storage + URL</td><td>Large files are better in object storage</td></tr></table></div>
+    <h3>Constraints</h3>
+    <div class="tblwrap"><table><tr><th>Constraint</th><th>Guarantees</th></tr>
+      <tr><td><code>PRIMARY KEY</code></td><td>Unique + not null; creates a clustered index by default</td></tr>
+      <tr><td><code>FOREIGN KEY</code></td><td>Child value exists in parent (or is NULL); options <code>ON DELETE CASCADE / SET NULL / NO ACTION</code></td></tr>
+      <tr><td><code>UNIQUE</code></td><td>No duplicates (one NULL allowed in SQL Server); creates a nonclustered index</td></tr>
+      <tr><td><code>NOT NULL</code></td><td>A value is required</td></tr>
+      <tr><td><code>CHECK</code></td><td>A rule such as <code>Price &gt;= 0</code></td></tr>
+      <tr><td><code>DEFAULT</code></td><td>Value used when none is supplied</td></tr></table></div>
+    <pre data-lang="sql" data-file="create-tables.sql">CREATE TABLE dbo.Customers (
+    CustomerId   int IDENTITY(1,1) CONSTRAINT PK_Customers PRIMARY KEY,
+    Email        nvarchar(256) NOT NULL CONSTRAINT UQ_Customers_Email UNIQUE,
+    FullName     nvarchar(120) NOT NULL,
+    CreatedUtc   datetime2(0)  NOT NULL CONSTRAINT DF_Customers_Created DEFAULT SYSUTCDATETIME()
+);
+
+CREATE TABLE dbo.Orders (
+    OrderId      int IDENTITY(1,1) CONSTRAINT PK_Orders PRIMARY KEY,
+    CustomerId   int NOT NULL CONSTRAINT FK_Orders_Customers REFERENCES dbo.Customers(CustomerId),
+    Total        decimal(19,4) NOT NULL CONSTRAINT CK_Orders_Total CHECK (Total &gt;= 0),
+    Status       tinyint NOT NULL DEFAULT 0,
+    OrderedUtc   datetime2(0) NOT NULL DEFAULT SYSUTCDATETIME()
+);</pre>
+    <div class="tip"><b>Name your constraints</b>Auto-generated names such as <code>PK__Orders__A1B2C3</code> differ per environment and make migration scripts awkward. A <code>CONSTRAINT PK_Orders</code> name is stable and readable in error messages.</div>
+    <div class="warn"><b>NULL is not a value</b>NULL means "unknown". <code>NULL = NULL</code> is not true; use <code>IS NULL</code>. Any arithmetic or comparison with NULL yields NULL (unknown), and <code>NOT IN</code> with a NULL in the list returns no rows; prefer <code>NOT EXISTS</code>.</div>
+  </section>
+
+  <div class="part-title">Part 2 &mdash; Querying with T-SQL</div>
+
+  <section class="topic" id="select" data-nav="SELECT and order of execution" data-group="2 · Querying" data-level="b">
+    <h2>SELECT, filtering and logical order of execution <span class="badge b">Basic</span></h2>
+    <pre data-lang="sql" data-file="select-basics.sql">SELECT   TOP (10) c.FullName, o.OrderId, o.Total
+FROM     dbo.Orders AS o
+JOIN     dbo.Customers AS c ON c.CustomerId = o.CustomerId
+WHERE    o.Total &gt;= 100
+  AND    o.OrderedUtc &gt;= '2026-01-01'
+  AND    c.FullName LIKE 'A%'
+ORDER BY o.Total DESC;</pre>
+    <p>You <i>write</i> SELECT first, but the engine <i>logically</i> processes clauses in a different order. This explains why you cannot use a column alias in <code>WHERE</code>.</p>
+    <div class="diagram"><div class="dtitle">Logical processing order</div>
+      <div class="flow">
+        <div class="node">1. FROM / JOIN<small>build the row set</small></div><span class="arrow">&rarr;</span>
+        <div class="node">2. WHERE<small>filter rows</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">3. GROUP BY<small>make groups</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">4. HAVING<small>filter groups</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">5. SELECT<small>compute columns, aliases</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">6. DISTINCT<small>remove duplicates</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">7. ORDER BY<small>sort (can use aliases)</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">8. TOP / OFFSET<small>limit rows</small></div>
+      </div>
+    </div>
+    <h3>Useful filters</h3>
+    <div class="tblwrap"><table><tr><th>Operator</th><th>Example</th></tr>
+      <tr><td><code>=, &lt;&gt;, &lt;, &gt;, &lt;=, &gt;=</code></td><td><code>WHERE Status &lt;&gt; 2</code></td></tr>
+      <tr><td><code>AND / OR / NOT</code></td><td>Use parentheses; AND binds tighter than OR</td></tr>
+      <tr><td><code>IN</code> / <code>BETWEEN</code></td><td><code>Status IN (1,2)</code>, <code>OrderedUtc BETWEEN @a AND @b</code> (inclusive both ends: careful with times)</td></tr>
+      <tr><td><code>LIKE</code></td><td><code>'A%'</code> can use an index; <code>'%son'</code> cannot</td></tr>
+      <tr><td><code>IS NULL</code></td><td><code>WHERE ShippedUtc IS NULL</code></td></tr>
+      <tr><td><code>EXISTS</code></td><td>Correlated test for presence of related rows</td></tr></table></div>
+    <h3>Paging</h3>
+    <pre data-lang="sql" data-file="paging.sql">-- Offset paging: page 3, 20 per page (ORDER BY is required)
+SELECT OrderId, Total FROM dbo.Orders
+ORDER BY OrderId
+OFFSET 40 ROWS FETCH NEXT 20 ROWS ONLY;
+
+-- Keyset ("seek") paging: fast on deep pages
+SELECT TOP (20) OrderId, Total FROM dbo.Orders
+WHERE OrderId &gt; @LastSeenId
+ORDER BY OrderId;</pre>
+    <div class="tip"><b>OFFSET gets slower with depth</b>The server still reads and discards all skipped rows. For infinite scroll or large tables use keyset paging on an indexed unique sort key.</div>
+  </section>
+
+  <section class="topic" id="joins" data-nav="Joins" data-group="2 · Querying" data-level="b">
+    <h2>Joins <span class="badge b">Basic</span></h2>
+    <p>A join combines rows from two tables based on a condition. The join type decides what happens to rows with no match.</p>
+    <div class="tblwrap"><table><tr><th>Join</th><th>Returns</th></tr>
+      <tr><td><b>INNER JOIN</b></td><td>Only matching rows</td></tr>
+      <tr><td><b>LEFT (OUTER) JOIN</b></td><td>All left rows + matches (NULLs on the right when none)</td></tr>
+      <tr><td><b>RIGHT (OUTER) JOIN</b></td><td>All right rows + matches</td></tr>
+      <tr><td><b>FULL (OUTER) JOIN</b></td><td>All rows from both, matched where possible</td></tr>
+      <tr><td><b>CROSS JOIN</b></td><td>Cartesian product (n x m)</td></tr>
+      <tr><td><b>Self join</b></td><td>A table joined to itself (employee &rarr; manager)</td></tr>
+      <tr><td><b>CROSS / OUTER APPLY</b></td><td>Run a table-valued expression per left row (like a lateral join): "top 3 orders per customer"</td></tr></table></div>
+    <div class="lab" id="join-lab"></div>
+    <pre data-lang="sql" data-file="joins.sql">-- Self join: employee and manager
+SELECT e.Name AS Employee, m.Name AS Manager
+FROM dbo.Employees e
+LEFT JOIN dbo.Employees m ON m.EmployeeId = e.ManagerId;
+
+-- Top 3 most recent orders per customer using APPLY
+SELECT c.FullName, x.OrderId, x.Total
+FROM dbo.Customers c
+CROSS APPLY (
+    SELECT TOP (3) o.OrderId, o.Total
+    FROM dbo.Orders o
+    WHERE o.CustomerId = c.CustomerId
+    ORDER BY o.OrderedUtc DESC
+) AS x;</pre>
+    <div class="warn"><b>Filter placement in outer joins</b>A condition on the right table in <code>WHERE</code> (e.g. <code>WHERE o.Status = 1</code>) silently turns a LEFT JOIN into an INNER JOIN, because NULL rows fail the test. Put it in the <code>ON</code> clause to keep unmatched left rows.</div>
+  </section>
+
+  <section class="topic" id="aggregate" data-nav="Aggregation: GROUP BY and HAVING" data-group="2 · Querying" data-level="b">
+    <h2>Aggregation: GROUP BY and HAVING <span class="badge b">Basic</span></h2>
+    <p>Aggregate functions collapse many rows into one value: <code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>, <code>STRING_AGG</code>. Every non-aggregated column in <code>SELECT</code> must appear in <code>GROUP BY</code>.</p>
+    <pre data-lang="sql" data-file="group-by.sql">SELECT   c.CustomerId, c.FullName,
+         COUNT(*)              AS Orders,
+         SUM(o.Total)          AS Revenue,
+         AVG(o.Total)          AS AvgOrder,
+         MAX(o.OrderedUtc)     AS LastOrder
+FROM     dbo.Customers c
+JOIN     dbo.Orders o ON o.CustomerId = c.CustomerId
+WHERE    o.OrderedUtc &gt;= '2026-01-01'      -- filters rows BEFORE grouping
+GROUP BY c.CustomerId, c.FullName
+HAVING   SUM(o.Total) &gt; 1000               -- filters groups AFTER aggregation
+ORDER BY Revenue DESC;</pre>
+    <div class="tblwrap"><table><tr><th>Detail</th><th>Notes</th></tr>
+      <tr><td><code>COUNT(*)</code> vs <code>COUNT(col)</code></td><td><code>COUNT(*)</code> counts rows; <code>COUNT(col)</code> skips NULLs; <code>COUNT(DISTINCT col)</code> counts unique non-NULL values</td></tr>
+      <tr><td><code>WHERE</code> vs <code>HAVING</code></td><td>WHERE filters rows, HAVING filters aggregated groups (cannot be replaced by WHERE)</td></tr>
+      <tr><td><code>ROLLUP</code>, <code>CUBE</code>, <code>GROUPING SETS</code></td><td>Subtotals and grand totals in one query</td></tr>
+      <tr><td>Aggregates ignore NULL</td><td><code>AVG</code> of (10, NULL, 20) is 15, not 10</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="subq" data-nav="Subqueries, CTEs and set operators" data-group="2 · Querying" data-level="i">
+    <h2>Subqueries, CTEs, temp tables and set operators <span class="badge i">Intermediate</span></h2>
+    <pre data-lang="sql" data-file="cte.sql">-- CTE: a named, readable step. Recursive CTE walks hierarchies.
+WITH TopCustomers AS (
+    SELECT CustomerId, SUM(Total) AS Revenue
+    FROM dbo.Orders
+    GROUP BY CustomerId
+    HAVING SUM(Total) &gt; 1000
+)
+SELECT c.FullName, t.Revenue
+FROM TopCustomers t
+JOIN dbo.Customers c ON c.CustomerId = t.CustomerId;
+
+-- Recursive CTE: org chart
+WITH Org AS (
+    SELECT EmployeeId, Name, ManagerId, 0 AS Lvl FROM dbo.Employees WHERE ManagerId IS NULL
+    UNION ALL
+    SELECT e.EmployeeId, e.Name, e.ManagerId, o.Lvl + 1
+    FROM dbo.Employees e JOIN Org o ON e.ManagerId = o.EmployeeId
+)
+SELECT * FROM Org OPTION (MAXRECURSION 100);
+
+-- EXISTS is a safe "has related rows" test
+SELECT c.FullName FROM dbo.Customers c
+WHERE NOT EXISTS (SELECT 1 FROM dbo.Orders o WHERE o.CustomerId = c.CustomerId);</pre>
+    <div class="tblwrap"><table><tr><th>Construct</th><th>Lifetime</th><th>Notes</th></tr>
+      <tr><td>Subquery / derived table</td><td>One statement</td><td>Inline, can be correlated</td></tr>
+      <tr><td>CTE (<code>WITH</code>)</td><td>One statement</td><td>Readability and recursion. It is <b>not</b> materialised; it is expanded like a view</td></tr>
+      <tr><td>Temp table <code>#t</code></td><td>Session / procedure</td><td>Stored in tempdb, has statistics and can be indexed: good for large intermediate results</td></tr>
+      <tr><td>Table variable <code>@t</code></td><td>Batch</td><td>Fewer statistics (deferred compilation helps in newer versions); fine for small sets</td></tr>
+      <tr><td>View</td><td>Permanent</td><td>Stored query; an indexed view materialises it</td></tr></table></div>
+    <h3>Set operators</h3>
+    <div class="tblwrap"><table><tr><th>Operator</th><th>Result</th></tr>
+      <tr><td><code>UNION</code></td><td>Combined rows, duplicates removed (sorts/deduplicates: slower)</td></tr>
+      <tr><td><code>UNION ALL</code></td><td>Combined rows, keep duplicates (prefer when duplicates are impossible or fine)</td></tr>
+      <tr><td><code>INTERSECT</code></td><td>Rows present in both</td></tr>
+      <tr><td><code>EXCEPT</code></td><td>Rows in the first but not the second</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="window" data-nav="Window functions" data-group="2 · Querying" data-level="i">
+    <h2>Window functions <span class="badge i">Intermediate</span></h2>
+    <p>A window function computes a value across a set of related rows <b>without collapsing them</b> (unlike <code>GROUP BY</code>). The <code>OVER (PARTITION BY ... ORDER BY ...)</code> clause defines the window.</p>
+    <pre data-lang="sql" data-file="window.sql">SELECT  CustomerId, OrderId, Total, OrderedUtc,
+        ROW_NUMBER() OVER (PARTITION BY CustomerId ORDER BY OrderedUtc DESC) AS rn,   -- 1,2,3 (no ties)
+        RANK()       OVER (ORDER BY Total DESC) AS rnk,                                -- 1,1,3 (gaps)
+        DENSE_RANK() OVER (ORDER BY Total DESC) AS drnk,                               -- 1,1,2 (no gaps)
+        SUM(Total)   OVER (PARTITION BY CustomerId ORDER BY OrderedUtc
+                           ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS RunningTotal,
+        LAG(Total)   OVER (PARTITION BY CustomerId ORDER BY OrderedUtc) AS PreviousTotal,
+        NTILE(4)     OVER (ORDER BY Total) AS Quartile
+FROM dbo.Orders;
+
+-- Classic: latest order per customer
+WITH x AS (
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY CustomerId ORDER BY OrderedUtc DESC) AS rn
+  FROM dbo.Orders
+)
+SELECT * FROM x WHERE rn = 1;
+
+-- Classic: Nth highest salary (2nd) without duplicates problems
+SELECT DISTINCT Salary FROM (
+  SELECT Salary, DENSE_RANK() OVER (ORDER BY Salary DESC) AS d FROM dbo.Employees
+) s WHERE d = 2;</pre>
+    <div class="tip"><b>Interview staples</b>Remove duplicates (<code>ROW_NUMBER</code> then delete where rn &gt; 1), top N per group, running totals, gaps and islands, previous/next row (<code>LAG</code>/<code>LEAD</code>), second-highest value.</div>
+  </section>
+
+  <section class="topic" id="dml" data-nav="INSERT, UPDATE, DELETE, MERGE, OUTPUT" data-group="2 · Querying" data-level="b">
+    <h2>Changing data: INSERT, UPDATE, DELETE, MERGE <span class="badge b">Basic</span></h2>
+    <pre data-lang="sql" data-file="dml.sql">INSERT INTO dbo.Customers (Email, FullName) VALUES ('asha@x.com', N'Asha'), ('ben@x.com', N'Ben');
+
+-- Get generated keys back safely (do not use @@IDENTITY)
+INSERT INTO dbo.Orders (CustomerId, Total)
+OUTPUT inserted.OrderId
+VALUES (1, 99.50);
+SELECT SCOPE_IDENTITY();                       -- last identity in this scope
+
+UPDATE o SET o.Status = 2                      -- UPDATE ... FROM with a join
+FROM dbo.Orders o JOIN dbo.Customers c ON c.CustomerId = o.CustomerId
+WHERE c.Email = 'asha@x.com' AND o.Status = 1;
+
+DELETE TOP (1000) FROM dbo.AuditLog WHERE CreatedUtc &lt; DATEADD(DAY, -90, SYSUTCDATETIME());  -- batched delete
+
+-- Upsert
+MERGE dbo.Stock AS t
+USING (VALUES (@Sku, @Qty)) AS s(Sku, Qty) ON t.Sku = s.Sku
+WHEN MATCHED THEN UPDATE SET t.Qty = t.Qty + s.Qty
+WHEN NOT MATCHED THEN INSERT (Sku, Qty) VALUES (s.Sku, s.Qty);</pre>
+    <div class="tblwrap"><table><tr><th>Statement</th><th>Remember</th></tr>
+      <tr><td><code>DELETE</code> vs <code>TRUNCATE</code> vs <code>DROP</code></td><td>DELETE is logged per row, can use WHERE, fires triggers. TRUNCATE removes all rows quickly, resets identity, no WHERE, no triggers. DROP removes the table itself.</td></tr>
+      <tr><td>Forgot <code>WHERE</code></td><td>Run a <code>SELECT</code> with the same WHERE first, and wrap in <code>BEGIN TRAN</code> so you can <code>ROLLBACK</code></td></tr>
+      <tr><td><code>MERGE</code></td><td>Convenient but has historical bugs and race conditions; many teams use <code>UPDATE</code> then <code>INSERT</code> in a transaction with <code>HOLDLOCK</code></td></tr>
+      <tr><td>Large changes</td><td>Batch (e.g. 5,000 rows) to keep the log and locks small</td></tr></table></div>
+  </section>
+
+  <div class="part-title">Part 3 &mdash; Database design</div>
+
+  <section class="topic" id="design-process" data-nav="Design process and ER modelling" data-group="3 · Design" data-level="b">
+    <h2>From requirements to tables: ER modelling <span class="badge b">Basic</span></h2>
+    <p>Good design starts with the business, not with tables. Identify <b>entities</b> (nouns: Customer, Order, Product), their <b>attributes</b>, and the <b>relationships</b> with <b>cardinality</b> (one-to-one, one-to-many, many-to-many).</p>
+    <div class="diagram"><div class="dtitle">Design workflow</div>
+      <div class="flow">
+        <div class="node">1. Requirements<small>what must be stored, which questions asked</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">2. Conceptual model<small>entities and relationships (ERD)</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">3. Logical model<small>tables, keys, normalise</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">4. Physical model<small>types, indexes, partitions</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">5. Validate<small>test queries, volumes, migrations</small></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Relationship</th><th>Implementation</th><th>Example</th></tr>
+      <tr><td><b>One-to-many</b></td><td>Foreign key on the "many" side</td><td>Customer &rarr; Orders: <code>Orders.CustomerId</code></td></tr>
+      <tr><td><b>Many-to-many</b></td><td>Junction (bridge) table holding both keys, plus attributes of the relationship</td><td>Students &harr; Courses via <code>Enrollments(StudentId, CourseId, Grade)</code></td></tr>
+      <tr><td><b>One-to-one</b></td><td>Foreign key with a UNIQUE constraint, or shared primary key</td><td>User &rarr; UserProfile; split rarely-used or sensitive columns</td></tr>
+      <tr><td><b>Hierarchy</b></td><td>Self-referencing FK (<code>ParentId</code>), <code>hierarchyid</code>, or closure table</td><td>Categories, org chart</td></tr></table></div>
+    <h3>Choosing a primary key</h3>
+    <div class="tblwrap"><table><tr><th>Option</th><th>Pros</th><th>Cons</th></tr>
+      <tr><td><b>Surrogate int/bigint identity</b></td><td>Small, ever-increasing, fast joins, stable</td><td>Meaningless; harder to merge across systems</td></tr>
+      <tr><td><b>GUID</b></td><td>Generated anywhere, no round trip, hard to guess</td><td>16 bytes; random values fragment a clustered index (use sequential GUIDs)</td></tr>
+      <tr><td><b>Natural key</b> (email, ISO country code)</td><td>Meaningful, may be unique anyway</td><td>Can change, can be long; keep as a UNIQUE constraint, not usually as the PK</td></tr></table></div>
+    <div class="tip"><b>Rule of thumb</b>Use a small, stable, ever-increasing surrogate key as the primary key, and enforce business uniqueness separately with <code>UNIQUE</code> constraints.</div>
+  </section>
+
+  <section class="topic" id="normalisation" data-nav="Normalisation (1NF to BCNF)" data-group="3 · Design" data-level="b">
+    <h2>Normalisation <span class="badge b">Basic</span></h2>
+    <p><b>Normalisation</b> removes redundancy so each fact is stored once, preventing <b>insert, update and delete anomalies</b>. Each normal form builds on the previous one.</p>
+    <div class="tblwrap"><table><tr><th>Form</th><th>Rule</th><th>Violation &rarr; fix</th></tr>
+      <tr><td><b>1NF</b></td><td>Atomic values, no repeating groups, each row identifiable</td><td><code>Phones = '111, 222'</code> &rarr; separate <code>CustomerPhone</code> rows</td></tr>
+      <tr><td><b>2NF</b></td><td>1NF + no partial dependency on part of a composite key</td><td><code>OrderLine(OrderId, ProductId, ProductName)</code>: <code>ProductName</code> depends only on <code>ProductId</code> &rarr; move to <code>Product</code></td></tr>
+      <tr><td><b>3NF</b></td><td>2NF + no transitive dependency (non-key depends on another non-key)</td><td><code>Customer(Id, ZipCode, City)</code>: City depends on ZipCode &rarr; <code>ZipCode</code> table</td></tr>
+      <tr><td><b>BCNF</b></td><td>Every determinant is a candidate key</td><td>Stricter 3NF; resolves rare overlapping-key anomalies</td></tr>
+      <tr><td><b>4NF / 5NF</b></td><td>No independent multi-valued facts in one table</td><td>Mostly academic; know they exist</td></tr></table></div>
+    <pre data-lang="sql" data-file="normalise.sql">-- Before: everything in one table
+-- Orders(OrderId, CustomerName, CustomerEmail, ProductName, UnitPrice, Qty)
+
+-- After (3NF)
+Customers(CustomerId PK, Name, Email UNIQUE)
+Products(ProductId PK, Name, UnitPrice)
+Orders(OrderId PK, CustomerId FK, OrderedUtc)
+OrderLines(OrderId FK, ProductId FK, Qty, UnitPriceAtSale, PRIMARY KEY (OrderId, ProductId))</pre>
+    <div class="note"><b>Note UnitPriceAtSale</b>Prices change; the price actually charged is a historical fact of the order line, so it is deliberately copied. This is correct design, not a normalisation violation.</div>
+    <div class="why"><b>Why normalise?</b>One place to update a customer's address, no contradictory copies, smaller tables, constraints that actually protect the data. OLTP systems aim for 3NF.</div>
+  </section>
+
+  <section class="topic" id="denormalise" data-nav="Denormalisation, OLTP vs OLAP" data-group="3 · Design" data-level="i">
+    <h2>Denormalisation, OLTP vs OLAP and common patterns <span class="badge i">Intermediate</span></h2>
+    <p><b>Denormalisation</b> deliberately adds redundancy to make reads faster or simpler. Do it with measured evidence and a plan to keep copies consistent (triggers, jobs, application logic, or computed/persisted columns).</p>
+    <div class="grid2">
+      <div class="card"><h4>OLTP (transactions)</h4><ul><li>Many small reads/writes</li><li>Normalised (3NF)</li><li>Row-store B-tree indexes</li><li>Latency and consistency matter</li></ul></div>
+      <div class="card"><h4>OLAP (analytics)</h4><ul><li>Few huge scans and aggregations</li><li>Star schema: <b>fact</b> table + <b>dimension</b> tables</li><li>Columnstore indexes</li><li>Throughput matters; loaded by ETL/ELT</li></ul></div>
+    </div>
+    <h3>Patterns you will meet</h3>
+    <div class="tblwrap"><table><tr><th>Pattern</th><th>Idea</th><th>Watch out</th></tr>
+      <tr><td><b>Soft delete</b></td><td><code>IsDeleted</code> / <code>DeletedUtc</code> instead of removing the row</td><td>Every query must filter it (use a global filter or filtered index); unique constraints need a filtered unique index</td></tr>
+      <tr><td><b>Audit / history</b></td><td><b>Temporal tables</b> (<code>SYSTEM_VERSIONING</code>) keep every old row version automatically</td><td>Storage growth; set a retention period</td></tr>
+      <tr><td><b>Lookup / enum tables</b></td><td>Small table with FK (<code>OrderStatus</code>) vs a check constraint</td><td>Keep ids stable across environments</td></tr>
+      <tr><td><b>EAV</b> (entity-attribute-value)</td><td>Flexible key-value rows</td><td>Slow, no types or constraints; prefer JSON column or sparse columns for variable attributes</td></tr>
+      <tr><td><b>Multi-tenancy</b></td><td>Tenant per database, schema, or <code>TenantId</code> column</td><td>Always filter by tenant; consider Row-Level Security</td></tr>
+      <tr><td><b>Optimistic concurrency</b></td><td><code>rowversion</code> column compared on update</td><td>Handle the 0-rows-updated case (conflict)</td></tr></table></div>
+    <pre data-lang="sql" data-file="patterns.sql">-- Unique email only among non-deleted rows
+CREATE UNIQUE INDEX UX_Customers_Email_Active ON dbo.Customers(Email) WHERE IsDeleted = 0;
+
+-- Optimistic concurrency token
+ALTER TABLE dbo.Orders ADD RowVer rowversion;
+UPDATE dbo.Orders SET Status = 3 WHERE OrderId = @Id AND RowVer = @OriginalRowVer;   -- check @@ROWCOUNT = 1
+
+-- Temporal table
+CREATE TABLE dbo.Prices (
+    ProductId int NOT NULL PRIMARY KEY, Price decimal(19,4) NOT NULL,
+    ValidFrom datetime2 GENERATED ALWAYS AS ROW START, ValidTo datetime2 GENERATED ALWAYS AS ROW END,
+    PERIOD FOR SYSTEM_TIME (ValidFrom, ValidTo)
+) WITH (SYSTEM_VERSIONING = ON);</pre>
+  </section>
+
+  <div class="part-title">Part 4 &mdash; Indexes and performance</div>
+
+  <section class="topic" id="indexes" data-nav="Indexes: clustered, nonclustered, covering" data-group="4 · Performance" data-level="i">
+    <h2>Indexes <span class="badge i">Intermediate</span></h2>
+    <p>Data pages are 8 KB. Without an index the engine must <b>scan</b> every page; with a suitable index it <b>seeks</b> through a balanced tree in a handful of page reads (usually 3-4 levels even for millions of rows).</p>
+    <div class="tblwrap"><table><tr><th>Index type</th><th>What it is</th><th>Notes</th></tr>
+      <tr><td><b>Clustered</b></td><td>The table <i>is</i> the index: rows physically ordered by the key; leaf level = data pages</td><td>One per table. Choose narrow, unique, ever-increasing (identity). The primary key is clustered by default</td></tr>
+      <tr><td><b>Nonclustered</b></td><td>Separate B-tree of key columns + a pointer (the clustering key) to the row</td><td>Up to 999 per table; each one slows writes and uses space</td></tr>
+      <tr><td><b>Covering</b> (<code>INCLUDE</code>)</td><td>Nonclustered index containing all columns the query needs</td><td>Avoids <b>key lookups</b></td></tr>
+      <tr><td><b>Filtered</b></td><td>Index over a subset (<code>WHERE IsActive = 1</code>)</td><td>Smaller, targeted; also for unique-where-not-deleted</td></tr>
+      <tr><td><b>Composite</b></td><td>Several key columns; order matters</td><td>Usable for the leftmost prefix: equality columns first, then range, then sort</td></tr>
+      <tr><td><b>Columnstore</b></td><td>Column-oriented compressed storage</td><td>Analytics and large scans, not point lookups</td></tr>
+      <tr><td><b>Unique, Full-text, XML, Spatial</b></td><td>Specialised</td><td>Full-text for word search instead of <code>LIKE '%x%'</code></td></tr></table></div>
+    <pre data-lang="sql" data-file="indexes.sql">-- Query: recent orders for a customer by status
+SELECT OrderId, Total, OrderedUtc
+FROM dbo.Orders
+WHERE CustomerId = @c AND Status = 1
+ORDER BY OrderedUtc DESC;
+
+-- Composite + covering: equality columns first, then the sort column, others INCLUDEd
+CREATE NONCLUSTERED INDEX IX_Orders_Customer_Status_Date
+ON dbo.Orders (CustomerId, Status, OrderedUtc DESC)
+INCLUDE (Total);
+
+-- Find unused / missing indexes
+SELECT * FROM sys.dm_db_missing_index_details;
+SELECT OBJECT_NAME(object_id) AS tbl, user_seeks, user_scans, user_updates FROM sys.dm_db_index_usage_stats;</pre>
+    <div class="lab" id="index-lab"></div>
+    <div class="warn"><b>Indexes are not free</b>Every INSERT/UPDATE/DELETE must maintain every index on the table. Over-indexing slows writes and bloats storage. Index for real queries (check Query Store), drop unused ones, and keep keys narrow.</div>
+    <h3>Why an index is sometimes ignored (non-SARGable predicates)</h3>
+    <div class="tblwrap"><table><tr><th>Bad (scan)</th><th>Better (seek)</th></tr>
+      <tr><td><code>WHERE YEAR(OrderedUtc) = 2026</code></td><td><code>WHERE OrderedUtc &gt;= '2026-01-01' AND OrderedUtc &lt; '2027-01-01'</code></td></tr>
+      <tr><td><code>WHERE LEFT(Name,1) = 'A'</code></td><td><code>WHERE Name LIKE 'A%'</code></td></tr>
+      <tr><td><code>WHERE Email = @e</code> where <code>@e</code> is the wrong type (implicit conversion, e.g. nvarchar vs varchar)</td><td>Match parameter type to column type</td></tr>
+      <tr><td><code>WHERE Name LIKE '%son'</code></td><td>Full-text search, or reverse/computed column index</td></tr>
+      <tr><td><code>WHERE ISNULL(Col,0) = 5</code></td><td><code>WHERE Col = 5</code></td></tr></table></div>
+    <details><summary>Fragmentation, fill factor and statistics</summary><div class="dbody">
+      <ul>
+        <li><b>Fragmentation:</b> page splits leave pages half-empty and out of order. <code>ALTER INDEX ... REORGANIZE</code> (light, online) for ~5-30%, <code>REBUILD</code> for &gt;30%. On SSDs and with smaller indexes it matters less than good statistics.</li>
+        <li><b>Fill factor:</b> % of each leaf page filled at rebuild; lower (e.g. 90) leaves room for inserts in random-key indexes.</li>
+        <li><b>Statistics:</b> histograms of column value distribution the optimizer uses for row-count estimates. Stale statistics cause bad plans: keep <code>AUTO_UPDATE_STATISTICS</code> on and update after large loads.</li>
+      </ul></div></details>
+  </section>
+
+  <section class="topic" id="plans" data-nav="Execution plans and tuning" data-group="4 · Performance" data-level="a">
+    <h2>Execution plans and query tuning <span class="badge a">Advanced</span></h2>
+    <p>The optimizer produces an <b>execution plan</b>: the operators (scan, seek, join type, sort) it will use. Read it right-to-left, top-to-bottom, and compare <i>estimated</i> vs <i>actual</i> row counts; big differences point to stale statistics or a poor estimate.</p>
+    <div class="tblwrap"><table><tr><th>Operator</th><th>Meaning</th><th>Red flag when</th></tr>
+      <tr><td>Index/Clustered <b>Seek</b></td><td>Navigates the B-tree to specific rows</td><td>Seek returning most of the table</td></tr>
+      <tr><td>Index/Table <b>Scan</b></td><td>Reads every row/page</td><td>Large table, selective predicate</td></tr>
+      <tr><td><b>Key Lookup</b></td><td>Fetch missing columns from the clustered index per row</td><td>Thousands of lookups &rarr; add INCLUDE columns</td></tr>
+      <tr><td><b>Nested Loops</b> join</td><td>For each outer row, seek inner</td><td>Large outer input</td></tr>
+      <tr><td><b>Hash Match</b> join</td><td>Builds a hash table of one input</td><td>Spills to tempdb (memory grant too small)</td></tr>
+      <tr><td><b>Merge Join</b></td><td>Both inputs sorted on the key</td><td>Forced sorts added</td></tr>
+      <tr><td><b>Sort</b> / <b>Spool</b></td><td>Order or cache rows</td><td>Warnings, spills</td></tr></table></div>
+    <pre data-lang="sql" data-file="tuning.sql">SET STATISTICS IO ON;       -- logical reads per table: the main number to reduce
+SET STATISTICS TIME ON;
+-- Ctrl+M in SSMS shows the actual plan
+
+-- Slowest queries from Query Store / DMVs
+SELECT TOP (10) qs.total_elapsed_time / qs.execution_count AS avg_us, qs.execution_count,
+       SUBSTRING(st.text, 1, 200) AS sql_text
+FROM sys.dm_exec_query_stats qs CROSS APPLY sys.dm_exec_sql_text(qs.sql_handle) st
+ORDER BY avg_us DESC;</pre>
+    <h3>Tuning checklist</h3>
+    <ol class="steps">
+      <li>Find the real slow query (Query Store, Extended Events, application timing), not the one you suspect.</li>
+      <li>Look at the actual plan and logical reads; compare estimated vs actual rows.</li>
+      <li>Fix predicates to be SARGable; remove implicit conversions; select only needed columns (no <code>SELECT *</code>).</li>
+      <li>Add or adjust an index (equality, range, sort, INCLUDE); then recheck reads.</li>
+      <li>Watch for <b>parameter sniffing</b>: a plan compiled for one parameter value is bad for another. Options: <code>OPTION (RECOMPILE)</code>, <code>OPTIMIZE FOR</code>, split procedures, Query Store plan forcing.</li>
+      <li>Reduce round trips and rows: filter early, page, batch writes, avoid row-by-row cursors and N+1 queries.</li>
+    </ol>
+  </section>
+
+  <div class="part-title">Part 5 &mdash; Transactions and concurrency</div>
+
+  <section class="topic" id="acid" data-nav="Transactions and ACID" data-group="5 · Transactions" data-level="b">
+    <h2>Transactions and ACID <span class="badge b">Basic</span></h2>
+    <p>A <b>transaction</b> groups statements so they succeed or fail together. SQL Server guarantees <b>ACID</b>:</p>
+    <div class="tblwrap"><table><tr><th>Letter</th><th>Property</th><th>How SQL Server provides it</th></tr>
+      <tr><td><b>A</b></td><td>Atomicity: all or nothing</td><td>Transaction log undo on rollback</td></tr>
+      <tr><td><b>C</b></td><td>Consistency: constraints hold before and after</td><td>Constraints, keys, triggers</td></tr>
+      <tr><td><b>I</b></td><td>Isolation: concurrent transactions do not see each other's partial work</td><td>Locks or row versioning (isolation levels)</td></tr>
+      <tr><td><b>D</b></td><td>Durability: committed data survives a crash</td><td>Write-ahead logging: log flushed to disk at commit</td></tr></table></div>
+    <pre data-lang="sql" data-file="transaction.sql">SET XACT_ABORT ON;       -- any runtime error rolls the whole transaction back and aborts the batch
+BEGIN TRY
+    BEGIN TRAN;
+        UPDATE dbo.Accounts SET Balance = Balance - 100 WHERE AccountId = 1 AND Balance &gt;= 100;
+        IF @@ROWCOUNT = 0 THROW 50001, 'Insufficient funds', 1;
+        UPDATE dbo.Accounts SET Balance = Balance + 100 WHERE AccountId = 2;
+    COMMIT;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT &gt; 0 ROLLBACK;
+    THROW;                -- rethrow to the caller
+END CATCH;</pre>
+    <div class="tip"><b>Keep transactions short</b>Do not hold a transaction open while waiting for user input or calling an external API. Open late, commit early, touch tables in a consistent order.</div>
+    <h3>Transaction modes</h3>
+    <ul><li><b>Autocommit</b> (default): each statement is its own transaction.</li><li><b>Explicit:</b> <code>BEGIN TRAN ... COMMIT/ROLLBACK</code>.</li><li><b>Implicit:</b> <code>SET IMPLICIT_TRANSACTIONS ON</code> (rare).</li><li><b>Distributed:</b> across servers via MSDTC; avoid in cloud designs, prefer sagas and idempotent messages.</li></ul>
+  </section>
+
+  <section class="topic" id="isolation" data-nav="Isolation levels, locking, deadlocks" data-group="5 · Transactions" data-level="a">
+    <h2>Isolation levels, locking and deadlocks <span class="badge a">Advanced</span></h2>
+    <p>Isolation decides what one transaction may see of another. The weaker the level, the more <b>anomalies</b> (anomalous reads) are possible; the stronger, the more blocking.</p>
+    <div class="tblwrap"><table><tr><th>Anomaly</th><th>Meaning</th></tr>
+      <tr><td><b>Dirty read</b></td><td>Reading another transaction's uncommitted data</td></tr>
+      <tr><td><b>Non-repeatable read</b></td><td>Reading the same row twice and getting different values</td></tr>
+      <tr><td><b>Phantom read</b></td><td>Re-running a range query and getting new rows</td></tr>
+      <tr><td><b>Lost update</b></td><td>Two transactions read, then overwrite each other's change</td></tr>
+      <tr><td><b>Write skew</b></td><td>Two transactions read overlapping data, write different rows, and together break an invariant (both doctors go off call)</td></tr></table></div>
+    <div class="lab" id="iso-lab"></div>
+    <h3>Locks and blocking</h3>
+    <ul>
+      <li><b>Lock modes:</b> Shared (S, reads), Exclusive (X, writes), Update (U, to avoid conversion deadlocks), Intent (IS/IX, table-level signal that row locks exist).</li>
+      <li><b>Granularity:</b> row &rarr; page &rarr; table. After about 5,000 locks the engine may <b>escalate</b> to a table lock.</li>
+      <li><b>Blocking</b> = one session waits for another's lock. Diagnose with <code>sys.dm_exec_requests</code> (<code>blocking_session_id</code>) or <code>sp_whoisactive</code>.</li>
+    </ul>
+    <div class="diagram"><div class="dtitle">A deadlock</div>
+      <div class="flow">
+        <div class="node">Tx A locks row 1<small>needs row 2</small></div><span class="arrow">&harr;</span>
+        <div class="node bad">Cycle: each waits for the other<small>nobody can proceed</small></div><span class="arrow">&harr;</span>
+        <div class="node">Tx B locks row 2<small>needs row 1</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Engine picks a victim<small>error 1205: rolled back, retry</small></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Reduce deadlocks</th><th>How</th></tr>
+      <tr><td>Consistent order</td><td>Always access tables/rows in the same sequence</td></tr>
+      <tr><td>Short transactions</td><td>Do less work between BEGIN and COMMIT</td></tr>
+      <tr><td>Right indexes</td><td>Narrow the rows locked; avoid scans that lock everything</td></tr>
+      <tr><td>Row versioning</td><td>Enable <code>READ_COMMITTED_SNAPSHOT</code> so readers do not block writers</td></tr>
+      <tr><td>Retry logic</td><td>Catch error 1205 in the app and retry with back-off</td></tr></table></div>
+    <pre data-lang="sql" data-file="isolation.sql">ALTER DATABASE Shop SET READ_COMMITTED_SNAPSHOT ON;          -- readers use row versions
+ALTER DATABASE Shop SET ALLOW_SNAPSHOT_ISOLATION ON;
+SET TRANSACTION ISOLATION LEVEL SNAPSHOT;
+
+-- Pessimistic "claim a job" without two workers taking the same row
+SELECT TOP (1) * FROM dbo.Jobs WITH (UPDLOCK, READPAST, ROWLOCK) WHERE Status = 0 ORDER BY JobId;</pre>
+    <div class="warn"><b>NOLOCK is not a free speed-up</b>It equals READ UNCOMMITTED: you can read uncommitted, duplicated or missing rows. Prefer row versioning (RCSI) to solve reader/writer blocking.</div>
+  </section>
+
+  <div class="part-title">Part 6 &mdash; Programmability and operations</div>
+
+  <section class="topic" id="programmability" data-nav="Views, procedures, functions, triggers" data-group="6 · Programmability" data-level="i">
+    <h2>Views, stored procedures, functions and triggers <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th>Object</th><th>Purpose</th><th>Notes</th></tr>
+      <tr><td><b>View</b></td><td>Saved SELECT; simplifies queries and exposes a limited column set</td><td>Not stored unless indexed; can enforce security by hiding columns</td></tr>
+      <tr><td><b>Stored procedure</b></td><td>Named batch of T-SQL with parameters; can modify data, return result sets, use transactions</td><td>Plan reuse, permissions on the procedure only, less network chatter; harder to version-control without discipline</td></tr>
+      <tr><td><b>Scalar function</b></td><td>Returns one value</td><td>Old versions run row-by-row and block parallelism; prefer inline expressions or inline TVFs</td></tr>
+      <tr><td><b>Inline table-valued function</b></td><td>Parameterised view</td><td>Expanded into the calling query: fast</td></tr>
+      <tr><td><b>Trigger</b></td><td>Code that fires on INSERT/UPDATE/DELETE (AFTER / INSTEAD OF) using <code>inserted</code> and <code>deleted</code> tables</td><td>Hidden logic and set-based pitfalls (fires once per statement, not per row); use sparingly for audit</td></tr>
+      <tr><td><b>Sequence</b></td><td>Number generator independent of a table</td><td>Shared across tables, cacheable</td></tr></table></div>
+    <pre data-lang="sql" data-file="proc.sql">CREATE OR ALTER PROCEDURE dbo.usp_GetCustomerOrders
+    @CustomerId int,
+    @From datetime2 = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;                                 -- no "n rows affected" messages
+    SELECT o.OrderId, o.Total, o.OrderedUtc
+    FROM dbo.Orders o
+    WHERE o.CustomerId = @CustomerId
+      AND (@From IS NULL OR o.OrderedUtc &gt;= @From)
+    ORDER BY o.OrderedUtc DESC;
+END;
+GO
+EXEC dbo.usp_GetCustomerOrders @CustomerId = 1;</pre>
+    <div class="warn"><b>SQL injection</b>Never build SQL by concatenating user input. Use parameters (<code>SqlCommand.Parameters</code>, Dapper, EF Core), or <code>sp_executesql</code> with parameters for dynamic SQL, and whitelist identifiers such as sort columns.</div>
+  </section>
+
+  <section class="topic" id="dotnet" data-nav="Using SQL from .NET (ADO.NET, Dapper, EF Core)" data-group="6 · Programmability" data-level="i">
+    <h2>Using SQL Server from .NET <span class="badge i">Intermediate</span></h2>
+    <pre data-lang="csharp" data-file="Data-access.cs">// ADO.NET: parameters, using-blocks, async
+await using var conn = new SqlConnection(cs);
+await conn.OpenAsync();
+await using var cmd = new SqlCommand("SELECT OrderId, Total FROM dbo.Orders WHERE CustomerId = @id", conn);
+cmd.Parameters.Add("@id", SqlDbType.Int).Value = customerId;
+await using var rdr = await cmd.ExecuteReaderAsync();
+while (await rdr.ReadAsync()) Console.WriteLine($"{rdr.GetInt32(0)}: {rdr.GetDecimal(1)}");
+
+// Dapper: tiny mapper, you write SQL
+var orders = await conn.QueryAsync&lt;Order&gt;("SELECT * FROM dbo.Orders WHERE CustomerId = @id", new { id = customerId });
+
+// EF Core: LINQ, change tracking, migrations
+var top = await db.Orders.AsNoTracking()
+    .Where(o =&gt; o.CustomerId == customerId)
+    .OrderByDescending(o =&gt; o.OrderedUtc)
+    .Select(o =&gt; new { o.OrderId, o.Total })
+    .Take(20).ToListAsync();</pre>
+    <div class="tblwrap"><table><tr><th>Tip</th><th>Why</th></tr>
+      <tr><td>Connection pooling is automatic</td><td><code>Open</code>/<code>Dispose</code> per operation is cheap; keep connections short-lived</td></tr>
+      <tr><td>Avoid the N+1 query problem</td><td>Use <code>Include</code>/joins or a projection instead of a query per row</td></tr>
+      <tr><td>Use <code>AsNoTracking</code> for read-only queries</td><td>Skips change-tracker overhead</td></tr>
+      <tr><td>Project to what you need</td><td>Avoid loading whole entities and <code>SELECT *</code></td></tr>
+      <tr><td>Use <code>TransactionScope</code> / <code>BeginTransaction</code> consciously</td><td>Keep scope small; EF's <code>SaveChanges</code> is already a transaction</td></tr>
+      <tr><td>Manage schema with migrations</td><td>Versioned, repeatable, reviewable changes (EF migrations, DbUp, Flyway)</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="ops" data-nav="Backup, security and high availability" data-group="6 · Programmability" data-level="a">
+    <h2>Backup, security and high availability <span class="badge a">Advanced</span></h2>
+    <h3>Backup and recovery</h3>
+    <div class="tblwrap"><table><tr><th>Recovery model</th><th>Log behaviour</th><th>Restore to</th></tr>
+      <tr><td><b>Simple</b></td><td>Log truncated automatically at checkpoint</td><td>Last full/differential backup only</td></tr>
+      <tr><td><b>Full</b></td><td>Log kept until a log backup runs</td><td>Any point in time (point-in-time restore)</td></tr>
+      <tr><td><b>Bulk-logged</b></td><td>Minimal logging for bulk operations</td><td>Point-in-time except in bulk ranges</td></tr></table></div>
+    <pre data-lang="sql" data-file="backup.sql">BACKUP DATABASE Shop TO DISK = 'D:\bak\Shop_full.bak' WITH COMPRESSION, CHECKSUM;
+BACKUP DATABASE Shop TO DISK = 'D:\bak\Shop_diff.bak' WITH DIFFERENTIAL, COMPRESSION;
+BACKUP LOG      Shop TO DISK = 'D:\bak\Shop_log.trn' WITH COMPRESSION;
+RESTORE DATABASE Shop_copy FROM DISK = 'D:\bak\Shop_full.bak' WITH NORECOVERY, MOVE 'Shop' TO 'D:\data\Shop_copy.mdf', MOVE 'Shop_log' TO 'D:\data\Shop_copy.ldf';
+RESTORE LOG Shop_copy FROM DISK = 'D:\bak\Shop_log.trn' WITH STOPAT = '2026-11-01T10:15:00', RECOVERY;</pre>
+    <div class="tip"><b>A backup you have not restored is a hope</b>Test restores regularly, keep copies off the server, and define RPO (how much data you can lose) and RTO (how long you can be down) before choosing a strategy.</div>
+    <h3>Security</h3>
+    <ul>
+      <li><b>Least privilege:</b> logins (server) &rarr; users (database) &rarr; roles/permissions on schemas or procedures. Never run apps as <code>sa</code> or <code>db_owner</code>.</li>
+      <li><b>Authentication:</b> prefer Windows/Entra ID (managed identity in Azure) over SQL passwords; keep secrets in Key Vault.</li>
+      <li><b>Encryption:</b> TLS in transit, <b>TDE</b> at rest, <b>Always Encrypted</b> for sensitive columns, dynamic data masking and row-level security for exposure control.</li>
+      <li><b>Auditing:</b> SQL Audit / Extended Events; parameterised queries stop injection.</li>
+    </ul>
+    <h3>High availability and scale</h3>
+    <div class="tblwrap"><table><tr><th>Option</th><th>Use</th></tr>
+      <tr><td>Failover cluster instance</td><td>Instance-level HA with shared storage</td></tr>
+      <tr><td><b>Always On availability groups</b></td><td>Database-level HA/DR with readable secondaries for read scale-out</td></tr>
+      <tr><td>Log shipping / replication</td><td>DR copies; selective data distribution</td></tr>
+      <tr><td>Azure SQL: geo-replication, failover groups</td><td>Managed HA/DR across regions</td></tr>
+      <tr><td>Partitioning, sharding, read replicas, caching</td><td>Scaling large data and read-heavy loads</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="nosql" data-nav="SQL vs NoSQL" data-group="6 · Programmability" data-level="i">
+    <h2>SQL vs NoSQL and the CAP theorem <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th>Family</th><th>Examples</th><th>Good for</th></tr>
+      <tr><td>Relational</td><td>SQL Server, PostgreSQL, MySQL</td><td>Structured data, joins, transactions, reporting</td></tr>
+      <tr><td>Document</td><td>MongoDB, Cosmos DB</td><td>Flexible JSON documents read as a whole</td></tr>
+      <tr><td>Key-value</td><td>Redis, DynamoDB</td><td>Caching, sessions, simple lookups at huge scale</td></tr>
+      <tr><td>Wide-column</td><td>Cassandra</td><td>Massive write throughput, time-series</td></tr>
+      <tr><td>Graph</td><td>Neo4j</td><td>Highly connected data</td></tr>
+      <tr><td>Search</td><td>Elasticsearch, Azure AI Search</td><td>Full-text and faceted search</td></tr></table></div>
+    <p><b>CAP theorem:</b> during a network <i>partition</i> a distributed store must choose between <b>consistency</b> and <b>availability</b>. Many NoSQL stores choose availability with <i>eventual consistency</i>; relational systems on one node favour strong consistency. Most real systems use <b>polyglot persistence</b>: relational as the source of truth plus cache, search or document stores for specific needs.</p>
+  </section>
+
+  <div class="part-title">Part 7 &mdash; Interview preparation &amp; revision</div>
+
+  <section class="topic" id="cheatsheet" data-nav="T-SQL cheat sheet" data-group="7 · Resources" data-level="b">
+    <h2>T-SQL cheat sheet <span class="badge b">Revision</span></h2>
+    <div class="tblwrap"><table><tr><th>Task</th><th>Snippet</th></tr>
+      <tr><td>Duplicates</td><td><code>SELECT Email, COUNT(*) FROM Customers GROUP BY Email HAVING COUNT(*) &gt; 1</code></td></tr>
+      <tr><td>Delete duplicates</td><td><code>WITH x AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY Email ORDER BY Id) rn FROM Customers) DELETE FROM x WHERE rn &gt; 1</code></td></tr>
+      <tr><td>Nth highest</td><td><code>SELECT DISTINCT Salary FROM (SELECT Salary, DENSE_RANK() OVER (ORDER BY Salary DESC) d FROM Emp) s WHERE d = N</code></td></tr>
+      <tr><td>Rows in A not in B</td><td><code>SELECT * FROM A WHERE NOT EXISTS (SELECT 1 FROM B WHERE B.Id = A.Id)</code></td></tr>
+      <tr><td>Running total</td><td><code>SUM(x) OVER (ORDER BY d ROWS UNBOUNDED PRECEDING)</code></td></tr>
+      <tr><td>Conditional logic</td><td><code>CASE WHEN Total &gt; 100 THEN 'Big' ELSE 'Small' END</code>, <code>IIF</code>, <code>COALESCE(a,b)</code>, <code>NULLIF</code></td></tr>
+      <tr><td>Date arithmetic</td><td><code>DATEADD(DAY,-7,SYSUTCDATETIME())</code>, <code>DATEDIFF(DAY,a,b)</code>, <code>EOMONTH(d)</code>, <code>FORMAT</code> (slow)</td></tr>
+      <tr><td>String</td><td><code>LEN, LEFT, SUBSTRING, CHARINDEX, REPLACE, TRIM, STRING_AGG, CONCAT, STRING_SPLIT</code></td></tr>
+      <tr><td>Row counts</td><td><code>SELECT COUNT(*)</code> (accurate), <code>sys.dm_db_partition_stats</code> (fast approximation)</td></tr>
+      <tr><td>Who is blocking?</td><td><code>SELECT * FROM sys.dm_exec_requests WHERE blocking_session_id &lt;&gt; 0</code></td></tr>
+      <tr><td>Table sizes</td><td><code>EXEC sp_spaceused 'dbo.Orders'</code></td></tr></table></div>
+  </section>
+
+  <section class="topic" id="quiz" data-nav="Self-test quiz" data-group="7 · Resources" data-level="b">
+    <h2>Self-test quiz <span class="badge b">Practice</span></h2>
+    <p>Ten questions. Pick an answer and read the explanation.</p>
+    <div class="lab quiz" data-title="SQL quiz">
+      <script type="application/json">
+      [
+        {"q":"Which clause filters AFTER aggregation?","o":["WHERE","HAVING","ON","TOP"],"a":1,"e":"HAVING filters groups after GROUP BY; WHERE filters individual rows before grouping."},
+        {"q":"Customers LEFT JOIN Orders, then WHERE Orders.Status = 1. What is the effect?","o":["Keeps all customers","Behaves like an INNER JOIN","Returns an error","Returns only NULL rows"],"a":1,"e":"Unmatched customers have NULL Status, which fails the WHERE test, so they vanish. Put the condition in ON to keep them."},
+        {"q":"Which is the best primary key for a high-volume OLTP table?","o":["Email address","A random GUID as clustered key","A narrow ever-increasing identity (int/bigint)","A composite of three text columns"],"a":2,"e":"Narrow, stable, ever-increasing keys keep the clustered index compact and avoid page splits."},
+        {"q":"Why is WHERE YEAR(OrderedUtc) = 2026 slow on a large table?","o":["YEAR is deprecated","It is non-SARGable: the function on the column prevents an index seek","It locks the table","It returns duplicates"],"a":1,"e":"Rewrite as a range: OrderedUtc >= '2026-01-01' AND OrderedUtc < '2027-01-01'."},
+        {"q":"A table has the dependency Zip -> City and Zip is not a key. Which normal form is violated?","o":["1NF","2NF","3NF","None"],"a":2,"e":"A non-key attribute depends on another non-key attribute (transitive dependency): a 3NF violation."},
+        {"q":"What does a key lookup in an execution plan mean?","o":["The index is corrupt","The nonclustered index lacks needed columns, so each row is fetched from the clustered index","A foreign key failed","A join is missing"],"a":1,"e":"Add the missing columns with INCLUDE to make the index covering."},
+        {"q":"Which isolation level prevents dirty reads without making readers block writers (default in Azure SQL)?","o":["READ UNCOMMITTED","READ COMMITTED SNAPSHOT","SERIALIZABLE","REPEATABLE READ"],"a":1,"e":"RCSI reads the last committed row version from the version store, so readers and writers do not block each other."},
+        {"q":"You get error 1205. What happened and what should the app do?","o":["Syntax error; fix the SQL","A deadlock; this transaction was chosen as victim, so retry it","Disk full; stop","Login failed"],"a":1,"e":"Deadlock victim. Retry the transaction with back-off, and reduce future deadlocks with consistent access order, short transactions and good indexes."},
+        {"q":"What is the difference between RANK() and DENSE_RANK() for scores 100, 100, 90?","o":["Identical","RANK gives 1,1,3; DENSE_RANK gives 1,1,2","RANK gives 1,2,3","DENSE_RANK gives 1,1,3"],"a":1,"e":"RANK leaves gaps after ties; DENSE_RANK does not. ROW_NUMBER would give 1,2,3."},
+        {"q":"Which is the safest way to avoid SQL injection?","o":["Escape quotes manually","Parameterised queries","Use NOLOCK","Run as sa"],"a":1,"e":"Parameters keep data separate from code. Also use least-privilege accounts and whitelist dynamic identifiers."}
+      ]
+      </script>
+    </div>
+  </section>
+
+  <section class="topic" id="interview-qa" data-nav="Interview questions & answers" data-group="7 · Resources" data-level="a">
+    <h2>SQL and database design interview questions <span class="badge a">Prep</span></h2>
+    <p>Filter by topic, expand a question and try to answer it aloud first.</p>
+    <div class="qfilter" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
+      <button class="btn primary" data-f="all" type="button">All</button><button class="btn" data-f="query" type="button">Querying</button><button class="btn" data-f="design" type="button">Design</button><button class="btn" data-f="index" type="button">Indexes &amp; tuning</button><button class="btn" data-f="tx" type="button">Transactions</button><button class="btn" data-f="ops" type="button">Operations</button>
+    </div>
+
+    <details class="qa" data-tag="query"><summary>INNER vs LEFT vs FULL OUTER join? <span class="qtag">query</span></summary><div class="dbody"><p>INNER keeps only matches. LEFT keeps all left rows with NULLs where no right match. FULL keeps all rows from both. Choose by which unmatched rows you must retain.</p></div></details>
+    <details class="qa" data-tag="query"><summary>WHERE vs HAVING? <span class="qtag">query</span></summary><div class="dbody"><p>WHERE filters rows before grouping and cannot use aggregates. HAVING filters groups after aggregation. Filter as much as possible in WHERE for performance.</p></div></details>
+    <details class="qa" data-tag="query"><summary>DELETE vs TRUNCATE vs DROP? <span class="qtag">query</span></summary><div class="dbody"><p>DELETE removes rows (optional WHERE, fully logged, fires triggers, keeps identity). TRUNCATE removes all rows minimally logged, resets identity, no WHERE or triggers, needs ALTER permission. DROP removes the table definition too.</p></div></details>
+    <details class="qa" data-tag="query"><summary>UNION vs UNION ALL? <span class="qtag">query</span></summary><div class="dbody"><p>UNION removes duplicates (extra sort/hash), UNION ALL keeps all rows and is faster. Use UNION ALL unless duplicates must be removed.</p></div></details>
+    <details class="qa" data-tag="query"><summary>How do you find the second highest salary / delete duplicate rows? <span class="qtag">query</span></summary><div class="dbody"><p>Use <code>DENSE_RANK() OVER (ORDER BY Salary DESC)</code> and select rank 2 (handles ties). For duplicates, number rows with <code>ROW_NUMBER() OVER (PARTITION BY key ORDER BY id)</code> in a CTE and delete rn &gt; 1.</p></div></details>
+    <details class="qa" data-tag="query"><summary>CTE vs temp table vs table variable? <span class="qtag">query</span></summary><div class="dbody"><p>A CTE is a named subquery for one statement (not materialised). A temp table lives in tempdb for the session, has statistics and indexes: good for large intermediate results reused several times. A table variable is batch-scoped with limited statistics: fine for small sets.</p></div></details>
+    <details class="qa" data-tag="query"><summary>How does NULL behave in comparisons and aggregates? <span class="qtag">query</span></summary><div class="dbody"><p>Comparisons with NULL are unknown, so use IS NULL. Aggregates (except COUNT(*)) ignore NULLs. <code>NOT IN</code> with a NULL in the subquery returns nothing; use NOT EXISTS.</p></div></details>
+
+    <details class="qa" data-tag="design"><summary>What is normalisation and when would you denormalise? <span class="qtag">design</span></summary><div class="dbody"><p>Organising data to remove redundancy and anomalies (1NF-3NF/BCNF). Denormalise deliberately for read performance or reporting (star schemas, precomputed totals), with a plan to keep copies consistent, after measuring a real problem.</p></div></details>
+    <details class="qa" data-tag="design"><summary>Primary key vs unique key vs foreign key? <span class="qtag">design</span></summary><div class="dbody"><p>PK: unique, not null, one per table, clustered by default. Unique key: enforces uniqueness (allows a NULL), several per table. FK: references a parent key, enforcing referential integrity with cascade options.</p></div></details>
+    <details class="qa" data-tag="design"><summary>How do you model many-to-many? <span class="qtag">design</span></summary><div class="dbody"><p>A junction table with foreign keys to both sides (composite primary key) plus any relationship attributes (enrolment date, grade).</p></div></details>
+    <details class="qa" data-tag="design"><summary>Surrogate vs natural keys? <span class="qtag">design</span></summary><div class="dbody"><p>Surrogate keys (identity/GUID) are small, stable and meaningless; natural keys carry business meaning but can change or be long. Common approach: surrogate PK plus a UNIQUE constraint on the natural key.</p></div></details>
+    <details class="qa" data-tag="design"><summary>Design the schema for an e-commerce order system. <span class="qtag">design</span></summary><div class="dbody"><p>Customers, Addresses, Products, Categories, Orders (CustomerId, status, totals, timestamps), OrderLines (OrderId, ProductId, Qty, UnitPriceAtSale), Payments, Shipments, Inventory. Keys and constraints, indexes on foreign keys and common filters, money as decimal, UTC timestamps, soft delete or history where needed, and explain query patterns that drive indexes.</p></div></details>
+
+    <details class="qa" data-tag="index"><summary>Clustered vs nonclustered index? <span class="qtag">index</span></summary><div class="dbody"><p>Clustered defines the physical order and stores the data in its leaf pages (one per table). Nonclustered is a separate structure pointing back to the rows (many per table). Covering nonclustered indexes use INCLUDE to avoid key lookups.</p></div></details>
+    <details class="qa" data-tag="index"><summary>A query is slow. How do you investigate? <span class="qtag">index</span></summary><div class="dbody"><p>Reproduce with real parameters; read the actual plan and STATISTICS IO; compare estimated and actual rows; look for scans, key lookups, spills and implicit conversions; check statistics and parameter sniffing; fix predicates or add an index; re-measure. Use Query Store for regressions.</p></div></details>
+    <details class="qa" data-tag="index"><summary>What is a SARGable predicate? <span class="qtag">index</span></summary><div class="dbody"><p>One the optimizer can satisfy with an index seek. Wrapping the column in a function (YEAR(col), ISNULL(col,0)) or leading wildcards prevents it; rewrite as a range on the bare column.</p></div></details>
+    <details class="qa" data-tag="index"><summary>Why not index every column? <span class="qtag">index</span></summary><div class="dbody"><p>Each index costs storage and slows INSERT/UPDATE/DELETE, adds maintenance and plan complexity. Index based on actual query patterns; remove unused ones.</p></div></details>
+    <details class="qa" data-tag="index"><summary>What is parameter sniffing? <span class="qtag">index</span></summary><div class="dbody"><p>The plan is compiled for the first parameter values and reused. If later values have very different selectivity, the cached plan is poor. Fix with OPTION (RECOMPILE), OPTIMIZE FOR, better statistics/indexes, splitting logic or Query Store forcing.</p></div></details>
+
+    <details class="qa" data-tag="tx"><summary>Explain ACID. <span class="qtag">tx</span></summary><div class="dbody"><p>Atomicity (all or nothing), Consistency (constraints preserved), Isolation (concurrent transactions do not interfere), Durability (committed data survives crashes via write-ahead logging).</p></div></details>
+    <details class="qa" data-tag="tx"><summary>What are isolation levels and which do you use? <span class="qtag">tx</span></summary><div class="dbody"><p>They trade consistency against concurrency: READ UNCOMMITTED, READ COMMITTED (default), REPEATABLE READ, SERIALIZABLE, plus row-versioning SNAPSHOT/RCSI. Most web apps use READ COMMITTED SNAPSHOT to avoid reader/writer blocking, and SERIALIZABLE or UPDLOCK only for narrow invariants.</p></div></details>
+    <details class="qa" data-tag="tx"><summary>How do you detect and prevent deadlocks? <span class="qtag">tx</span></summary><div class="dbody"><p>Capture the deadlock graph (Extended Events system_health). Prevent with consistent access order, short transactions, proper indexes, RCSI and retry on error 1205.</p></div></details>
+    <details class="qa" data-tag="tx"><summary>Pessimistic vs optimistic concurrency? <span class="qtag">tx</span></summary><div class="dbody"><p>Pessimistic locks data while you work (UPDLOCK); safe for hot contention but blocks. Optimistic lets everyone proceed and checks at write time with a rowversion token, handling conflicts by retrying or telling the user.</p></div></details>
+
+    <details class="qa" data-tag="ops"><summary>What backup types exist and how do you restore to a point in time? <span class="qtag">ops</span></summary><div class="dbody"><p>Full, differential, transaction log. Under the full recovery model restore the last full, the latest differential, then log backups with STOPAT. Define RPO/RTO and test restores.</p></div></details>
+    <details class="qa" data-tag="ops"><summary>How do you scale a database that is slowing down? <span class="qtag">ops</span></summary><div class="dbody"><p>First optimise queries and indexes; then caching, read replicas, partitioning or archiving old data, bigger hardware (scale up), and only then sharding. Measure at each step.</p></div></details>
+    <details class="qa" data-tag="ops"><summary>SQL vs NoSQL: how do you choose? <span class="qtag">ops</span></summary><div class="dbody"><p>Relational for structured data needing joins, transactions and reporting; NoSQL where the access pattern is simple key/document lookup at huge scale or the schema varies. Many systems use both.</p></div></details>
+  </section>
+
+  <section class="topic" id="next" data-nav="Next steps" data-group="7 · Resources" data-level="b">
+    <h2>Practice plan and next steps <span class="badge b">Roadmap</span></h2>
+    <div class="tip"><b>Two-week plan</b>Days 1-3: write 30 SELECT/JOIN/GROUP BY queries on a sample DB. Days 4-6: window functions and CTE puzzles. Days 7-9: design three schemas (e-commerce, library, ride-share) and normalise them. Days 10-12: create indexes and compare plans and logical reads. Days 13-14: transactions, deadlock and isolation experiments with two query windows.</div>
+    <p><small>Companion guides: <a href="ASP.NET-Core-Web-API-Guide.html">Web API (EF Core)</a> &middot; <a href="General-Delivery-Guide.html">Delivery &amp; Engineering</a> &middot; <a href="Cloud-Fundamentals-Guide.html">Cloud basics</a></small></p>
+  </section>
+
+</main>
+</div>
+
+<script src="assets/guide.js"></script>
+<script src="assets/concepts.js"></script>
+<script src="assets/sql.js"></script>
+</body>
+</html>

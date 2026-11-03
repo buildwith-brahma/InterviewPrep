@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delivery &amp; Engineering Fundamentals - Agile, JIRA, Estimation, Roadmaps</title>
+<link rel="stylesheet" href="assets/guide.css">
+<style>
+:root{--accent:#0f766e;--accent-soft:#dcf3f0}
+body.dark{--accent:#4fd1c5;--accent-soft:#12302d}
+.hero{background:linear-gradient(135deg,#053f3a,#0f766e 55%,#2b86e0)}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="brand"><h1>Delivery &amp; Engineering Fundamentals</h1><small>Agile &rarr; JIRA &rarr; Requirements &rarr; Estimation &rarr; Roadmaps &rarr; Engineering practice</small></div>
+  <div class="search"><input id="search" type="search" placeholder="Search concepts ( press / )" autocomplete="off"><div id="search-results"></div></div>
+  <nav id="nav"></nav>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    <button id="menu-btn" type="button">Menu</button>
+    <div class="prog"><i id="progress"></i></div>
+    <button id="expand-all" type="button">Expand all</button>
+    <button id="collapse-all" type="button">Collapse all</button>
+    <button id="theme-btn" type="button">Dark / Light</button>
+  </div>
+
+  <main id="content">
+
+  <div class="hero" id="top">
+    <h1>Delivery &amp; Engineering Fundamentals &ndash; The General Topics Guide</h1>
+    <p>The non-language topics every developer, tech lead and interviewee is expected to know: how teams run <b>Agile / Scrum / Kanban</b>, how to use <b>JIRA</b> properly, how to turn a vague idea into <b>requirements</b>, how to <b>estimate</b> honestly, how to build and communicate a <b>roadmap</b>, and the engineering practices (Git, CI/CD, testing, architecture, security, observability) that surround the code. Includes four live labs and a behavioural-interview section.</p>
+    <div class="chips"><span>Scrum &middot; Kanban</span><span>JIRA &middot; JQL</span><span>User stories &middot; Gherkin</span><span>Story points &middot; PERT</span><span>Roadmaps &middot; OKRs &middot; RICE</span><span>Git &middot; CI/CD &middot; Testing</span><span>STAR interviews</span></div>
+  </div>
+
+  <section class="topic" id="how-to-use" data-nav="How to use this guide" data-group="Start here">
+    <h2>How to use this guide</h2>
+    <div class="grid3">
+      <div class="card"><h4>1. Follow the delivery flow</h4><p>Parts 1-5 follow the life of a feature: <i>work method &rarr; tracking tool &rarr; requirements &rarr; estimate &rarr; roadmap</i>. Part 6 covers the engineering practice around it.</p></div>
+      <div class="card"><h4>2. Try the labs</h4><p>Dashed boxes are live: a PERT estimator, a velocity forecast, a RICE/WSJF prioritiser and a JQL query playground. Change numbers and watch the answers move.</p></div>
+      <div class="card"><h4>3. Prepare stories</h4><p>Part 7 has a quiz, scenario questions, and a STAR answer builder section. Press <span class="kbd">/</span> to search any topic.</p></div>
+    </div>
+    <h3>Roadmap of this guide</h3>
+    <div class="diagram"><div class="dtitle">From idea to running software</div>
+      <div class="flow">
+        <div class="node ok">1. Agile<small>Scrum, Kanban,<br>ceremonies, DoR/DoD</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">2. JIRA<small>Issues, workflows,<br>boards, JQL, reports</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">3. Requirements<small>Stories, INVEST,<br>acceptance criteria, NFRs</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">4. Estimation<small>Points, PERT,<br>velocity, capacity</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">5. Roadmap<small>OKRs, RICE, MVP,<br>releases, dependencies</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">6. Engineering<small>Git, CI/CD, tests,<br>architecture, security, ops</small></div>
+      </div>
+    </div>
+    <div class="note"><b>Suggested additions beyond what you asked</b>Besides requirements, estimation and roadmaps this guide also covers: Definition of Ready/Done, risk &amp; dependency management, stakeholder communication, technical debt, Git workflows, code review, CI/CD, the testing pyramid, architecture and design basics, security (OWASP), observability, SLA/SLO, incident management, behavioural (STAR) interviews, and a "what to learn next" list at the end.</div>
+  </section>
+
+  <div class="part-title">Part 1 &mdash; Agile, Scrum and Kanban</div>
+
+  <section class="topic" id="sdlc" data-nav="SDLC models: Waterfall to Agile" data-group="1 · Agile" data-level="b">
+    <h2>Software development life cycle (SDLC) and delivery models <span class="badge b">Basic</span></h2>
+    <p>The <b>SDLC</b> is the set of stages work passes through: <i>requirements &rarr; design &rarr; build &rarr; test &rarr; release &rarr; operate &rarr; improve</i>. Delivery models differ in how they sequence those stages and how often they loop.</p>
+    <div class="why"><b>Why so many models?</b>Because uncertainty differs. When requirements are fixed and change is costly (bridges, regulated hardware) a plan-driven model works. When the problem is only understood by building and showing it (most software products) short feedback loops beat a perfect upfront plan.</div>
+    <div class="tblwrap"><table><tr><th>Model</th><th>How it works</th><th>Strengths</th><th>Weaknesses</th><th>Use when</th></tr>
+      <tr><td><b>Waterfall</b></td><td>Phases run once, in order, with sign-off gates</td><td>Clear milestones, heavy documentation, simple to contract</td><td>Late feedback, changes are expensive, risk discovered at the end</td><td>Stable, well-understood scope; compliance-heavy projects</td></tr>
+      <tr><td><b>V-model</b></td><td>Waterfall where each phase has a matching test level</td><td>Test planning from day one</td><td>Same rigidity as waterfall</td><td>Safety-critical systems</td></tr>
+      <tr><td><b>Iterative / Incremental</b></td><td>Build in slices, each adds working features</td><td>Early working software</td><td>Needs architecture discipline</td><td>Medium uncertainty</td></tr>
+      <tr><td><b>Agile (Scrum, XP)</b></td><td>Short time-boxed iterations; continuous feedback and re-planning</td><td>Adapts to change, early value, transparency</td><td>Needs engaged product owner and disciplined team</td><td>Product development with evolving requirements</td></tr>
+      <tr><td><b>Kanban / Lean</b></td><td>Continuous flow, limit work in progress</td><td>Smooths flow, great for support/ops</td><td>No natural cadence for planning</td><td>Maintenance, support, mixed-priority work</td></tr>
+      <tr><td><b>DevOps</b></td><td>Development and operations share ownership; automate build-test-deploy-monitor</td><td>Fast, safe, frequent releases</td><td>Cultural change, tooling investment</td><td>Any team shipping online services</td></tr>
+      <tr><td><b>Hybrid ("Water-Scrum-Fall")</b></td><td>Upfront budgeting/requirements, agile delivery, formal release gate</td><td>Fits traditional organisations</td><td>Inherits some weaknesses of both</td><td>Large enterprises and fixed-bid contracts</td></tr></table></div>
+    <h3>The Agile Manifesto in one minute</h3>
+    <div class="grid2">
+      <div class="card"><h4>Four values</h4><ul><li>Individuals and interactions <i>over</i> processes and tools</li><li>Working software <i>over</i> comprehensive documentation</li><li>Customer collaboration <i>over</i> contract negotiation</li><li>Responding to change <i>over</i> following a plan</li></ul><p><small>"Over" means the left is valued more, not that the right is worthless.</small></p></div>
+      <div class="card"><h4>Principles worth quoting</h4><ul><li>Deliver working software frequently (weeks, not months)</li><li>Welcome changing requirements, even late</li><li>Business and developers work together daily</li><li>Sustainable pace; simplicity; maximise work not done</li><li>Regularly reflect and adjust (retrospective)</li></ul></div>
+    </div>
+    <div class="warn"><b>Agile is not "no planning" or "no documentation"</b>Agile teams plan continuously (release, sprint, daily) and document what is needed to build and operate the system. What they avoid is large speculative documents that go stale.</div>
+  </section>
+
+  <section class="topic" id="scrum" data-nav="Scrum framework" data-group="1 · Agile" data-level="b">
+    <h2>Scrum: roles, events and artifacts <span class="badge b">Basic</span></h2>
+    <p><b>Scrum</b> is a lightweight framework for delivering a product in fixed-length <b>sprints</b> (1-4 weeks, usually 2). It defines three accountabilities, five events and three artifacts, each with a commitment.</p>
+    <div class="diagram"><div class="dtitle">One sprint</div>
+      <div class="flow">
+        <div class="node">Product Backlog<small>ordered by the PO</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Sprint Planning<small>Goal + Sprint Backlog</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Sprint (1-4 weeks)<small>Daily Scrum every day</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Increment<small>meets Definition of Done</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Sprint Review<small>inspect the product</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">Retrospective<small>inspect the process</small></div>
+      </div>
+    </div>
+    <h3>Accountabilities (roles)</h3>
+    <div class="tblwrap"><table><tr><th>Role</th><th>Accountable for</th><th>Is not</th></tr>
+      <tr><td><b>Product Owner (PO)</b></td><td>Maximising product value; owning and ordering the Product Backlog; clear Product Goal</td><td>A requirements typist or a project manager; one person, not a committee</td></tr>
+      <tr><td><b>Scrum Master (SM)</b></td><td>Scrum is understood and effective; removing impediments; coaching the team and organisation</td><td>The team's boss, a secretary or the person who assigns tasks</td></tr>
+      <tr><td><b>Developers</b></td><td>Creating a usable Increment every sprint (build, test, design, ops: whatever it takes); self-managing the plan</td><td>"Only coders"; sub-teams with hand-offs</td></tr></table></div>
+    <h3>Events</h3>
+    <div class="tblwrap"><table><tr><th>Event</th><th>Time-box (2-week sprint)</th><th>Purpose / output</th></tr>
+      <tr><td><b>Sprint</b></td><td>2 weeks</td><td>Container for all events; the scope may be clarified but the Sprint Goal does not change</td></tr>
+      <tr><td><b>Sprint Planning</b></td><td>up to 4 h</td><td>Why (Sprint Goal), What (items), How (plan) &rarr; Sprint Backlog</td></tr>
+      <tr><td><b>Daily Scrum</b></td><td>15 min</td><td>Developers inspect progress to the Sprint Goal and adapt the plan for the next 24 h. Not a status meeting for managers.</td></tr>
+      <tr><td><b>Sprint Review</b></td><td>up to 2 h</td><td>Demo the Increment to stakeholders, gather feedback, adjust the backlog</td></tr>
+      <tr><td><b>Sprint Retrospective</b></td><td>up to 1.5 h</td><td>Improve people, process, tools: pick 1-2 concrete actions</td></tr>
+      <tr><td><i>Backlog refinement</i> (ongoing, not a formal event)</td><td>about 10% of capacity</td><td>Clarify, split and estimate upcoming items so they are "ready"</td></tr></table></div>
+    <h3>Artifacts and commitments</h3>
+    <div class="tblwrap"><table><tr><th>Artifact</th><th>Commitment</th><th>Meaning</th></tr>
+      <tr><td><b>Product Backlog</b></td><td>Product Goal</td><td>Ordered, evolving list of everything the product may need</td></tr>
+      <tr><td><b>Sprint Backlog</b></td><td>Sprint Goal</td><td>Selected items + plan to deliver them (owned by Developers)</td></tr>
+      <tr><td><b>Increment</b></td><td>Definition of Done</td><td>A usable, integrated, tested step toward the Product Goal</td></tr></table></div>
+    <div class="seq" data-title="A typical sprint conversation">
+<script type="text/seq">
+participants: Stakeholders | Product Owner | Developers | Scrum Master
+Stakeholders -> Product Owner : needs and feedback
+Product Owner -> Developers : refined backlog items (ready)
+Developers -> Developers : plan sprint, forecast, set Sprint Goal
+Developers -> Developers : build and test daily, integrate continuously
+Scrum Master --> Developers : remove blockers, protect focus
+Developers -> Stakeholders : Sprint Review: demo a working Increment
+Stakeholders --> Product Owner : feedback reorders the backlog
+Developers -> Scrum Master : Retrospective: process improvements
+</script>
+    </div>
+    <details><summary>Scrum vs Kanban vs "Scrumban" at a glance</summary><div class="dbody">
+      <div class="tblwrap"><table><tr><th></th><th>Scrum</th><th>Kanban</th><th>Scrumban</th></tr>
+      <tr><td>Cadence</td><td>Fixed sprints</td><td>Continuous flow</td><td>Flow with periodic planning</td></tr>
+      <tr><td>Roles</td><td>PO, SM, Developers</td><td>None prescribed</td><td>Flexible</td></tr>
+      <tr><td>WIP limits</td><td>Implicit (sprint scope)</td><td>Explicit per column</td><td>Explicit</td></tr>
+      <tr><td>Change mid-iteration</td><td>Discouraged (goal protected)</td><td>Allowed any time</td><td>Allowed within WIP</td></tr>
+      <tr><td>Key metrics</td><td>Velocity, burndown</td><td>Lead/cycle time, throughput</td><td>Cycle time, throughput</td></tr>
+      <tr><td>Best for</td><td>Product development</td><td>Support, ops, maintenance</td><td>Teams transitioning, mixed work</td></tr></table></div></div></details>
+  </section>
+
+  <section class="topic" id="kanban" data-nav="Kanban and flow metrics" data-group="1 · Agile" data-level="i">
+    <h2>Kanban, WIP limits and flow metrics <span class="badge i">Mid</span></h2>
+    <p><b>Kanban</b> visualises work on a board and limits <b>Work In Progress (WIP)</b> so that the team finishes things before starting new ones. Pull, don't push.</p>
+    <div class="diagram"><div class="dtitle">Kanban board with WIP limits</div>
+      <div class="flow">
+        <div class="node">Backlog<small>no limit</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Analysis<small>WIP 3</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">In Progress<small>WIP 4</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">In Review<small>WIP 2</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Testing<small>WIP 3</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">Done<small>released</small></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Metric</th><th>Definition</th><th>Why it matters</th></tr>
+      <tr><td><b>Lead time</b></td><td>Request created &rarr; delivered (customer's wait)</td><td>What the customer experiences</td></tr>
+      <tr><td><b>Cycle time</b></td><td>Work started &rarr; done</td><td>How fast the team works once it starts; basis for forecasting</td></tr>
+      <tr><td><b>Throughput</b></td><td>Items finished per period</td><td>Probabilistic forecasting without estimates</td></tr>
+      <tr><td><b>WIP</b></td><td>Items started but not finished</td><td>Little's Law: <code>cycle time = WIP / throughput</code>. Cut WIP and cycle time drops.</td></tr>
+      <tr><td><b>Flow efficiency</b></td><td>Active work time / total lead time</td><td>Typically 5-15%: most time is waiting</td></tr></table></div>
+    <div class="tip"><b>Why WIP limits work</b>Context switching wastes effort and hides bottlenecks. A full "In Review" column forces the team to review before starting new work, which exposes and removes the real constraint.</div>
+  </section>
+
+  <section class="topic" id="dor-dod" data-nav="Definition of Ready / Done, ceremonies" data-group="1 · Agile" data-level="i">
+    <h2>Definition of Ready, Definition of Done and acceptance criteria <span class="badge i">Mid</span></h2>
+    <div class="grid2">
+      <div class="card"><h4>Definition of Ready (DoR)</h4><p>Checklist for a story to <b>enter</b> a sprint:</p><ul><li>Clear value statement (who / what / why)</li><li>Acceptance criteria written</li><li>Small enough for one sprint, estimated</li><li>Dependencies identified, designs/API contract available</li><li>Testable; no open critical questions</li></ul></div>
+      <div class="card"><h4>Definition of Done (DoD)</h4><p>Quality bar for <b>every</b> item (the Increment's commitment):</p><ul><li>Code reviewed, merged, builds in CI</li><li>Unit/integration tests pass; coverage not reduced</li><li>Acceptance criteria demonstrated</li><li>No critical static-analysis or security findings</li><li>Docs/API spec updated, deployed to test, monitoring added</li></ul></div>
+    </div>
+    <div class="warn"><b>DoD vs acceptance criteria</b>Acceptance criteria are <i>specific to one story</i> ("login locks after 5 failed attempts"). The DoD is the <i>common</i> quality checklist applied to all stories. A story is done only when both are met.</div>
+    <h3>Common anti-patterns</h3>
+    <ul><li><b>Zombie Scrum</b>: events happen but nothing is inspected or adapted.</li><li><b>Sprint as mini-waterfall</b>: design week, build week, test week &mdash; nothing integrated until the end.</li><li><b>Carrying over</b> half-done stories: they are worth zero until Done; split smaller instead.</li><li><b>Velocity as a target</b>: using it to compare teams or reward output makes people inflate points (Goodhart's law).</li><li><b>Daily as status report</b> to a manager rather than team planning.</li></ul>
+  </section>
+
+  <div class="part-title">Part 2 &mdash; JIRA</div>
+
+  <section class="topic" id="jira-concepts" data-nav="JIRA core concepts" data-group="2 · JIRA" data-level="b">
+    <h2>JIRA: what it is and how its pieces fit <span class="badge b">Basic</span></h2>
+    <p><b>JIRA</b> (Atlassian) is an issue and project tracker. Everything is an <b>issue</b> that moves through a <b>workflow</b> inside a <b>project</b>, is displayed on a <b>board</b>, and can be searched with <b>JQL</b>. Confluence (docs/wiki) is its usual companion; Bitbucket/GitHub integrate commits and PRs into issues.</p>
+    <div class="why"><b>Why teams use it</b>One shared, auditable source of truth for "what are we building, who is on it, what state is it in, and why", which feeds sprint planning, reporting, release notes and compliance traceability.</div>
+    <h3>Issue type hierarchy</h3>
+    <div class="diagram"><div class="dtitle">Typical hierarchy (company-managed project)</div>
+      <div class="layers">
+        <div class="layer">Initiative / Theme<small>Strategic goal spanning quarters (Jira Premium / Advanced Roadmaps)</small></div><div class="down">&darr; contains</div>
+        <div class="layer l2">Epic<small>A large feature delivered over several sprints: "Online checkout"</small></div><div class="down">&darr;</div>
+        <div class="layer l3">Story / Bug / Task<small>A user-visible slice that fits in one sprint</small></div><div class="down">&darr;</div>
+        <div class="layer l4">Sub-task<small>Technical step: "Add endpoint", "Write unit tests" (one assignee)</small></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Issue type</th><th>Use for</th></tr>
+      <tr><td><b>Epic</b></td><td>Big body of work, tracked by progress of its children</td></tr>
+      <tr><td><b>Story</b></td><td>Requirement from a user's perspective (carries story points)</td></tr>
+      <tr><td><b>Task</b></td><td>Work that is not a user feature (set up pipeline, upgrade library)</td></tr>
+      <tr><td><b>Bug</b></td><td>Defect: include steps to reproduce, expected vs actual, environment, severity</td></tr>
+      <tr><td><b>Sub-task</b></td><td>Breakdown of a story among people or steps</td></tr>
+      <tr><td><b>Spike</b></td><td>Time-boxed research to reduce uncertainty (output: knowledge, not shippable code)</td></tr></table></div>
+    <h3>Key vocabulary</h3>
+    <div class="tblwrap"><table><tr><th>Term</th><th>Meaning</th></tr>
+      <tr><td><b>Project</b> / <b>Key</b></td><td>Container of issues; the key prefixes IDs (<code>SHOP-123</code>)</td></tr>
+      <tr><td><b>Workflow</b></td><td>Statuses (To Do, In Progress, In Review, Done) and the allowed <b>transitions</b>; can add conditions, validators and post-functions</td></tr>
+      <tr><td><b>Board</b></td><td>Scrum board (sprints) or Kanban board (flow); columns map to statuses</td></tr>
+      <tr><td><b>Backlog</b></td><td>Ordered list of issues not yet in a sprint; drag to rank</td></tr>
+      <tr><td><b>Sprint</b></td><td>Time-boxed container started and completed from the board; unfinished items move on</td></tr>
+      <tr><td><b>Version / Release</b></td><td>Fix Version marks which release delivers an issue (release notes)</td></tr>
+      <tr><td><b>Component</b></td><td>Sub-part of the system (API, UI), can have default assignee</td></tr>
+      <tr><td><b>Labels</b></td><td>Free-form tags for ad-hoc grouping</td></tr>
+      <tr><td><b>Priority vs Severity</b></td><td>Priority = business urgency; severity = technical impact (custom field)</td></tr>
+      <tr><td><b>Issue links</b></td><td>blocks / is blocked by, relates to, duplicates, clones: the basis of dependency tracking</td></tr>
+      <tr><td><b>Filter, Dashboard</b></td><td>Saved JQL query; page of gadgets showing filters and charts</td></tr>
+      <tr><td><b>Team-managed vs company-managed</b></td><td>Team-managed: simple, per-project config. Company-managed: shared schemes, admin-controlled, richer features</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="jira-workflow" data-nav="Workflows, boards and sprints in JIRA" data-group="2 · JIRA" data-level="b">
+    <h2>Workflows, boards and the sprint routine in JIRA <span class="badge b">Basic</span></h2>
+    <div class="diagram"><div class="dtitle">A typical workflow</div>
+      <div class="flow">
+        <div class="node">To Do</div><span class="arrow">&rarr;</span>
+        <div class="node alt">In Progress</div><span class="arrow">&rarr;</span>
+        <div class="node warn">In Review</div><span class="arrow">&rarr;</span>
+        <div class="node warn">In Test / QA</div><span class="arrow">&rarr;</span>
+        <div class="node ok">Done</div>
+      </div>
+      <p style="margin:10px 0 0;font-size:13px;color:var(--muted)">Back-transitions (e.g. QA &rarr; In Progress on a failed test) are allowed. <b>Blocked</b> is better modelled as a flag/link than as a status.</p>
+    </div>
+    <h3>Running a sprint in JIRA</h3>
+    <ol>
+      <li><b>Refine</b> the backlog: write stories, add acceptance criteria, estimate (story points), link dependencies, rank.</li>
+      <li><b>Plan</b>: create sprint, set <b>Sprint Goal</b>, drag items from backlog in capacity limits.</li>
+      <li><b>Start sprint</b>: set start and end date. Scope added mid-sprint appears on the burndown as a scope change.</li>
+      <li><b>Work the board</b>: move cards, flag impediments, update remaining estimates, link PRs (branch name or commit message contains the key: <code>git commit -m "SHOP-123 add retry"</code>).</li>
+      <li><b>Review</b>: use the sprint report; release version.</li>
+      <li><b>Complete sprint</b>: unfinished issues return to the backlog or next sprint; metrics are recorded.</li>
+    </ol>
+    <div class="tip"><b>Good ticket hygiene</b>Descriptive summary starting with a verb, a "why", acceptance criteria, a single clear owner, correct type/priority, linked to an epic and fix version, and no comments hiding decisions (decisions go in the description or Confluence).</div>
+    <h3>Writing a good bug</h3>
+    <pre data-lang="plain" data-file="Bug template">Summary:   [Checkout] Total shows 0.00 when coupon SAVE10 is applied twice
+Environment: Chrome 126 / Windows 11 / build 2.14.3 / staging
+Steps to reproduce:
+  1. Add any item to the cart
+  2. Apply coupon SAVE10, then apply SAVE10 again
+Expected:  Second attempt rejected with "Coupon already applied"
+Actual:    Cart total becomes 0.00 and order can be placed
+Severity:  Major (revenue impact)   Priority: High
+Evidence:  Screenshot, HAR file, console log, correlation id 8f3c-...
+</pre>
+  </section>
+
+  <section class="topic" id="jql" data-nav="JQL: searching and filtering" data-group="2 · JIRA" data-level="i">
+    <h2>JQL (JIRA Query Language) <span class="badge i">Mid</span></h2>
+    <p><b>JQL</b> is the SQL-like language behind filters, boards and dashboards: <code>field operator value</code> clauses joined with <code>AND</code>/<code>OR</code>, with an optional <code>ORDER BY</code>.</p>
+    <pre data-lang="jql" data-file="JQL examples">project = SHOP AND status = "In Progress" AND assignee = currentUser()
+issuetype = Bug AND priority in (High, Highest) AND resolution = Unresolved ORDER BY priority DESC, created ASC
+sprint in openSprints() AND status != Done
+fixVersion = "2.14" AND issuetype in (Story, Bug)
+created &gt;= -7d AND reporter = currentUser()                      -- relative dates
+status changed to "Done" during (startOfWeek(), now())
+assignee is EMPTY AND status = "To Do"
+text ~ "timeout" AND labels = payments
+"Epic Link" = SHOP-50 OR parent = SHOP-50
+issueFunction in linkedIssuesOf("key = SHOP-1", "blocks")          -- ScriptRunner add-on</pre>
+    <div class="tblwrap"><table><tr><th>Element</th><th>Examples</th></tr>
+      <tr><td>Operators</td><td><code>= != &gt; &lt; &gt;= &lt;= ~ !~ IN NOT IN IS EMPTY IS NOT EMPTY WAS CHANGED</code></td></tr>
+      <tr><td>Functions</td><td><code>currentUser() openSprints() closedSprints() startOfWeek() now() membersOf("group")</code></td></tr>
+      <tr><td>Keywords</td><td><code>AND OR NOT ORDER BY ASC DESC</code></td></tr>
+      <tr><td>Fields</td><td>project, issuetype, status, priority, assignee, reporter, sprint, labels, component, fixVersion, created, updated, resolution, "Story Points"</td></tr></table></div>
+    <div class="lab" id="jql-lab"></div>
+    <div class="tip"><b>Use filters to drive everything</b>Save a JQL as a filter, then base a board, dashboard gadget, subscription email or automation rule on it. Change the filter once and all of them update.</div>
+  </section>
+
+  <section class="topic" id="jira-reports" data-nav="Reports and metrics" data-group="2 · JIRA" data-level="i">
+    <h2>JIRA reports and what they tell you <span class="badge i">Mid</span></h2>
+    <div class="tblwrap"><table><tr><th>Report</th><th>Shows</th><th>How to read it</th></tr>
+      <tr><td><b>Burndown chart</b></td><td>Remaining work vs time in a sprint</td><td>Flat then cliff at the end = work finished late / big stories. Upward steps = scope added.</td></tr>
+      <tr><td><b>Burnup chart</b></td><td>Completed work vs total scope</td><td>Shows scope growth explicitly; good for release tracking</td></tr>
+      <tr><td><b>Velocity chart</b></td><td>Committed vs completed points per sprint</td><td>Use average of last 3-6 sprints for forecasting; stable is better than high</td></tr>
+      <tr><td><b>Sprint report</b></td><td>Completed, not completed, added, removed items</td><td>Retrospective input</td></tr>
+      <tr><td><b>Cumulative Flow Diagram (CFD)</b></td><td>Issues per status over time</td><td>Widening band = bottleneck in that column</td></tr>
+      <tr><td><b>Control chart</b></td><td>Cycle time per issue with rolling average</td><td>Outliers show stuck work; use percentiles (85th) for commitments</td></tr>
+      <tr><td><b>Created vs Resolved</b></td><td>Inflow vs outflow of issues</td><td>Backlog growing? Support team capacity gap</td></tr>
+      <tr><td><b>Release burndown / roadmap</b></td><td>Progress toward a version / epics on a timeline</td><td>Stakeholder-facing progress view</td></tr></table></div>
+    <div class="warn"><b>Metrics are for the team, not against the team</b>Velocity and ticket counts are planning aids. Using them for performance reviews or cross-team comparison leads to point inflation, ticket-splitting games and hidden work.</div>
+  </section>
+
+  <section class="topic" id="jira-admin" data-nav="Configuration, automation, integrations" data-group="2 · JIRA" data-level="a">
+    <h2>JIRA configuration, automation and integrations <span class="badge a">Adv</span></h2>
+    <div class="tblwrap"><table><tr><th>Area</th><th>What to know</th></tr>
+      <tr><td><b>Schemes</b> (company-managed)</td><td>Issue-type, workflow, screen, field-configuration, permission and notification schemes are reusable and shared across projects. Changing a shared scheme affects every project using it.</td></tr>
+      <tr><td><b>Custom fields</b></td><td>Add sparingly: each adds screen clutter and index cost. Prefer labels/components when enough.</td></tr>
+      <tr><td><b>Workflow conditions / validators / post-functions</b></td><td>Control who can transition, require fields (e.g. resolution), and auto-update fields afterwards.</td></tr>
+      <tr><td><b>Permissions &amp; roles</b></td><td>Project roles (Admin, Developer, Viewer) grant permissions; issue-level security hides sensitive tickets.</td></tr>
+      <tr><td><b>Automation rules</b></td><td>"When an issue moves to Done &rarr; transition parent epic if all children done", "When a PR is merged &rarr; move to QA", scheduled stale-ticket reminders.</td></tr>
+      <tr><td><b>Dev-tool integration</b></td><td>Branch/commit/PR names containing <code>SHOP-123</code> link automatically to the issue (GitHub, Bitbucket, GitLab, Azure DevOps).</td></tr>
+      <tr><td><b>REST API</b></td><td><code>GET /rest/api/3/search?jql=...</code>, <code>POST /rest/api/3/issue</code>, webhooks for events; use API tokens, not passwords.</td></tr>
+      <tr><td><b>Alternatives</b></td><td>Azure DevOps Boards, GitHub Projects, Linear, Trello (light), ServiceNow (ITSM). Concepts transfer directly.</td></tr></table></div>
+    <pre data-lang="bash" data-file="terminal">curl -u you@company.com:$JIRA_API_TOKEN -H "Content-Type: application/json" \
+  -X POST https://yourcompany.atlassian.net/rest/api/3/search/jql \
+  -d '{ "jql": "project = SHOP AND sprint in openSprints()", "fields": ["summary","status","assignee"] }'</pre>
+  </section>
+
+  <div class="part-title">Part 3 &mdash; Requirements engineering</div>
+
+  <section class="topic" id="req-basics" data-nav="Requirements: types and gathering" data-group="3 · Requirements" data-level="b">
+    <h2>Requirements: what they are and how to gather them <span class="badge b">Basic</span></h2>
+    <p>A <b>requirement</b> is a statement of a need that the system must satisfy. <b>Requirements engineering</b> is the continuous activity of discovering, clarifying, documenting, validating and managing those needs.</p>
+    <div class="why"><b>Why it matters</b>Most expensive defects are not coding mistakes but wrong or misunderstood requirements. The cost of fixing a misunderstanding grows roughly tenfold with each stage it survives (requirements &rarr; design &rarr; code &rarr; test &rarr; production).</div>
+    <div class="tblwrap"><table><tr><th>Type</th><th>Meaning</th><th>Example</th></tr>
+      <tr><td><b>Business requirement</b></td><td>Why the organisation wants this; measurable goal</td><td>Cut checkout abandonment from 30% to 20%</td></tr>
+      <tr><td><b>Stakeholder / user requirement</b></td><td>What users need to accomplish</td><td>A shopper can pay with a saved card</td></tr>
+      <tr><td><b>Functional requirement</b></td><td>What the system does (behaviour)</td><td>System sends a confirmation email after payment</td></tr>
+      <tr><td><b>Non-functional requirement (NFR / quality attribute)</b></td><td>How well it does it</td><td>95% of API calls respond within 300 ms at 500 rps</td></tr>
+      <tr><td><b>Constraint</b></td><td>Fixed limits: technology, law, budget, deadline</td><td>Must run on Azure; GDPR; go-live by 1 March</td></tr>
+      <tr><td><b>Assumption / dependency</b></td><td>Things believed true or needed from others</td><td>Payment provider sandbox available by sprint 2</td></tr></table></div>
+    <h3>Non-functional requirements checklist (often forgotten, often decisive)</h3>
+    <div class="grid3">
+      <div class="card"><h4>Performance &amp; scale</h4><ul><li>Latency, throughput</li><li>Peak concurrent users</li><li>Data volume growth</li></ul></div>
+      <div class="card"><h4>Reliability</h4><ul><li>Availability (99.9% = 8.8 h/yr down)</li><li>RPO / RTO (data loss, recovery time)</li><li>Fault tolerance</li></ul></div>
+      <div class="card"><h4>Security &amp; compliance</h4><ul><li>AuthN/AuthZ, encryption</li><li>Audit logging, retention</li><li>GDPR, PCI-DSS, HIPAA</li></ul></div>
+      <div class="card"><h4>Usability &amp; accessibility</h4><ul><li>WCAG 2.2 AA</li><li>Browser/device support</li><li>Localisation</li></ul></div>
+      <div class="card"><h4>Maintainability</h4><ul><li>Test coverage, modularity</li><li>Observability</li><li>Documentation</li></ul></div>
+      <div class="card"><h4>Portability &amp; ops</h4><ul><li>Cloud/on-prem, containers</li><li>Deployment frequency</li><li>Cost ceiling</li></ul></div>
+    </div>
+    <h3>Elicitation techniques</h3>
+    <div class="tblwrap"><table><tr><th>Technique</th><th>Best for</th><th>Watch out for</th></tr>
+      <tr><td>Stakeholder interviews</td><td>Deep understanding, politics, constraints</td><td>People describe solutions, not problems: ask "why?" five times</td></tr>
+      <tr><td>Workshops (event storming, story mapping)</td><td>Shared understanding, conflict resolution</td><td>Needs a facilitator and the right people in the room</td></tr>
+      <tr><td>Observation / shadowing</td><td>What users really do</td><td>Observer effect</td></tr>
+      <tr><td>Prototypes / wireframes</td><td>Validating UI and flow cheaply</td><td>Mistaking a prototype for a finished product</td></tr>
+      <tr><td>Surveys and analytics</td><td>Quantifying opinions and behaviour</td><td>Leading questions; vanity metrics</td></tr>
+      <tr><td>Document / legacy-system analysis</td><td>Hidden business rules</td><td>Outdated documents; replicating old mistakes</td></tr>
+      <tr><td>Spikes / proofs of concept</td><td>Technical feasibility</td><td>Time-box it; throw code away or harden it deliberately</td></tr></table></div>
+    <div class="tip"><b>Questions to ask on every vague request</b>Who is it for and what problem does it solve? How will we know it worked (metric)? What happens if we don't build it? What is the simplest thing that could work? What are the edge cases, errors and permissions? What must it integrate with? Who approves it? What is out of scope?</div>
+  </section>
+
+  <section class="topic" id="user-stories" data-nav="User stories, INVEST, acceptance criteria" data-group="3 · Requirements" data-level="b">
+    <h2>User stories, INVEST and acceptance criteria <span class="badge b">Basic</span></h2>
+    <p>A <b>user story</b> is a short description of a need from the user's viewpoint, intended to start a conversation: <i>Card</i> (the text), <i>Conversation</i> (the discussion), <i>Confirmation</i> (acceptance criteria).</p>
+    <pre data-lang="plain" data-file="Story format">As a <b>returning shopper</b>
+I want to <b>pay with a saved card</b>
+So that <b>I can check out in one click</b>.</pre>
+    <h3>INVEST: a quality check for stories</h3>
+    <div class="tblwrap"><table><tr><th>Letter</th><th>Question</th><th>Bad example &rarr; fix</th></tr>
+      <tr><td><b>I</b>ndependent</td><td>Can it be built and released without another story?</td><td>"Show order total" depends on "Add to cart" &rarr; order the work or merge</td></tr>
+      <tr><td><b>N</b>egotiable</td><td>Does it describe the need, leaving room for the solution?</td><td>"Use a dropdown with 12 colours" &rarr; "choose a colour"</td></tr>
+      <tr><td><b>V</b>aluable</td><td>Does a user or the business benefit?</td><td>"Create DB table" is a task, not a story</td></tr>
+      <tr><td><b>E</b>stimable</td><td>Can the team size it?</td><td>Unknown tech &rarr; do a spike first</td></tr>
+      <tr><td><b>S</b>mall</td><td>Fits within a sprint (ideally 1-3 days)?</td><td>"Manage users" is an epic &rarr; split</td></tr>
+      <tr><td><b>T</b>estable</td><td>Can we prove it works?</td><td>"Fast" &rarr; "page loads under 2 s at p95"</td></tr></table></div>
+    <h3>Acceptance criteria: Given / When / Then (Gherkin)</h3>
+    <pre data-lang="gherkin" data-file="checkout-coupon.feature">Feature: Apply a discount coupon at checkout
+
+  Background:
+    Given the cart contains items worth 100.00
+
+  Scenario: Valid coupon reduces the total
+    Given a coupon "SAVE10" worth 10 percent exists
+    When the shopper applies "SAVE10"
+    Then the total is 90.00
+
+  Scenario: The same coupon cannot be used twice
+    Given the shopper already applied "SAVE10"
+    When the shopper applies "SAVE10" again
+    Then an error "Coupon already applied" is shown
+    And the total remains 90.00
+
+  Scenario Outline: Invalid coupons are rejected
+    When the shopper applies "&lt;code&gt;"
+    Then the error "&lt;message&gt;" is shown
+
+    Examples:
+      | code    | message             |
+      | EXPIRED | Coupon has expired  |
+      | WRONG   | Coupon not found    |</pre>
+    <div class="note"><b>Rule-based alternative</b>For simple stories a bullet checklist of acceptance criteria is enough. Use Gherkin when you want executable specs (SpecFlow / Cucumber / Reqnroll) so documentation and automated tests are the same artefact (BDD).</div>
+    <h3>Splitting big stories</h3>
+    <div class="tblwrap"><table><tr><th>Pattern</th><th>Example for "Manage products"</th></tr>
+      <tr><td>Workflow steps</td><td>Create product &rarr; edit &rarr; archive</td></tr>
+      <tr><td>CRUD operations</td><td>Create, read, update, delete as separate stories</td></tr>
+      <tr><td>Business rule variations</td><td>Percentage coupon first, then fixed-amount, then free shipping</td></tr>
+      <tr><td>Simple / complex</td><td>Single image first, then gallery with reordering</td></tr>
+      <tr><td>Happy path / exceptions</td><td>Successful payment first; then declined card, timeouts, 3-D Secure</td></tr>
+      <tr><td>Data / interface</td><td>CSV import first; Excel and API import later</td></tr>
+      <tr><td>Defer performance</td><td>Make it work, then make it fast (with an explicit NFR story)</td></tr>
+      <tr><td><b>Vertical slice</b></td><td>Always cut through UI + API + DB so each slice is demoable. Avoid "front-end story" and "back-end story" separately.</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="req-docs" data-nav="Requirement documents, prioritisation, traceability" data-group="3 · Requirements" data-level="i">
+    <h2>Documenting, prioritising and tracing requirements <span class="badge i">Mid</span></h2>
+    <div class="tblwrap"><table><tr><th>Artefact</th><th>Content</th><th>When</th></tr>
+      <tr><td><b>BRD</b> (Business Requirements Document)</td><td>Goals, scope, stakeholders, high-level needs, success metrics</td><td>Start of larger initiatives</td></tr>
+      <tr><td><b>PRD</b> (Product Requirements Document)</td><td>Problem, personas, user journeys, features, NFRs, out-of-scope, metrics</td><td>Per product / big feature</td></tr>
+      <tr><td><b>SRS</b> (Software Requirements Specification)</td><td>Detailed functional/NFR specification</td><td>Formal / regulated projects</td></tr>
+      <tr><td><b>User story map</b></td><td>Journey steps across, priority/slices down: reveals the MVP</td><td>Discovery and release planning</td></tr>
+      <tr><td><b>Use case / sequence diagram</b></td><td>Actor-system interaction with alternate flows</td><td>Complex interactions</td></tr>
+      <tr><td><b>API contract</b> (OpenAPI)</td><td>Endpoints, payloads, errors</td><td>Before front-end/back-end work in parallel</td></tr>
+      <tr><td><b>ADR</b> (Architecture Decision Record)</td><td>Context, decision, alternatives, consequences</td><td>Every significant technical decision</td></tr></table></div>
+    <h3>Prioritising requirements</h3>
+    <div class="grid2">
+      <div class="card"><h4>MoSCoW</h4><ul><li><b>Must</b> have: release fails without it</li><li><b>Should</b> have: important, workaround exists</li><li><b>Could</b> have: nice if time allows</li><li><b>Won't</b> (this time): explicitly parked</li></ul><p><small>Rule: keep Musts under ~60% of effort to leave buffer.</small></p></div>
+      <div class="card"><h4>Kano model</h4><ul><li><b>Basic</b> expectations (missing = angry)</li><li><b>Performance</b>: more is better</li><li><b>Delighters</b>: unexpected joy</li><li>Delighters become basics over time</li></ul></div>
+    </div>
+    <p>Scoring models (RICE, WSJF, value vs effort) are covered in the roadmap part, with a calculator.</p>
+    <h3>Traceability and change control</h3>
+    <ul>
+      <li><b>Traceability</b>: each requirement links to a story/epic, design, code (commit/PR), test case and release (JIRA links + fix version). Auditors and impact analysis rely on it.</li>
+      <li><b>Change control</b>: new or changed scope goes through the Product Owner (or change board in formal projects): assess impact on cost/time/risk, then accept, defer or reject. Scope that creeps silently is <b>scope creep</b>.</li>
+      <li><b>Baseline</b> a version of the requirements at agreed milestones so changes are visible.</li>
+    </ul>
+    <div class="warn"><b>Common requirement smells</b>Ambiguous words ("fast", "user-friendly", "etc.", "should support"), missing error and permission cases, solution in disguise ("use Redis"), unmeasurable NFRs, conflicting needs from different stakeholders, and no owner.</div>
+  </section>
+
+  <div class="part-title">Part 4 &mdash; Estimation</div>
+
+  <section class="topic" id="est-basics" data-nav="Estimation fundamentals" data-group="4 · Estimation" data-level="b">
+    <h2>Estimation: what it is and why it is hard <span class="badge b">Basic</span></h2>
+    <p>An <b>estimate</b> is a prediction of effort or duration under uncertainty. It is neither a <b>commitment</b> (a promise) nor a <b>target</b> (what the business wants). Mixing the three is the root of most estimation conflict.</p>
+    <div class="why"><b>Why estimates are usually wrong</b>(1) Humans are optimistic and anchor on the happy path. (2) Unknown unknowns: requirements, integration and bugs reveal themselves later. (3) Work is not uniform: waiting, meetings, reviews and context switching eat time. (4) Parkinson's law and the student syndrome stretch work to fit. (5) Pressure: estimates get negotiated down.</div>
+    <div class="diagram"><div class="dtitle">The Cone of Uncertainty</div>
+      <div class="flow">
+        <div class="node bad">Initial concept<small>actual may be 0.25x - 4x of estimate</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Approved requirements<small>0.5x - 2x</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Design complete<small>0.67x - 1.5x</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Mid-build<small>0.8x - 1.25x</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Nearly done<small>about 1x</small></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Concept</th><th>Meaning</th></tr>
+      <tr><td><b>Effort vs duration</b></td><td>Effort = person-hours of work. Duration = calendar time (effort &divide; people &divide; availability). 10 person-days is not 2 calendar days with 5 people (Brooks' law: adding people to a late project makes it later).</td></tr>
+      <tr><td><b>Absolute vs relative</b></td><td>Absolute: hours/days. Relative: points or T-shirt sizes compared to a reference story. Relative is faster and avoids false precision.</td></tr>
+      <tr><td><b>Top-down vs bottom-up</b></td><td>Top-down: analogy or parametric from similar projects. Bottom-up: break into tasks and sum. Use both and compare.</td></tr>
+      <tr><td><b>Accuracy vs precision</b></td><td>"137.5 hours" is precise but probably inaccurate; "3-5 weeks" is honest.</td></tr>
+      <tr><td><b>Buffer / contingency</b></td><td>Explicit reserve for risk; add at project level (shared) rather than padding every task.</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="est-agile" data-nav="Story points, planning poker, T-shirt sizes" data-group="4 · Estimation" data-level="b">
+    <h2>Agile estimation: story points, planning poker and T-shirt sizes <span class="badge b">Basic</span></h2>
+    <p><b>Story points</b> measure the <i>relative size</i> of a story combining effort, complexity, uncertainty and risk &ndash; not hours. A 5 is "about 2.5 times a 2". They are team-specific and meaningless across teams.</p>
+    <div class="tblwrap"><table><tr><th>Points</th><th>Typical meaning</th><th>Example</th></tr>
+      <tr><td>1</td><td>Trivial, well understood</td><td>Change a label, add a field to a form</td></tr>
+      <tr><td>2</td><td>Small, straightforward</td><td>Add a validated input and persist it</td></tr>
+      <tr><td>3</td><td>Some thinking, a few touch points</td><td>New filter on a list (UI + API + query)</td></tr>
+      <tr><td>5</td><td>Moderate complexity or unknowns</td><td>Integrate a simple third-party API</td></tr>
+      <tr><td>8</td><td>Large; consider splitting</td><td>New CRUD module with permissions</td></tr>
+      <tr><td>13+</td><td>Too big or too uncertain: split or spike</td><td>"Build reporting"</td></tr></table></div>
+    <p>The scale is usually <b>Fibonacci-like</b> (1, 2, 3, 5, 8, 13...) because uncertainty grows with size; the widening gaps stop false precision ("is it 6 or 7?").</p>
+    <h3>Planning Poker</h3>
+    <ol>
+      <li>PO reads the story; team asks clarifying questions.</li>
+      <li>Everyone privately picks a card, then all reveal <b>at once</b> (avoids anchoring).</li>
+      <li>High and low voters explain their assumptions (usually they imagined different scope or risk).</li>
+      <li>Re-vote until close; take the agreed value or the higher one. If it will not converge, split the story or do a spike.</li>
+    </ol>
+    <h3>Other relative techniques</h3>
+    <div class="tblwrap"><table><tr><th>Technique</th><th>How</th><th>Good for</th></tr>
+      <tr><td><b>T-shirt sizes</b> (XS-XL)</td><td>Coarse sizing; map to points later</td><td>Epics, early roadmap, large backlogs</td></tr>
+      <tr><td><b>Affinity / wall estimation</b></td><td>Team silently sorts cards left (small) to right (large)</td><td>Estimating 50+ items in an hour</td></tr>
+      <tr><td><b>Dot voting / Bucket system</b></td><td>Place items into size buckets quickly</td><td>Initial backlog sizing</td></tr>
+      <tr><td><b>#NoEstimates / right-sizing</b></td><td>Make all stories roughly equal; count items, forecast with throughput</td><td>Mature teams with steady flow</td></tr></table></div>
+    <div class="warn"><b>Anti-patterns</b>Converting points to hours "1 point = 4 hours" (then they are just hours); one person estimating for the team; comparing velocities between teams; changing the estimate after the fact to match actuals; estimating tasks nobody understands (do a spike).</div>
+  </section>
+
+  <section class="topic" id="est-techniques" data-nav="Three-point (PERT), analogy, WBS" data-group="4 · Estimation" data-level="i">
+    <h2>Time-based techniques: WBS, analogy and three-point (PERT) <span class="badge i">Mid</span></h2>
+    <p>When a customer needs a date or a budget (fixed-bid, procurement), time-based estimates are required. Break the work down (<b>WBS &ndash; Work Breakdown Structure</b>) until each item is small enough to estimate with confidence, then combine with ranges.</p>
+    <div class="grid2">
+      <div class="card"><h4>Three-point estimate</h4><p>Ask for <b>O</b>ptimistic, <b>M</b>ost likely, <b>P</b>essimistic.</p><ul><li>Triangular: (O + M + P) / 3</li><li><b>PERT</b>: (O + 4M + P) / 6</li><li>Standard deviation: (P - O) / 6</li><li>Project SD = &radic;(sum of task variances)</li></ul></div>
+      <div class="card"><h4>Analogy / parametric</h4><ul><li><b>Analogy</b>: "the last payment integration took 3 weeks"; adjust for differences.</li><li><b>Parametric</b>: units x rate ("40 screens x 2 days"), or function points / use-case points.</li><li><b>Delphi</b>: anonymous rounds of expert estimates converging after discussion.</li></ul></div>
+    </div>
+    <div class="lab" id="pert-lab"></div>
+    <h3>Estimating a whole project: a practical recipe</h3>
+    <ol>
+      <li>List scope (epics &rarr; stories) and explicitly list <b>exclusions and assumptions</b>.</li>
+      <li>Estimate each item with O/M/P or points; include <b>all</b> disciplines: development, code review, testing, defects, documentation, environments, deployment, security review, UAT support, project management.</li>
+      <li>Add <b>risk contingency</b> for known risks (third-party delays, unfamiliar tech): usually 10-30%.</li>
+      <li>Convert to calendar time using realistic <b>capacity</b> (see next section).</li>
+      <li>Present a <b>range with confidence levels</b> and the assumptions that would change it. Re-estimate at milestones as the cone narrows.</li>
+    </ol>
+    <div class="tip"><b>The pocket formula many leads use</b>Development effort &times; 1.3 for testing and defects &times; 1.15 for reviews/documentation &times; 1.2 for coordination = roughly 1.8&times; the "pure coding" number. Calibrate it with your own history.</div>
+  </section>
+
+  <section class="topic" id="est-capacity" data-nav="Capacity, velocity and forecasting" data-group="4 · Estimation" data-level="i">
+    <h2>Capacity, velocity and forecasting <span class="badge i">Mid</span></h2>
+    <div class="tblwrap"><table><tr><th>Term</th><th>Definition</th><th>Use</th></tr>
+      <tr><td><b>Capacity</b></td><td>Available person-hours/days in a period after holidays, leave, meetings, support and ceremonies</td><td>How much the team <i>could</i> take on</td></tr>
+      <tr><td><b>Velocity</b></td><td>Story points completed (meeting DoD) per sprint, historical</td><td>How much the team <i>typically does</i></td></tr>
+      <tr><td><b>Focus factor</b></td><td>Share of a working day spent on planned project work (typically 60-75%)</td><td>Convert person-days to productive days</td></tr>
+      <tr><td><b>Throughput</b></td><td>Count of items finished per week</td><td>Forecast without points</td></tr></table></div>
+    <pre data-lang="plain" data-file="Capacity example">Team: 5 developers, sprint = 10 working days
+Person-days available     = 5 x 10                    = 50
+Minus leave / holidays    = 1 person x 3 days          = -3
+Minus ceremonies / support (~15%)                      = -7
+Net capacity              = 40 person-days
+Focus factor 0.75         -> ~30 productive person-days
+Historical velocity       = 22 points / sprint  -> plan ~22 points (not 40!)</pre>
+    <div class="lab" id="forecast-lab"></div>
+    <div class="note"><b>Monte Carlo forecasting</b>Instead of one average, simulate thousands of futures by sampling past sprint throughputs. Output: "85% chance to finish 30 items by 12 June". Tools: ActionableAgile, Focused Objective spreadsheets, Jira add-ons. Use the 85th percentile for commitments.</div>
+    <h3>Communicating estimates well</h3>
+    <ul>
+      <li>Give a <b>range plus confidence</b>: "6-9 weeks, 80% confident, assuming the vendor API is ready by week 2."</li>
+      <li>State assumptions and risks; list what is <b>not</b> included.</li>
+      <li>Do not give a number in the corridor. Say "I will come back after a short breakdown".</li>
+      <li>Re-estimate when facts change and report early when the date is at risk. Bad news does not improve with age.</li>
+      <li>If told "can you do it in 4 weeks?", answer with trade-offs: reduce scope (MoSCoW), add time, or add risk. Do not silently absorb it with overtime.</li>
+    </ul>
+  </section>
+
+  <div class="part-title">Part 5 &mdash; Roadmaps, planning and prioritisation</div>
+
+  <section class="topic" id="roadmap-concepts" data-nav="What a roadmap is (and is not)" data-group="5 · Roadmap" data-level="b">
+    <h2>Product roadmaps: purpose, types and horizons <span class="badge b">Basic</span></h2>
+    <p>A <b>roadmap</b> is a strategic, outcome-oriented view of where the product is heading and why. It is a communication and alignment tool &ndash; not a Gantt chart, a promise of dates, or a list of tickets.</p>
+    <div class="why"><b>Why</b>It aligns engineering, sales, support and leadership on priorities, explains trade-offs ("we are not doing X because Y"), and frames each sprint's work in a bigger goal.</div>
+    <div class="tblwrap"><table><tr><th>Roadmap type</th><th>Audience</th><th>Contents</th><th>Time precision</th></tr>
+      <tr><td><b>Now / Next / Later</b></td><td>Everyone; recommended default</td><td>Themes and problems to solve grouped by confidence</td><td>No dates; Now = in progress, Next = planned, Later = ideas</td></tr>
+      <tr><td><b>Outcome / goal-based</b></td><td>Leadership, product teams</td><td>Objectives and key results per quarter</td><td>Quarter</td></tr>
+      <tr><td><b>Release / timeline</b></td><td>Delivery, sales, customers</td><td>Features per release or month</td><td>Month / quarter, with a disclaimer</td></tr>
+      <tr><td><b>Technical / platform</b></td><td>Engineering, architects</td><td>Upgrades, tech-debt, security, migrations</td><td>Quarter</td></tr>
+      <tr><td><b>Gantt / delivery plan</b></td><td>Project managers, contracts</td><td>Tasks, dependencies, milestones, critical path</td><td>Days; only for well-known work</td></tr></table></div>
+    <div class="diagram"><div class="dtitle">Now / Next / Later example</div>
+      <div class="grid3">
+        <div class="layers"><div class="layer l3">NOW (this quarter)<small>Checkout one-click pay<br>Fix payment retries<br>SSO for enterprise</small></div></div>
+        <div class="layers"><div class="layer l2">NEXT (following quarter)<small>Order tracking page<br>Mobile-responsive admin<br>Reporting v1</small></div></div>
+        <div class="layers"><div class="layer l4">LATER (exploring)<small>Recommendations<br>Multi-currency<br>Public API</small></div></div>
+      </div>
+    </div>
+    <h3>Planning horizons (onion)</h3>
+    <div class="flow">
+      <div class="node ok">Vision<small>3-5 years: why we exist</small></div><span class="arrow">&rarr;</span>
+      <div class="node alt">Strategy<small>1-2 years: where to play</small></div><span class="arrow">&rarr;</span>
+      <div class="node alt">Roadmap<small>quarters: outcomes</small></div><span class="arrow">&rarr;</span>
+      <div class="node warn">Release plan<small>weeks to months</small></div><span class="arrow">&rarr;</span>
+      <div class="node bad">Sprint / daily<small>days</small></div>
+    </div>
+    <div class="warn"><b>Roadmap anti-patterns</b>Feature factory (a list of outputs without outcomes), dates for uncertain work, no "why", roadmap owned only by the PO with no engineering input, never updated, or treated as a contract.</div>
+  </section>
+
+  <section class="topic" id="prioritisation" data-nav="Prioritisation: RICE, WSJF, value vs effort" data-group="5 · Roadmap" data-level="i">
+    <h2>Prioritisation frameworks <span class="badge i">Mid</span></h2>
+    <div class="tblwrap"><table><tr><th>Framework</th><th>Formula / idea</th><th>Best for</th></tr>
+      <tr><td><b>RICE</b></td><td>(Reach &times; Impact &times; Confidence) / Effort</td><td>Product features with usage data</td></tr>
+      <tr><td><b>ICE</b></td><td>Impact &times; Confidence &times; Ease (1-10 each)</td><td>Quick growth experiments</td></tr>
+      <tr><td><b>WSJF</b> (SAFe)</td><td>Cost of Delay / Job Size, where CoD = business value + time criticality + risk reduction</td><td>Scaled agile, mixed work (features, compliance, tech)</td></tr>
+      <tr><td><b>Value vs Effort matrix</b></td><td>2&times;2: quick wins (high value, low effort) first, avoid money pits</td><td>Workshops, quick alignment</td></tr>
+      <tr><td><b>MoSCoW</b></td><td>Must / Should / Could / Won't</td><td>Fixed-scope releases and MVP definition</td></tr>
+      <tr><td><b>Kano</b></td><td>Basic vs performance vs delight</td><td>Customer satisfaction design</td></tr>
+      <tr><td><b>Cost of Delay</b></td><td>Value lost per week of waiting; compare urgency profiles</td><td>Deciding what must go first</td></tr></table></div>
+    <div class="lab" id="prio-lab"></div>
+    <div class="tip"><b>Always include these in the conversation</b>Compliance deadlines and security fixes that cannot wait; technical debt that slows everything (reserve 10-20% capacity for it); dependencies on other teams; and learning value of reducing uncertainty early.</div>
+  </section>
+
+  <section class="topic" id="mvp-release" data-nav="MVP, release and milestone planning" data-group="5 · Roadmap" data-level="i">
+    <h2>MVP, release planning, milestones and dependencies <span class="badge i">Mid</span></h2>
+    <p>An <b>MVP (Minimum Viable Product)</b> is the smallest thing that lets you <i>learn</i> whether you are solving a real problem. It is not a bad-quality product nor "version 1 with half the features".</p>
+    <div class="diagram"><div class="dtitle">Skateboard &rarr; car (build the whole thing in thin vertical slices)</div>
+      <div class="flow">
+        <div class="node bad">Skateboard<small>transport: usable end-to-end, crude</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Scooter<small>steering added</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Bicycle<small>faster, more comfortable</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Car<small>full vision, validated step by step</small></div>
+      </div>
+    </div>
+    <h3>Release planning steps</h3>
+    <ol>
+      <li><b>Goal</b>: what outcome must this release achieve, and by when does it matter (event, contract, regulation)?</li>
+      <li><b>Scope</b>: build a story map, slice vertically, mark the MVP line (MoSCoW).</li>
+      <li><b>Size</b>: epics in T-shirts/points, forecast with velocity (range).</li>
+      <li><b>Sequence</b>: risky and high-value items first; respect dependencies; leave a hardening/buffer sprint.</li>
+      <li><b>Plan the path to production</b>: environments, feature flags, migration, data, training, support hand-over, rollback.</li>
+      <li><b>Track</b> with burnup and risk burndown; replan every sprint.</li>
+    </ol>
+    <h3>Dependencies, risks and the critical path</h3>
+    <div class="tblwrap"><table><tr><th>Item</th><th>Practice</th></tr>
+      <tr><td><b>Dependencies</b></td><td>Make them visible (JIRA "blocks" links, program board). Remove them by contract-first APIs, mocks, feature flags, or re-slicing.</td></tr>
+      <tr><td><b>Risk register</b></td><td>List risk, probability, impact, owner, mitigation, trigger. Review each sprint; <b>ROAM</b> them (Resolved, Owned, Accepted, Mitigated).</td></tr>
+      <tr><td><b>Critical path</b></td><td>The longest chain of dependent tasks; any delay on it delays the release. Protect it and put your best effort there.</td></tr>
+      <tr><td><b>Milestones</b></td><td>Verifiable checkpoints (demo-able environment, security sign-off, UAT start), not "50% complete".</td></tr>
+      <tr><td><b>Feature flags &amp; phased rollout</b></td><td>Decouple deploy from release: ship dark, enable for 1% &rarr; 10% &rarr; 100%, kill switch.</td></tr></table></div>
+    <h3>Goals and OKRs</h3>
+    <pre data-lang="plain" data-file="OKR example">Objective: Make checkout effortless for returning customers
+  KR1: Checkout conversion  62% -> 70%
+  KR2: Median checkout time 140 s -> 60 s
+  KR3: Payment-error rate   2.1% -> below 0.5%
+(Outputs such as "build one-click pay" are initiatives that serve the KRs, not the KRs themselves.)</pre>
+    <div class="note"><b>Fixed-price projects</b>If scope and date are both fixed, treat the contract as a risk: agree a change process, a prioritised "must" scope, and the rule "if we add, something leaves". The iron triangle: scope, time, cost &mdash; quality is not a variable you negotiate.</div>
+  </section>
+
+  <section class="topic" id="stakeholders" data-nav="Stakeholders, communication, scaled agile" data-group="5 · Roadmap" data-level="i">
+    <h2>Stakeholders, communication and scaling agile <span class="badge i">Mid</span></h2>
+    <div class="tblwrap"><table><tr><th>Stakeholder group</th><th>Cares about</th><th>Communicate with</th></tr>
+      <tr><td>Executives / sponsors</td><td>Outcomes, cost, risk, dates</td><td>Roadmap, quarterly review, risk summary</td></tr>
+      <tr><td>Product owner / business</td><td>Value, scope, trade-offs</td><td>Backlog, refinement, sprint review</td></tr>
+      <tr><td>Users / customers</td><td>Works for them, no disruption</td><td>Demos, release notes, beta programmes</td></tr>
+      <tr><td>Support / operations</td><td>Stability, runbooks, alerts</td><td>Early involvement, handover docs</td></tr>
+      <tr><td>Security / compliance</td><td>Controls, evidence</td><td>Threat model, audit trail, sign-offs</td></tr>
+      <tr><td>Other engineering teams</td><td>Interfaces, timelines</td><td>API contracts, dependency boards</td></tr></table></div>
+    <p><b>RACI</b> clarifies ownership: <b>R</b>esponsible (does), <b>A</b>ccountable (one owner who signs off), <b>C</b>onsulted (two-way), <b>I</b>nformed (one-way).</p>
+    <h3>Scaling frameworks (know the names)</h3>
+    <div class="tblwrap"><table><tr><th>Framework</th><th>Idea</th></tr>
+      <tr><td><b>SAFe</b></td><td>Agile Release Trains of 50-125 people; Program Increment (PI) planning every ~10 weeks; WSJF; most common in enterprises</td></tr>
+      <tr><td><b>LeSS</b></td><td>Scrum scaled with one backlog and minimal extra structure</td></tr>
+      <tr><td><b>Scrum@Scale / Nexus</b></td><td>Scrum-of-scrums, integration team</td></tr>
+      <tr><td><b>Spotify model</b></td><td>Squads, tribes, chapters, guilds (inspiration, not a framework)</td></tr></table></div>
+  </section>
+
+  <div class="part-title">Part 6 &mdash; Engineering practice around the code</div>
+
+  <section class="topic" id="git" data-nav="Git, branching and code review" data-group="6 · Engineering" data-level="b">
+    <h2>Git, branching strategies and code review <span class="badge b">Basic</span></h2>
+    <pre data-lang="bash" data-file="terminal">git clone https://github.com/acme/shop.git
+git switch -c feature/SHOP-123-coupon        # branch per ticket
+git add -p; git commit -m "SHOP-123 reject duplicate coupon"
+git fetch origin; git rebase origin/main     # replay your work on latest main (clean history)
+git push -u origin feature/SHOP-123-coupon   # open a Pull Request
+git merge --no-ff feature/x                  # merge commit; or squash-merge in the PR UI
+git revert &lt;sha&gt;                             # safe undo on shared branches (new commit)
+git stash; git cherry-pick &lt;sha&gt;; git bisect start   # shelve work / copy a commit / find the bad commit</pre>
+    <div class="tblwrap"><table><tr><th>Strategy</th><th>How</th><th>Use when</th></tr>
+      <tr><td><b>Trunk-based development</b></td><td>Short-lived branches (&lt; 1-2 days) merged to <code>main</code> multiple times a day; feature flags hide unfinished work</td><td>Mature CI/CD, high deployment frequency (recommended)</td></tr>
+      <tr><td><b>GitHub Flow</b></td><td><code>main</code> is always deployable; feature branches + PRs</td><td>Web apps, continuous deployment</td></tr>
+      <tr><td><b>Git Flow</b></td><td><code>main</code>, <code>develop</code>, feature/release/hotfix branches</td><td>Versioned products with scheduled releases</td></tr></table></div>
+    <div class="tblwrap"><table><tr><th>merge</th><th>rebase</th><th>squash</th></tr>
+      <tr><td>Keeps full history with a merge commit</td><td>Rewrites your branch onto the new base: linear history. <b>Never rebase shared branches.</b></td><td>Collapses a PR into one commit on main</td></tr></table></div>
+    <h3>Code review that works</h3>
+    <ul>
+      <li><b>Small PRs</b> (&lt; 400 lines), linked to the ticket, with a description of what and why, and screenshots/tests.</li>
+      <li>Review for correctness, readability, tests, security, performance and design &ndash; automate style with linters/formatters.</li>
+      <li>Be kind and specific: ask questions, suggest alternatives, label <i>nit</i> vs <i>blocking</i>. Respond within a working day.</li>
+      <li>Authors: self-review first, keep CI green, do not take comments personally. Reviewers: approve when the code improves the system, not when it is perfect.</li>
+    </ul>
+  </section>
+
+  <section class="topic" id="cicd" data-nav="CI/CD, environments, deployments" data-group="6 · Engineering" data-level="i">
+    <h2>CI/CD, environments and deployment strategies <span class="badge i">Mid</span></h2>
+    <div class="diagram"><div class="dtitle">A typical pipeline</div>
+      <div class="flow">
+        <div class="node">Commit / PR</div><span class="arrow">&rarr;</span>
+        <div class="node alt">Build + lint<small>restore, compile</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">Unit + integration tests<small>coverage gate</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">Security scan<small>SAST, deps, secrets</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Package<small>container / artefact, versioned</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">Deploy Dev &rarr; Test &rarr; Staging</div><span class="arrow">&rarr;</span>
+        <div class="node bad">Approve &rarr; Production<small>smoke test + monitoring</small></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Term</th><th>Meaning</th></tr>
+      <tr><td><b>Continuous Integration</b></td><td>Everyone merges to main frequently; every merge builds and tests automatically</td></tr>
+      <tr><td><b>Continuous Delivery</b></td><td>Every green build is releasable; deployment to production is a manual button</td></tr>
+      <tr><td><b>Continuous Deployment</b></td><td>Every green build goes to production automatically</td></tr>
+      <tr><td><b>Infrastructure as Code</b></td><td>Environments defined in Terraform / Bicep / ARM / Pulumi, versioned and reviewable</td></tr>
+      <tr><td><b>Immutable artefact</b></td><td>Build once, promote the same artefact through environments; only configuration differs</td></tr></table></div>
+    <h3>Deployment strategies</h3>
+    <div class="tblwrap"><table><tr><th>Strategy</th><th>How</th><th>Trade-off</th></tr>
+      <tr><td><b>Rolling</b></td><td>Replace instances gradually</td><td>Simple; mixed versions run briefly (needs backward compatibility)</td></tr>
+      <tr><td><b>Blue-Green</b></td><td>Two identical environments; switch traffic</td><td>Instant rollback; double cost</td></tr>
+      <tr><td><b>Canary</b></td><td>Send 1-5% of traffic to the new version, watch metrics, expand</td><td>Limits blast radius; needs good monitoring</td></tr>
+      <tr><td><b>Feature flags</b></td><td>Deploy dark, enable per user/segment</td><td>Flag clean-up discipline needed</td></tr>
+      <tr><td><b>Database migrations</b></td><td>Expand &rarr; migrate &rarr; contract (backward-compatible steps)</td><td>Never ship a breaking schema change in one step</td></tr></table></div>
+    <pre data-lang="yaml" data-file=".github/workflows/ci.yml">name: ci
+on: [pull_request, push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: 8.0.x }
+      - run: dotnet restore
+      - run: dotnet build --no-restore -c Release
+      - run: dotnet test --no-build -c Release --collect:"XPlat Code Coverage"</pre>
+    <div class="tip"><b>DORA metrics</b>The four research-backed indicators of delivery performance: deployment frequency, lead time for changes, change failure rate and time to restore service. Elite teams deploy on demand with low failure rate and fast recovery.</div>
+  </section>
+
+  <section class="topic" id="testing-general" data-nav="Testing strategy" data-group="6 · Engineering" data-level="i">
+    <h2>Testing strategy: the pyramid and beyond <span class="badge i">Mid</span></h2>
+    <div class="diagram"><div class="dtitle">Test pyramid</div>
+      <div class="layers">
+        <div class="layer l4">End-to-end / UI tests (few)<small>Playwright, Cypress, Selenium &middot; slow, brittle, high confidence in key journeys</small></div>
+        <div class="layer l2">Integration / API / contract tests (some)<small>WebApplicationFactory, Testcontainers, Pact &middot; real DB, HTTP, queues</small></div>
+        <div class="layer l3">Unit tests (many)<small>xUnit / NUnit / Jasmine &middot; fast, isolated, run on every save</small></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table><tr><th>Type</th><th>Purpose</th></tr>
+      <tr><td>Smoke / sanity</td><td>Is the build basically alive after deployment?</td></tr>
+      <tr><td>Regression</td><td>Did a change break existing behaviour? (automated suite)</td></tr>
+      <tr><td>UAT (User Acceptance)</td><td>Business confirms the solution meets the need</td></tr>
+      <tr><td>Performance: load / stress / soak</td><td>Expected load, breaking point, long-run leaks (k6, JMeter, NBomber)</td></tr>
+      <tr><td>Security testing</td><td>SAST/DAST, dependency scan, pen-test</td></tr>
+      <tr><td>Exploratory</td><td>Skilled humans hunting unexpected problems</td></tr>
+      <tr><td>Accessibility</td><td>WCAG checks, screen readers</td></tr></table></div>
+    <ul>
+      <li><b>TDD</b>: red (failing test) &rarr; green (minimum code) &rarr; refactor. <b>BDD</b>: behaviour specs in Given/When/Then shared with the business.</li>
+      <li>Good unit tests are <b>FIRST</b>: Fast, Isolated, Repeatable, Self-validating, Timely. Use Arrange-Act-Assert; one behaviour per test; fakes/mocks for external dependencies only.</li>
+      <li>Coverage is a smell detector, not a goal: 100% coverage with no assertions proves nothing. Track mutation score or defect escape rate for real quality.</li>
+      <li><b>Bug severity vs priority</b>: severity = technical impact; priority = how soon to fix. A typo on the CEO's page can be low severity but high priority.</li>
+    </ul>
+  </section>
+
+  <section class="topic" id="architecture-general" data-nav="Architecture, design principles, patterns" data-group="6 · Engineering" data-level="a">
+    <h2>Architecture styles, design principles and patterns <span class="badge a">Adv</span></h2>
+    <div class="tblwrap"><table><tr><th>Style</th><th>Description</th><th>Choose when</th></tr>
+      <tr><td><b>Monolith (modular)</b></td><td>One deployable with strong internal module boundaries</td><td>Most teams, most of the time: start here</td></tr>
+      <tr><td><b>Layered / Clean / Hexagonal</b></td><td>Domain in the centre; infrastructure depends inward (dependency inversion)</td><td>Long-lived business logic needing testability</td></tr>
+      <tr><td><b>Microservices</b></td><td>Independently deployable services per business capability, own data store</td><td>Large orgs, independent scaling/teams. Costs: distributed complexity, observability, data consistency.</td></tr>
+      <tr><td><b>Event-driven</b></td><td>Services react to events via a broker (Kafka, Service Bus, RabbitMQ)</td><td>Decoupling, async workflows, integration</td></tr>
+      <tr><td><b>CQRS / Event sourcing</b></td><td>Separate read/write models; store events as truth</td><td>Complex domains with audit and scaling needs</td></tr>
+      <tr><td><b>Serverless</b></td><td>Functions / managed services pay per use</td><td>Spiky load, glue code</td></tr></table></div>
+    <div class="grid2">
+      <div class="card"><h4>Design principles</h4><ul><li><b>SOLID</b> (see C# guide)</li><li><b>DRY</b>: one source of truth for each piece of knowledge</li><li><b>KISS</b> and <b>YAGNI</b>: do not build it until needed</li><li>High cohesion, low coupling</li><li>Separation of concerns; Law of Demeter</li><li>Fail fast; make illegal states unrepresentable</li></ul></div>
+      <div class="card"><h4>Patterns to recognise</h4><ul><li><b>Creational</b>: Factory, Builder, Singleton (via DI)</li><li><b>Structural</b>: Adapter, Decorator, Facade, Proxy</li><li><b>Behavioural</b>: Strategy, Observer, Command, Mediator</li><li><b>Enterprise</b>: Repository, Unit of Work, Outbox, Saga, Circuit Breaker, Retry, Cache-aside</li></ul></div>
+    </div>
+    <h3>Scalability and reliability concepts</h3>
+    <div class="tblwrap"><table><tr><th>Concept</th><th>Essence</th></tr>
+      <tr><td>Vertical vs horizontal scaling</td><td>Bigger machine vs more machines (requires stateless services)</td></tr>
+      <tr><td>CAP theorem</td><td>Under a network partition choose consistency or availability; otherwise trade latency vs consistency</td></tr>
+      <tr><td>ACID vs BASE</td><td>Strict transactions vs eventually consistent, highly available</td></tr>
+      <tr><td>Caching layers</td><td>Browser/CDN &rarr; gateway &rarr; in-memory/Redis &rarr; database; mind invalidation</td></tr>
+      <tr><td>Idempotency, retries, back-off</td><td>Make repeated calls safe; retry only transient errors with jitter</td></tr>
+      <tr><td>Circuit breaker, bulkhead, timeout</td><td>Contain failure of a dependency so it does not cascade</td></tr>
+      <tr><td>Load balancer, API gateway</td><td>Distribute traffic; single entry with auth, rate limit, routing</td></tr>
+      <tr><td>Message queue</td><td>Absorb spikes, decouple producers and consumers, at-least-once delivery &rarr; consumers idempotent</td></tr></table></div>
+    <div class="note"><b>Record decisions as ADRs</b>Title, context, decision, alternatives considered, consequences. A 10-line ADR in the repo saves months of "why did we do this?" later.</div>
+  </section>
+
+  <section class="topic" id="security-general" data-nav="Security basics (OWASP) and privacy" data-group="6 · Engineering" data-level="i">
+    <h2>Security basics: OWASP Top 10 mindset <span class="badge i">Mid</span></h2>
+    <div class="tblwrap"><table><tr><th>Risk</th><th>Prevention in one line</th></tr>
+      <tr><td>Broken access control</td><td>Authorise every request on the server; deny by default; check object ownership</td></tr>
+      <tr><td>Cryptographic failures</td><td>TLS everywhere; modern algorithms; hash passwords with Argon2/bcrypt/PBKDF2; keep secrets in a vault</td></tr>
+      <tr><td>Injection (SQL, command, XSS)</td><td>Parameterised queries, output encoding, validate input, CSP</td></tr>
+      <tr><td>Insecure design</td><td>Threat modelling (STRIDE) early; abuse cases next to use cases</td></tr>
+      <tr><td>Security misconfiguration</td><td>Hardened defaults, no debug in prod, least privilege, IaC reviews</td></tr>
+      <tr><td>Vulnerable and outdated components</td><td>Dependency scanning (Dependabot, npm audit), SBOM, patch cadence</td></tr>
+      <tr><td>Identification and authentication failures</td><td>MFA, lockout, secure session/token handling</td></tr>
+      <tr><td>Software and data integrity failures</td><td>Signed artefacts, protected CI, trusted registries</td></tr>
+      <tr><td>Logging and monitoring failures</td><td>Log security events (no secrets/PII), alert on anomalies</td></tr>
+      <tr><td>SSRF</td><td>Allow-list outbound destinations; block internal ranges</td></tr></table></div>
+    <ul><li><b>Shift left</b>: security in design, code review and CI, not only a final pen-test.</li><li><b>Least privilege</b>, <b>defence in depth</b>, <b>secure by default</b>.</li><li><b>Privacy</b>: collect only what you need, encrypt, retain briefly, honour deletion/export requests (GDPR); classify data (public/internal/confidential/restricted).</li><li>Never commit secrets; rotate any that leak; use managed identities instead of passwords.</li></ul>
+  </section>
+
+  <section class="topic" id="observability" data-nav="Observability, SLOs and incident management" data-group="6 · Engineering" data-level="a">
+    <h2>Observability, SLI/SLO/SLA and incident management <span class="badge a">Adv</span></h2>
+    <div class="tblwrap"><table><tr><th>Pillar</th><th>Question answered</th><th>Examples</th></tr>
+      <tr><td><b>Logs</b></td><td>What happened?</td><td>Structured JSON, correlation id, Serilog, ELK, Azure Monitor</td></tr>
+      <tr><td><b>Metrics</b></td><td>How much / how fast?</td><td>Request rate, errors, duration (RED); CPU, queue depth; Prometheus, Application Insights</td></tr>
+      <tr><td><b>Traces</b></td><td>Where did this request spend time?</td><td>OpenTelemetry, Jaeger, distributed trace ids</td></tr>
+      <tr><td><b>Alerts</b></td><td>Who should wake up and why?</td><td>Alert on symptoms (user impact), not every cause</td></tr></table></div>
+    <div class="tblwrap"><table><tr><th>Term</th><th>Meaning</th><th>Example</th></tr>
+      <tr><td><b>SLI</b></td><td>A measured indicator</td><td>% of requests under 300 ms</td></tr>
+      <tr><td><b>SLO</b></td><td>Internal target for an SLI</td><td>99.5% of requests under 300 ms per 30 days</td></tr>
+      <tr><td><b>SLA</b></td><td>Contract with consequences</td><td>99.9% uptime or service credits</td></tr>
+      <tr><td><b>Error budget</b></td><td>Allowed unreliability = 100% - SLO</td><td>If spent, freeze features and fix reliability</td></tr>
+      <tr><td><b>RPO / RTO</b></td><td>Max tolerable data loss / downtime</td><td>RPO 5 min, RTO 1 h</td></tr></table></div>
+    <h3>Incident lifecycle</h3>
+    <div class="flow">
+      <div class="node bad">Detect<small>alert/customer</small></div><span class="arrow">&rarr;</span>
+      <div class="node warn">Triage<small>severity, commander</small></div><span class="arrow">&rarr;</span>
+      <div class="node warn">Mitigate<small>rollback, flag off, scale</small></div><span class="arrow">&rarr;</span>
+      <div class="node alt">Resolve<small>root cause fix</small></div><span class="arrow">&rarr;</span>
+      <div class="node ok">Post-incident review<small>blameless, actions tracked</small></div>
+    </div>
+    <p>Severity example: <b>SEV1</b> total outage / data loss; <b>SEV2</b> major feature degraded; <b>SEV3</b> minor issue with workaround. Mitigate first, investigate later; communicate regularly to stakeholders; write a blameless post-mortem with timeline, root causes (5 whys), and follow-up tickets with owners.</p>
+  </section>
+
+  <section class="topic" id="tech-debt" data-nav="Technical debt, documentation, working practices" data-group="6 · Engineering" data-level="i">
+    <h2>Technical debt, documentation and everyday working practices <span class="badge i">Mid</span></h2>
+    <ul>
+      <li><b>Technical debt</b> is a conscious or accidental shortcut that speeds delivery now and charges "interest" later. Types: deliberate/prudent ("ship now, refactor next sprint"), accidental, and bit-rot (outdated dependencies). Track it as visible backlog items with business impact; reserve a standing capacity share (10-20%); refactor continuously under test (the Boy Scout rule); avoid "big rewrite" proposals.</li>
+      <li><b>Documentation that earns its keep</b>: README (what, run, test, deploy), architecture overview + ADRs, API docs from OpenAPI, runbooks for operations, onboarding guide. Keep docs next to code and review them in PRs.</li>
+      <li><b>Definition of good communication</b>: write async updates that stand alone (context, decision needed, deadline); use ticket comments for decisions; summarise meetings with owners and dates.</li>
+      <li><b>Working in a team</b>: pair/mob programming for hard problems, knowledge sharing sessions, rotate on-call, protect focus time, ask for help after a time-box (for example 30-60 minutes of being stuck).</li>
+      <li><b>Estimating bugs and support</b>: reserve capacity (for example 15%) instead of estimating every bug; keep a clear triage process with severity and SLAs.</li>
+    </ul>
+    <div class="tblwrap"><table><tr><th>Soft skill</th><th>Why interviewers probe it</th></tr>
+      <tr><td>Ownership</td><td>Do you drive things to production and own outcomes, not just tickets?</td></tr>
+      <tr><td>Communication</td><td>Can you explain trade-offs to non-technical people and disagree constructively?</td></tr>
+      <tr><td>Prioritisation under pressure</td><td>Can you say "not now", negotiate scope, and escalate early?</td></tr>
+      <tr><td>Learning and adaptability</td><td>How do you handle unfamiliar tech and legacy systems?</td></tr>
+      <tr><td>Mentoring and collaboration</td><td>Do you make the team better?</td></tr></table></div>
+  </section>
+
+  <div class="part-title">Part 7 &mdash; Interview preparation &amp; revision</div>
+
+  <section class="topic" id="quiz" data-nav="Self-test quiz" data-group="7 · Resources" data-level="b">
+    <h2>Self-test quiz <span class="badge b">Practice</span></h2>
+    <p>Ten scenario questions. Pick an answer, read the explanation, and keep score.</p>
+    <div class="lab quiz" data-title="Delivery quiz">
+      <script type="application/json">
+      [
+        {"q":"A team's velocity over the last 5 sprints was 20, 22, 18, 24, 21. The backlog has 210 points. Roughly how many sprints are needed?","o":["About 5","About 10","About 20","Impossible to say"],"a":1,"e":"Average velocity is 21, so 210 / 21 = 10 sprints. Give a range using the min and max (about 9 to 12 sprints) rather than a single number."},
+        {"q":"Which of these is a good Sprint Goal?","o":["Complete tickets SHOP-1 to SHOP-14","Returning shoppers can pay with a saved card","Everyone works at full capacity","Refactor everything"],"a":1,"e":"A Sprint Goal states a coherent outcome that gives the sprint purpose and flexibility. A list of tickets is a forecast, not a goal."},
+        {"q":"Who owns the order of the Product Backlog in Scrum?","o":["Scrum Master","Project manager","Product Owner","The most senior developer"],"a":2,"e":"The Product Owner is a single accountable person who orders the backlog (they may take input from stakeholders and developers)."},
+        {"q":"A story is estimated at 21 points. What is the best next step?","o":["Accept it and start","Split it into smaller vertical slices or run a spike","Convert it to hours","Give it to the strongest developer"],"a":1,"e":"Very large estimates signal uncertainty and size. Split by workflow step, rule variation or happy-path/exception, or spike to reduce unknowns."},
+        {"q":"What is the difference between Definition of Done and acceptance criteria?","o":["They are the same","DoD is a shared quality checklist for all items; acceptance criteria are specific to one story","Acceptance criteria apply only to bugs","DoD is written by the customer"],"a":1,"e":"A story is done only when its own acceptance criteria are met AND it satisfies the team's Definition of Done."},
+        {"q":"Which statement about story points is correct?","o":["One point equals one day","They compare relative size, complexity and uncertainty, and are team-specific","They can be compared across teams to rank productivity","They must be revised after the sprint to match actual hours"],"a":1,"e":"Points are relative and calibrate to a team. Comparing teams or tying them to hours turns them into a distorted metric."},
+        {"q":"Three tasks have PERT expected values 4, 6 and 10 days with standard deviations 1, 2 and 3. What is the expected project duration and SD (sequential tasks)?","o":["20 days, SD 6","20 days, SD about 3.7","20 days, SD 2","6.7 days, SD 2"],"a":1,"e":"Expected values add: 20. Variances add (1 + 4 + 9 = 14), so SD = sqrt(14) = 3.74, not the sum of standard deviations."},
+        {"q":"Your roadmap shows exact dates for a feature that still needs discovery. What is the better approach?","o":["Keep the dates to look confident","Use Now / Next / Later or date ranges with confidence, and refine as uncertainty drops","Remove the feature","Add 50% buffer to the dates"],"a":1,"e":"Roadmaps should reflect uncertainty. Commit to outcomes and near-term work; show later items as themes or ranges."},
+        {"q":"In JQL, which query lists unassigned bugs that are not finished?","o":["issuetype = Bug AND assignee = null AND status = Done","issuetype = Bug AND assignee is EMPTY AND status != Done","type = Bug OR assignee is EMPTY","issuetype = Bug ORDER BY assignee"],"a":1,"e":"Use `is EMPTY` for unassigned and `status != Done` (or `statusCategory != Done`) to exclude finished issues; combine with AND."},
+        {"q":"A critical bug reaches production after a deploy. What is the first priority?","o":["Find the root cause and who is to blame","Mitigate fast (roll back, disable the flag) and communicate, then investigate","Wait for the next sprint","Hotfix without tests"],"a":1,"e":"Stop the customer impact first (roll back, feature-flag off), keep stakeholders informed, then perform root-cause analysis in a blameless post-incident review."}
+      ]
+      </script>
+    </div>
+  </section>
+
+  <section class="topic" id="interview-qa" data-nav="Interview questions & answers" data-group="7 · Resources" data-level="a">
+    <h2>Common delivery and general-engineering interview questions <span class="badge a">Prep</span></h2>
+    <p>Filter by topic, expand a question and try to answer it aloud first.</p>
+    <div class="qfilter" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
+      <button class="btn primary" data-f="all" type="button">All</button><button class="btn" data-f="agile" type="button">Agile</button><button class="btn" data-f="jira" type="button">JIRA</button><button class="btn" data-f="req" type="button">Requirements</button><button class="btn" data-f="est" type="button">Estimation</button><button class="btn" data-f="road" type="button">Roadmap</button><button class="btn" data-f="eng" type="button">Engineering</button><button class="btn" data-f="beh" type="button">Behavioural</button>
+    </div>
+
+    <details class="qa" data-tag="agile"><summary>Explain Scrum in two minutes. <span class="qtag">agile</span></summary><div class="dbody"><p>A framework where a cross-functional team delivers a potentially releasable Increment every sprint (1-4 weeks). A Product Owner orders the backlog, Developers plan and build, a Scrum Master improves the system. Events: Planning, Daily Scrum, Review, Retrospective. Transparency, inspection, adaptation drive it.</p></div></details>
+    <details class="qa" data-tag="agile"><summary>Scrum vs Kanban vs Waterfall? <span class="qtag">agile</span></summary><div class="dbody"><p>Waterfall: sequential phases, late feedback, best for stable scope. Scrum: time-boxed iterations with roles and events, adapts every sprint. Kanban: continuous flow with WIP limits and no prescribed cadence, ideal for support. Choose by uncertainty and nature of work.</p></div></details>
+    <details class="qa" data-tag="agile"><summary>What happens if a team keeps missing sprint commitments? <span class="qtag">agile</span></summary><div class="dbody"><p>Inspect in the retrospective: stories too big, unplanned work, dependencies, unclear acceptance criteria, over-commitment vs real velocity. Plan to average velocity and capacity, slice smaller, protect focus, handle interrupts with a reserved buffer, and track carry-over as a signal not as blame.</p></div></details>
+    <details class="qa" data-tag="agile"><summary>What is a good retrospective? <span class="qtag">agile</span></summary><div class="dbody"><p>Psychologically safe, data-informed (cycle time, escaped bugs), ends with 1-2 owned, time-bound experiments that are reviewed next retro. Vary formats (Start/Stop/Continue, 4Ls, sailboat) to avoid staleness.</p></div></details>
+    <details class="qa" data-tag="agile"><summary>How do you handle changing requirements mid-sprint? <span class="qtag">agile</span></summary><div class="dbody"><p>Protect the Sprint Goal. Urgent changes go through the Product Owner: if the goal is still valid, swap equal-sized items; if the goal is obsolete, the PO may cancel the sprint. Otherwise queue it for the next planning. Make the trade-off visible.</p></div></details>
+
+    <details class="qa" data-tag="jira"><summary>Epic vs Story vs Task vs Sub-task vs Bug? <span class="qtag">jira</span></summary><div class="dbody"><p>Epic: large body of work across sprints. Story: user-valued slice that fits a sprint (points). Task: non-user-facing work. Sub-task: breakdown of a parent for a single assignee. Bug: defect in existing behaviour with reproduction steps.</p></div></details>
+    <details class="qa" data-tag="jira"><summary>How do you customise a JIRA workflow and why would you? <span class="qtag">jira</span></summary><div class="dbody"><p>In project settings (or admin for company-managed) add statuses and transitions to mirror your real process (e.g. In Review, QA), then add conditions (who can move), validators (required fields) and post-functions (set resolution). Keep it as simple as the team needs; every status is a handoff.</p></div></details>
+    <details class="qa" data-tag="jira"><summary>How do you find all high-priority unresolved bugs assigned to me in the current sprint? <span class="qtag">jira</span></summary><div class="dbody"><p><code>issuetype = Bug AND priority in (High, Highest) AND resolution = Unresolved AND assignee = currentUser() AND sprint in openSprints()</code>. Save it as a filter and add it to a dashboard.</p></div></details>
+    <details class="qa" data-tag="jira"><summary>What do burndown and velocity charts tell you and what can mislead? <span class="qtag">jira</span></summary><div class="dbody"><p>Burndown shows progress vs the sprint goal; velocity shows capacity trend for forecasting. They mislead when stories are huge (cliff at the end), when scope changes, when points are inflated, or when used to compare teams.</p></div></details>
+
+    <details class="qa" data-tag="req"><summary>Functional vs non-functional requirements? Give examples. <span class="qtag">req</span></summary><div class="dbody"><p>Functional: what the system does (send an invoice email). Non-functional: qualities and constraints (p95 latency under 300 ms, 99.9% availability, WCAG AA, GDPR). NFRs often drive architecture and must be measurable and testable.</p></div></details>
+    <details class="qa" data-tag="req"><summary>What makes a good user story? <span class="qtag">req</span></summary><div class="dbody"><p>INVEST: independent, negotiable, valuable, estimable, small, testable. Written from the user's perspective with a clear "so that", acceptance criteria (Given/When/Then), and linked designs/rules. A vertical slice you can demo.</p></div></details>
+    <details class="qa" data-tag="req"><summary>Requirements are vague or conflicting. What do you do? <span class="qtag">req</span></summary><div class="dbody"><p>Ask why and who, get concrete examples, prototype or draw the flow, identify the decision-maker (PO), document assumptions, resolve conflicts with data or by escalating, and time-box a spike if technical uncertainty is the blocker. Record decisions in the ticket.</p></div></details>
+    <details class="qa" data-tag="req"><summary>How do you handle scope creep? <span class="qtag">req</span></summary><div class="dbody"><p>Make every change a visible backlog item with impact on cost/time/risk, route through the PO or change board, trade scope for scope or extend the date, and keep a "later" list so ideas are not lost. Agree a definition of the MVP early.</p></div></details>
+    <details class="qa" data-tag="req"><summary>What is the difference between BRD, PRD and SRS? <span class="qtag">req</span></summary><div class="dbody"><p>BRD: business goals and needs (why). PRD: product features, personas and metrics (what for users). SRS: detailed software specification of functions and NFRs (what exactly the system does). Agile teams often replace much of this with epics, stories, acceptance criteria and living docs.</p></div></details>
+
+    <details class="qa" data-tag="est"><summary>How do you estimate a feature you have never built? <span class="qtag">est</span></summary><div class="dbody"><p>Break it down, compare with similar past work, run a time-boxed spike for the riskiest unknown, estimate with O/M/P ranges, list assumptions and risks, add contingency, and present a range with confidence. Re-estimate as you learn.</p></div></details>
+    <details class="qa" data-tag="est"><summary>Why use story points instead of hours? <span class="qtag">est</span></summary><div class="dbody"><p>Humans are better at relative than absolute estimates; points include uncertainty and complexity, are independent of who does the work, and avoid false precision. Velocity then converts them to time using real history.</p></div></details>
+    <details class="qa" data-tag="est"><summary>The business asks for a fixed date, and your estimate is longer. What do you say? <span class="qtag">est</span></summary><div class="dbody"><p>Separate estimate, target and commitment. Show the range and assumptions, then give options: reduce scope (MoSCoW), add capacity (with onboarding costs and Brooks' law), move the date, or accept more risk. Document the choice and track risk weekly.</p></div></details>
+    <details class="qa" data-tag="est"><summary>How do you calculate team capacity for a sprint? <span class="qtag">est</span></summary><div class="dbody"><p>Person-days minus leave and holidays, ceremonies, support/on-call and a focus factor (about 60-75%); then plan at or below the average velocity of recent sprints, not theoretical capacity.</p></div></details>
+    <details class="qa" data-tag="est"><summary>What is the Cone of Uncertainty? <span class="qtag">est</span></summary><div class="dbody"><p>Estimates at project start can be off by 4x either way; the variance narrows as requirements, design and implementation reduce unknowns. It argues for ranges early and re-estimation at milestones.</p></div></details>
+
+    <details class="qa" data-tag="road"><summary>How do you build and maintain a roadmap? <span class="qtag">road</span></summary><div class="dbody"><p>Start from vision and goals (OKRs), gather input from customers, data, stakeholders and engineering, prioritise with a framework (RICE/WSJF + strategic judgement), express as outcomes in Now/Next/Later, validate feasibility and dependencies with the team, review every quarter, and communicate changes with reasons.</p></div></details>
+    <details class="qa" data-tag="road"><summary>RICE vs WSJF vs MoSCoW &ndash; when to use which? <span class="qtag">road</span></summary><div class="dbody"><p>RICE ranks product features with reach data. WSJF handles mixed work with cost-of-delay (compliance, tech, features). MoSCoW defines scope for a fixed release/MVP. They can be combined: WSJF/RICE to rank, MoSCoW to cut the release.</p></div></details>
+    <details class="qa" data-tag="road"><summary>What is an MVP and how do you decide its scope? <span class="qtag">road</span></summary><div class="dbody"><p>The smallest end-to-end product that tests the riskiest assumption with real users. Use story mapping to select one thin slice per journey step, apply MoSCoW, define success metrics beforehand, and plan how to learn from it.</p></div></details>
+    <details class="qa" data-tag="road"><summary>How do you manage dependencies on other teams? <span class="qtag">road</span></summary><div class="dbody"><p>Identify early (planning, dependency board), agree API contracts and dates, mock the dependency, slice work to be independent, track via JIRA links, raise risks at the first sign of slip, and escalate with options rather than complaints.</p></div></details>
+
+    <details class="qa" data-tag="eng"><summary>Trunk-based development vs Git Flow? <span class="qtag">eng</span></summary><div class="dbody"><p>Trunk-based: tiny short-lived branches, daily merges, feature flags, fast CI: best for continuous delivery. Git Flow: long-lived develop/release branches suited to versioned, scheduled releases but with heavier merging.</p></div></details>
+    <details class="qa" data-tag="eng"><summary>Continuous Integration vs Delivery vs Deployment? <span class="qtag">eng</span></summary><div class="dbody"><p>CI: merge often with automated build and tests. Delivery: every build is releasable, release is a manual decision. Deployment: every passing change goes to production automatically.</p></div></details>
+    <details class="qa" data-tag="eng"><summary>What makes a good unit test and what is the test pyramid? <span class="qtag">eng</span></summary><div class="dbody"><p>Fast, isolated, deterministic, one behaviour, meaningful name, Arrange-Act-Assert. The pyramid prefers many unit tests, fewer integration tests, and a few end-to-end tests for balance of speed and confidence.</p></div></details>
+    <details class="qa" data-tag="eng"><summary>Monolith or microservices for a new product? <span class="qtag">eng</span></summary><div class="dbody"><p>Start with a modular monolith unless there are clear independent scaling/team needs: it is simpler to build, deploy and debug. Extract services later along proven boundaries. Microservices add network, data consistency, observability and operational cost.</p></div></details>
+    <details class="qa" data-tag="eng"><summary>How do you reduce technical debt without stopping feature delivery? <span class="qtag">eng</span></summary><div class="dbody"><p>Make it visible and quantified (time lost, incidents), reserve 10-20% of capacity, refactor opportunistically near changes under tests, prioritise debt that blocks upcoming roadmap items, and avoid big-bang rewrites.</p></div></details>
+    <details class="qa" data-tag="eng"><summary>What is the difference between SLI, SLO and SLA? <span class="qtag">eng</span></summary><div class="dbody"><p>SLI: a measurement (success rate). SLO: internal target for it (99.9%). SLA: contractual promise with penalties. The error budget (100% - SLO) balances reliability and feature speed.</p></div></details>
+
+    <details class="qa" data-tag="beh"><summary>Tell me about a time you disagreed with a teammate or stakeholder. <span class="qtag">beh</span></summary><div class="dbody"><p>Use <b>STAR</b>: <i>Situation</i> (context, 1-2 sentences), <i>Task</i> (your responsibility), <i>Action</i> (what <u>you</u> did: listened, gathered data, proposed options, agreed on a decision), <i>Result</i> (measurable outcome and what you learned). Show respect and focus on the problem, not the person.</p></div></details>
+    <details class="qa" data-tag="beh"><summary>Describe a project that went wrong. What did you learn? <span class="qtag">beh</span></summary><div class="dbody"><p>Pick a real example with genuine ownership: what signals you missed, what you changed (earlier demos, smaller slices, better risk tracking, monitoring), and the improved result next time. Avoid blaming others.</p></div></details>
+    <details class="qa" data-tag="beh"><summary>How do you prioritise when everything is urgent? <span class="qtag">beh</span></summary><div class="dbody"><p>Clarify impact and deadlines, ask the PO/stakeholders to rank, use cost-of-delay thinking, separate fires from important work, communicate trade-offs and what will slip, and protect a buffer.</p></div></details>
+    <details class="qa" data-tag="beh"><summary>How do you handle a tight deadline you believe is unrealistic? <span class="qtag">beh</span></summary><div class="dbody"><p>Raise it early with data: the estimate range, risks and options (scope cut, more time, more people). Propose an MVP slice that meets the date. Agree and document the decision; do not hide the risk or burn out the team.</p></div></details>
+    <details class="qa" data-tag="beh"><summary>Why should we hire you / where do you want to grow? <span class="qtag">beh</span></summary><div class="dbody"><p>Connect your strongest, proven skills (with one metric-backed example) to the role's needs, show curiosity (a topic you are learning, such as the migration from AngularJS to Angular or cloud-native practices), and align growth goals with what the team offers.</p></div></details>
+  </section>
+
+  <section class="topic" id="next-steps" data-nav="What else to learn (suggestions)" data-group="7 · Resources" data-level="b">
+    <h2>What else would make you stronger? <span class="badge b">Roadmap</span></h2>
+    <p>You now have language, framework, API, front-end and delivery guides. These are the next most valuable additions, in rough order of interview and job impact:</p>
+    <div class="tblwrap"><table><tr><th>Priority</th><th>Topic</th><th>Why it adds value</th></tr>
+      <tr><td>1</td><td><b>SQL and database design</b> (joins, indexes, query plans, transactions, isolation levels, normalisation, migrations)</td><td>Asked in nearly every backend interview; performance problems usually live here</td></tr>
+      <tr><td>2</td><td><b>Data structures and algorithms</b> (Big-O, arrays, hash maps, trees, graphs, sorting, recursion) plus coding-test practice</td><td>Screening rounds at many companies</td></tr>
+      <tr><td>3</td><td><b>System design</b> (load balancing, caching, queues, sharding, rate limiting, designing URL shortener / chat / feed)</td><td>Senior-level interview round and day-to-day architecture work</td></tr>
+      <tr><td>4</td><td><b>Cloud fundamentals</b> (Azure or AWS: compute, storage, networking, IAM, managed databases, cost)</td><td>Most roles deploy to the cloud</td></tr>
+      <tr><td>5</td><td><b>Docker and Kubernetes basics</b></td><td>Standard packaging and runtime for services</td></tr>
+      <tr><td>6</td><td><b>Modern Angular (17+) and TypeScript</b>, or React</td><td>AngularJS is end of life; current front-end skills matter for new work</td></tr>
+      <tr><td>7</td><td><b>Messaging and microservices patterns</b> (Service Bus, Kafka, outbox, saga, idempotency)</td><td>Integration and resilience scenarios</td></tr>
+      <tr><td>8</td><td><b>Networking and web fundamentals</b> (DNS, TCP, TLS, HTTP/2, CORS, caching headers, WebSockets)</td><td>Debugging production problems</td></tr>
+      <tr><td>9</td><td><b>Testing in depth</b> (xUnit, Moq/NSubstitute, WebApplicationFactory, Testcontainers, Playwright, contract tests)</td><td>Quality culture and CI confidence</td></tr>
+      <tr><td>10</td><td><b>Leadership skills</b>: mentoring, technical writing, running meetings, giving feedback, stakeholder management</td><td>Growth to lead / architect roles</td></tr></table></div>
+    <div class="tip"><b>Study plan</b>Weeks 1-2: re-read the C#, ASP.NET Core and Web API guides and take their quizzes. Weeks 3-4: SQL + algorithms daily (30-45 minutes). Weeks 5-6: system design and cloud. In parallel, prepare six STAR stories (conflict, failure, leadership, tight deadline, technical decision, learning) and rehearse them aloud.</div>
+    <p><small>Companion guides: <a href="CSharp-Concepts-Guide.html">C# Concepts</a> &middot; <a href="ASP.NET-Core-Concepts-Guide.html">ASP.NET Core Concepts</a> &middot; <a href="ASP.NET-Core-Web-API-Guide.html">Web API</a> &middot; <a href="AngularJS-Concepts-Guide.html">AngularJS</a></small></p>
+  </section>
+
+</main>
+</div>
+
+<script src="assets/guide.js"></script>
+<script src="assets/concepts.js"></script>
+<script src="assets/general.js"></script>
+</body>
+</html>

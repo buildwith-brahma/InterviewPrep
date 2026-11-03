@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Networking &amp; HTTP Internals - TCP/IP, DNS, TLS, HTTP, CORS, Caching</title>
+<link rel="stylesheet" href="assets/guide.css">
+<style>
+:root{--accent:#6d4aa8;--accent-soft:#ece5f7}
+body.dark{--accent:#b9a0ee;--accent-soft:#2a2040}
+.hero{background:linear-gradient(135deg,#2a1a4d,#6d4aa8 55%,#2b86e0)}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="brand"><h1>Networking &amp; HTTP Internals</h1><small>Layers &rarr; IP &rarr; DNS &rarr; TCP &rarr; TLS &rarr; HTTP &rarr; CORS &rarr; Caching &rarr; Debugging</small></div>
+  <div class="search"><input id="search" type="search" placeholder="Search concepts ( press / )" autocomplete="off"><div id="search-results"></div></div>
+  <nav id="nav"></nav>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    <button id="menu-btn" type="button">Menu</button>
+    <div class="prog"><i id="progress"></i></div>
+    <button id="expand-all" type="button">Expand all</button>
+    <button id="collapse-all" type="button">Collapse all</button>
+    <button id="theme-btn" type="button">Dark / Light</button>
+  </div>
+
+  <main id="content">
+
+  <div class="hero" id="top">
+    <h1>Networking &amp; HTTP Internals &ndash; What Happens Between the Browser and Your API</h1>
+    <p>The fundamentals underneath every web app and cloud service: the <b>network layers</b>, <b>IP addressing and subnets</b>, <b>DNS</b>, <b>TCP</b> and <b>TLS</b> handshakes, the <b>HTTP</b> protocol (methods, status codes, headers, HTTP/1.1 vs 2 vs 3), <b>cookies and caching</b>, <b>CORS</b>, <b>WebSockets</b>, load balancers and proxies, and a practical <b>debugging toolkit</b>. Three labs: a CIDR calculator, an HTTP-cache simulator and a CORS simulator.</p>
+    <div class="chips"><span>OSI &middot; TCP/IP</span><span>IP &middot; CIDR &middot; NAT</span><span>DNS</span><span>TCP &middot; TLS</span><span>HTTP/1.1 &middot; 2 &middot; 3</span><span>Cookies &middot; Caching &middot; CORS</span><span>WebSockets &middot; Proxies &middot; CDN</span><span>curl &middot; DevTools &middot; Wireshark</span></div>
+  </div>
+
+  <section class="topic" id="how-to-use" data-nav="How to use this guide" data-group="Start here">
+    <h2>How to use this guide</h2>
+    <div class="grid3">
+      <div class="card"><h4>1. Follow one request</h4><p>The big story: typing a URL triggers DNS &rarr; TCP &rarr; TLS &rarr; HTTP. Part 2 follows exactly one request through every layer; the rest zooms into each step.</p></div>
+      <div class="card"><h4>2. Play with the labs</h4><p>Subnet maths, caching headers and CORS rules are easier to learn by changing inputs than by reading. The labs run offline.</p></div>
+      <div class="card"><h4>3. Use the tools</h4><p>Part 6 lists commands (<code>curl -v</code>, <code>dig</code>, <code>openssl s_client</code>, browser DevTools) to inspect each layer yourself. Press <span class="kbd">/</span> to search.</p></div>
+    </div>
+  </section>
+
+  <div class="part-title">Part 1 &mdash; The network stack</div>
+
+  <section class="topic" id="layers" data-nav="Layers: OSI and TCP/IP" data-group="1 · Stack" data-level="b">
+    <h2>Network layers: OSI and TCP/IP models <span class="badge b">Basic</span></h2>
+    <p>Networking is split into <b>layers</b>; each layer uses the one below and hides its complexity. Data is <b>encapsulated</b> as it goes down (each layer adds a header) and unwrapped on the way up.</p>
+    <div class="tblwrap"><table><tr><th>OSI layer</th><th>TCP/IP layer</th><th>Unit</th><th>Examples</th><th>Job</th></tr>
+      <tr><td>7 Application</td><td rowspan="3">Application</td><td>Data / message</td><td>HTTP, DNS, SMTP, SSH, gRPC</td><td>What apps say to each other</td></tr>
+      <tr><td>6 Presentation</td><td>-</td><td>TLS, JSON, compression, encoding</td><td>Format, encrypt</td></tr>
+      <tr><td>5 Session</td><td>-</td><td>TLS sessions, sockets</td><td>Conversations</td></tr>
+      <tr><td>4 Transport</td><td>Transport</td><td>Segment / datagram</td><td><b>TCP</b>, <b>UDP</b>, QUIC; port numbers</td><td>Process-to-process delivery, reliability</td></tr>
+      <tr><td>3 Network</td><td>Internet</td><td>Packet</td><td><b>IP</b>, ICMP, routers</td><td>Addressing and routing across networks</td></tr>
+      <tr><td>2 Data link</td><td rowspan="2">Link</td><td>Frame</td><td>Ethernet, Wi-Fi, MAC addresses, switches, ARP</td><td>Delivery on one local network</td></tr>
+      <tr><td>1 Physical</td><td>Bits</td><td>Cable, fibre, radio</td><td>Signals</td></tr></table></div>
+    <div class="diagram"><div class="dtitle">Encapsulation of one HTTP request</div>
+      <div class="flow">
+        <div class="node">HTTP message<small>GET /orders ...</small></div><span class="arrow">&rarr;</span>
+        <div class="node alt">+ TCP header<small>ports 52311 &rarr; 443, seq, ack</small></div><span class="arrow">&rarr;</span>
+        <div class="node ok">+ IP header<small>source / destination IP, TTL</small></div><span class="arrow">&rarr;</span>
+        <div class="node warn">+ Ethernet frame<small>MAC addresses, CRC</small></div><span class="arrow">&rarr;</span>
+        <div class="node bad">Bits on the wire</div>
+      </div>
+    </div>
+    <div class="tip"><b>Which layer is it?</b>Switch = L2, router = L3, firewall/security group = L3-L4 (IP + port), load balancer = L4 (TCP) or L7 (HTTP aware), WAF/API gateway/reverse proxy = L7, TLS termination = between L4 and L7.</div>
+  </section>
+
+  <section class="topic" id="ip" data-nav="IP addressing, CIDR, NAT" data-group="1 · Stack" data-level="b">
+    <h2>IP addresses, subnets and CIDR <span class="badge b">Basic</span></h2>
+    <p>An <b>IPv4</b> address is 32 bits written as four decimal bytes (<code>192.168.10.37</code>). A <b>CIDR</b> prefix (<code>/24</code>) says how many leading bits are the <i>network</i> part; the rest identify the <i>host</i>. Hosts in the same subnet talk directly; to reach other subnets they send packets to the <b>default gateway</b> (a router).</p>
+    <div class="tblwrap"><table><tr><th>Prefix</th><th>Mask</th><th>Addresses</th><th>Usable hosts</th><th>Typical use</th></tr>
+      <tr><td>/8</td><td>255.0.0.0</td><td>16,777,216</td><td>16,777,214</td><td>Huge private block (10.0.0.0/8)</td></tr>
+      <tr><td>/16</td><td>255.255.0.0</td><td>65,536</td><td>65,534</td><td>A cloud VNet/VPC</td></tr>
+      <tr><td>/24</td><td>255.255.255.0</td><td>256</td><td>254</td><td>A subnet</td></tr>
+      <tr><td>/28</td><td>255.255.255.240</td><td>16</td><td>14</td><td>Tiny subnet (cloud reserves 5, so 11 usable)</td></tr>
+      <tr><td>/32</td><td>255.255.255.255</td><td>1</td><td>1</td><td>A single host route</td></tr></table></div>
+    <div class="lab" id="cidr-lab"></div>
+    <h3>Special ranges</h3>
+    <div class="tblwrap"><table><tr><th>Range</th><th>Meaning</th></tr>
+      <tr><td><code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code></td><td>Private (RFC 1918): not routable on the internet; used inside LANs and VNets</td></tr>
+      <tr><td><code>127.0.0.0/8</code> (<code>localhost</code>)</td><td>Loopback to the same machine</td></tr>
+      <tr><td><code>169.254.0.0/16</code></td><td>Link-local / auto-assigned (also the cloud metadata service <code>169.254.169.254</code>)</td></tr>
+      <tr><td><code>100.64.0.0/10</code></td><td>Carrier-grade NAT</td></tr>
+      <tr><td><code>0.0.0.0</code></td><td>"Any address" when binding a server; default route <code>0.0.0.0/0</code></td></tr></table></div>
+    <ul>
+      <li><b>NAT</b> (network address translation): a router rewrites private source addresses to its public address so many hosts share one public IP. Inbound traffic needs port forwarding or a load balancer.</li>
+      <li><b>DHCP</b> hands out IP, mask, gateway and DNS to devices automatically.</li>
+      <li><b>ARP</b> maps an IP on the local network to a MAC address.</li>
+      <li><b>IPv6</b> uses 128-bit addresses (<code>2001:db8::1</code>), removes the need for NAT and is gradually replacing IPv4. Dual-stack runs both.</li>
+      <li><b>Ports:</b> 16-bit numbers identify the service (80 HTTP, 443 HTTPS, 22 SSH, 53 DNS, 25/587 SMTP, 1433 SQL Server, 5432 PostgreSQL, 3306 MySQL, 6379 Redis, 3389 RDP). A <b>socket</b> is IP + port + protocol.</li>
+    </ul>
+  </section>
+
+  <section class="topic" id="tcp-udp" data-nav="TCP vs UDP and the TCP handshake" data-group="1 · Stack" data-level="b">
+    <h2>TCP and UDP <span class="badge b">Basic</span></h2>
+    <div class="tblwrap"><table><tr><th></th><th>TCP</th><th>UDP</th></tr>
+      <tr><td>Connection</td><td>Connection-oriented (handshake)</td><td>Connectionless</td></tr>
+      <tr><td>Reliability</td><td>Acknowledgements, retransmission, ordering, no duplicates</td><td>None: packets may be lost, duplicated or reordered</td></tr>
+      <tr><td>Flow / congestion control</td><td>Yes (window, slow start)</td><td>No</td></tr>
+      <tr><td>Overhead / latency</td><td>Higher (setup + head-of-line blocking)</td><td>Low</td></tr>
+      <tr><td>Used by</td><td>HTTP/1.1, HTTP/2, SMTP, SSH, databases</td><td>DNS queries, video/voice, games, QUIC (HTTP/3), DHCP</td></tr></table></div>
+    <div class="seq" data-title="TCP three-way handshake and teardown">
+<script type="text/seq">
+participants: Client | Server
+Client -> Server : SYN (seq=x) "I want to talk"
+Server --> Client : SYN-ACK (seq=y, ack=x+1)
+Client -> Server : ACK (ack=y+1) - connection established
+Client -> Server : data (HTTP request)
+Server --> Client : ACK + data (HTTP response)
+Client -> Server : FIN "I am done"
+Server --> Client : ACK, then FIN
+Client -> Server : ACK - closed (TIME_WAIT briefly)
+</script>
+    </div>
+    <ul>
+      <li>The handshake costs <b>one round trip (RTT)</b> before any data. Reusing connections (keep-alive, pooling, HTTP/2) avoids repeating it.</li>
+      <li><b>Slow start:</b> new connections begin with a small congestion window; large transfers speed up gradually, another reason to reuse connections.</li>
+      <li><b>Port exhaustion / TIME_WAIT:</b> creating a new connection for every call (e.g. <code>new HttpClient()</code> per request in .NET) exhausts ephemeral ports. Use <code>IHttpClientFactory</code> or a shared <code>HttpClient</code>.</li>
+    </ul>
+  </section>
+
+  <div class="part-title">Part 2 &mdash; From URL to response</div>
+
+  <section class="topic" id="journey" data-nav="What happens when you type a URL" data-group="2 · One request" data-level="b">
+    <h2>What happens when you open https://shop.com/products <span class="badge b">Classic question</span></h2>
+    <div class="seq" data-title="One page load, step by step">
+<script type="text/seq">
+participants: Browser | DNS resolver | Server (443) | App / Database
+Browser -> Browser : 1. parse URL, check HSTS, cache and service worker
+Browser -> DNS resolver : 2. DNS: shop.com A / AAAA?
+DNS resolver --> Browser : 93.184.216.34 (TTL 300)
+Browser -> Server (443) : 3. TCP handshake (SYN, SYN-ACK, ACK)
+Browser -> Server (443) : 4. TLS handshake: ClientHello (SNI, ALPN)
+Server (443) --> Browser : certificate chain, key exchange - encrypted from here
+Browser -> Server (443) : 5. HTTP request: GET /products + headers + cookies
+Server (443) -> App / Database : 6. route, authenticate, query
+App / Database --> Server (443) : result
+Server (443) --> Browser : 7. HTTP 200 + headers + HTML
+Browser -> Browser : 8. parse HTML, fetch CSS/JS/images (reuse connection), render
+</script>
+    </div>
+    <div class="tblwrap"><table><tr><th>Step</th><th>Typical cost</th><th>How to cut it</th></tr>
+      <tr><td>DNS lookup</td><td>0 - 100+ ms (cached = 0)</td><td>Long-enough TTLs, fewer distinct domains, <code>dns-prefetch</code></td></tr>
+      <tr><td>TCP handshake</td><td>1 RTT</td><td>Keep-alive, HTTP/2 multiplexing, HTTP/3 (QUIC)</td></tr>
+      <tr><td>TLS handshake</td><td>1 RTT (TLS 1.3), 0-RTT resumption</td><td>TLS 1.3, session resumption, OCSP stapling</td></tr>
+      <tr><td>Request/response (TTFB)</td><td>server time + 1 RTT</td><td>Caching, CDN near users, faster back end</td></tr>
+      <tr><td>Downloading assets</td><td>bandwidth and number of round trips</td><td>Compression (br/gzip), minify, image formats, <code>preload</code>, caching</td></tr></table></div>
+    <div class="note"><b>Latency vs bandwidth</b>Latency (RTT) is bounded by distance and the speed of light; adding bandwidth does not help many small requests. Reduce round trips, move content closer (CDN) and reuse connections.</div>
+  </section>
+
+  <section class="topic" id="dns" data-nav="DNS" data-group="2 · One request" data-level="b">
+    <h2>DNS: the internet's phone book <span class="badge b">Basic</span></h2>
+    <p><b>DNS</b> translates names (<code>api.shop.com</code>) into IP addresses. It is a distributed, hierarchical, cached database; usually UDP port 53 (TCP for large answers; DoH/DoT encrypt it).</p>
+    <div class="seq" data-title="Recursive resolution (cold cache)">
+<script type="text/seq">
+participants: Client | Recursive resolver | Root | .com TLD | shop.com NS
+Client -> Recursive resolver : api.shop.com ?
+Recursive resolver -> Root : api.shop.com ?
+Root --> Recursive resolver : ask the .com servers
+Recursive resolver -> .com TLD : api.shop.com ?
+.com TLD --> Recursive resolver : ask shop.com's name servers
+Recursive resolver -> shop.com NS : api.shop.com ?
+shop.com NS --> Recursive resolver : A 203.0.113.10 (TTL 300)
+Recursive resolver --> Client : 203.0.113.10 (cached for TTL)
+</script>
+    </div>
+    <div class="tblwrap"><table><tr><th>Record</th><th>Purpose</th><th>Example</th></tr>
+      <tr><td><b>A / AAAA</b></td><td>Name &rarr; IPv4 / IPv6</td><td><code>api.shop.com A 203.0.113.10</code></td></tr>
+      <tr><td><b>CNAME</b></td><td>Alias to another name (not allowed at the zone apex)</td><td><code>www.shop.com CNAME shop.azurewebsites.net</code></td></tr>
+      <tr><td><b>MX</b></td><td>Mail servers</td><td><code>shop.com MX 10 mail.shop.com</code></td></tr>
+      <tr><td><b>TXT</b></td><td>Free text: SPF, DKIM, domain verification</td><td><code>"v=spf1 include:_spf.google.com ~all"</code></td></tr>
+      <tr><td><b>NS / SOA</b></td><td>Authoritative servers / zone metadata</td><td></td></tr>
+      <tr><td><b>SRV, CAA, PTR</b></td><td>Service location, allowed certificate authorities, reverse lookup</td><td></td></tr></table></div>
+    <ul>
+      <li><b>TTL</b> controls how long answers are cached. Lower it <i>before</i> a planned migration; changes take up to the old TTL to propagate.</li>
+      <li><b>Caching layers:</b> browser, OS, router, ISP/recursive resolver. "DNS propagation" is just caches expiring.</li>
+      <li><b>DNS-based routing:</b> round robin, weighted, latency-based, geo and failover records (Route 53, Azure Traffic Manager).</li>
+    </ul>
+    <pre data-lang="bash" data-file="terminal">dig api.shop.com A +short            # quick answer
+dig api.shop.com +trace              # walk root -&gt; TLD -&gt; authoritative
+dig @8.8.8.8 shop.com MX             # ask a specific resolver
+nslookup api.shop.com                # works on Windows too
+ipconfig /flushdns                   # Windows: clear local DNS cache</pre>
+  </section>
+
+  <section class="topic" id="tls" data-nav="TLS and HTTPS" data-group="2 · One request" data-level="i">
+    <h2>TLS and HTTPS <span class="badge i">Intermediate</span></h2>
+    <p><b>TLS</b> (Transport Layer Security) gives HTTPS three guarantees: <b>confidentiality</b> (encryption), <b>integrity</b> (tamper detection) and <b>authentication</b> (the server is who the certificate says). It uses <b>asymmetric</b> cryptography to agree on a key and the faster <b>symmetric</b> encryption for the data.</p>
+    <div class="seq" data-title="TLS 1.3 handshake (simplified)">
+<script type="text/seq">
+participants: Browser | Server
+Browser -> Server : ClientHello (versions, ciphers, key share, SNI, ALPN h2)
+Server --> Browser : ServerHello (chosen cipher, key share)
+Server --> Browser : certificate + signature (encrypted)
+Browser -> Browser : validate chain, hostname, expiry, revocation
+Browser -> Server : Finished (both now have the session key)
+Browser -> Server : HTTP request, encrypted with the symmetric key
+</script>
+    </div>
+    <div class="tblwrap"><table><tr><th>Concept</th><th>Explanation</th></tr>
+      <tr><td><b>Certificate</b> (X.509)</td><td>Binds a public key to a domain, signed by a Certificate Authority (CA). Contains subject/SAN, validity dates, issuer.</td></tr>
+      <tr><td><b>Chain of trust</b></td><td>Server cert &rarr; intermediate CA &rarr; root CA that is preinstalled in the OS/browser trust store. Servers must send the intermediates.</td></tr>
+      <tr><td><b>SNI</b></td><td>The client names the host in the handshake so one IP can serve many certificates.</td></tr>
+      <tr><td><b>Forward secrecy</b></td><td>Ephemeral (ECDHE) keys mean a stolen private key cannot decrypt past traffic.</td></tr>
+      <tr><td><b>HSTS</b></td><td><code>Strict-Transport-Security</code> header makes browsers use HTTPS only for that domain.</td></tr>
+      <tr><td><b>mTLS</b></td><td>The client also presents a certificate (service-to-service and zero-trust).</td></tr>
+      <tr><td><b>TLS termination</b></td><td>The load balancer/CDN decrypts at the edge; traffic behind it may be re-encrypted (end-to-end) or plain inside a trusted network.</td></tr>
+      <tr><td><b>Let's Encrypt / ACME</b></td><td>Free automated certificates (90-day) renewed automatically.</td></tr></table></div>
+    <pre data-lang="bash" data-file="terminal">openssl s_client -connect shop.com:443 -servername shop.com -showcerts   # inspect the handshake and chain
+curl -vI https://shop.com 2&gt;&amp;1 | grep -E "SSL|subject|expire|issuer"
+dotnet dev-certs https --trust                                           # local ASP.NET Core dev certificate</pre>
+    <div class="warn"><b>Common TLS errors</b>"Certificate expired" (renewal failed), "hostname mismatch" (name not in SAN), "unable to get local issuer certificate" (missing intermediate or untrusted private CA), clock skew, TLS version/cipher mismatch with old clients. Never "fix" it with <code>ServerCertificateCustomValidationCallback = (...) =&gt; true</code> in production.</div>
+  </section>
+
+  <div class="part-title">Part 3 &mdash; HTTP</div>
+
+  <section class="topic" id="http-basics" data-nav="HTTP messages, methods, status codes" data-group="3 · HTTP" data-level="b">
+    <h2>HTTP: requests, responses, methods and status codes <span class="badge b">Basic</span></h2>
+    <p><b>HTTP</b> is a stateless, text-based (in 1.x) request/response protocol. Each request is independent; state is carried by cookies, tokens or URLs.</p>
+    <pre data-lang="http" data-file="request and response">POST /api/orders HTTP/1.1
+Host: api.shop.com
+Authorization: Bearer eyJhbGciOi...
+Content-Type: application/json
+Accept: application/json
+Content-Length: 41
+
+{"customerId":7,"items":[{"sku":"MUG","qty":2}]}
+
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Location: /api/orders/1001
+Cache-Control: no-store
+X-Request-Id: 8f3a...
+
+{"id":1001,"status":"Pending"}</pre>
+    <h3>Methods</h3>
+    <div class="tblwrap"><table><tr><th>Method</th><th>Purpose</th><th>Safe</th><th>Idempotent</th><th>Body</th></tr>
+      <tr><td><b>GET</b></td><td>Read a resource</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+      <tr><td><b>HEAD</b></td><td>Like GET, headers only</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+      <tr><td><b>POST</b></td><td>Create / process</td><td>No</td><td>No</td><td>Yes</td></tr>
+      <tr><td><b>PUT</b></td><td>Replace a resource</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+      <tr><td><b>PATCH</b></td><td>Partial update</td><td>No</td><td>Not guaranteed</td><td>Yes</td></tr>
+      <tr><td><b>DELETE</b></td><td>Remove</td><td>No</td><td>Yes</td><td>Rare</td></tr>
+      <tr><td><b>OPTIONS</b></td><td>Capabilities, CORS preflight</td><td>Yes</td><td>Yes</td><td>No</td></tr></table></div>
+    <div class="why"><b>Safe vs idempotent</b><i>Safe</i> = no side effects (clients and crawlers may call it freely). <i>Idempotent</i> = calling it N times has the same effect as once, so it can be retried after a timeout. POST is not idempotent: use an <code>Idempotency-Key</code> header to make payment-style POSTs retry-safe.</div>
+    <h3>Status codes</h3>
+    <div class="tblwrap"><table><tr><th>Class</th><th>Codes to know</th></tr>
+      <tr><td><b>1xx</b> informational</td><td>101 Switching Protocols (WebSocket), 100 Continue</td></tr>
+      <tr><td><b>2xx</b> success</td><td>200 OK, 201 Created (+Location), 202 Accepted (async), 204 No Content, 206 Partial Content</td></tr>
+      <tr><td><b>3xx</b> redirect</td><td>301 Moved Permanently, 302 Found, 304 Not Modified (cache hit), 307/308 redirect keeping method and body</td></tr>
+      <tr><td><b>4xx</b> client error</td><td>400 Bad Request, <b>401 Unauthorized</b> (not authenticated), <b>403 Forbidden</b> (authenticated, not allowed), 404 Not Found, 405 Method Not Allowed, 409 Conflict, 415 Unsupported Media Type, 422 Unprocessable Entity, 429 Too Many Requests (+Retry-After)</td></tr>
+      <tr><td><b>5xx</b> server error</td><td>500 Internal Server Error, 502 Bad Gateway (upstream sent garbage), 503 Service Unavailable, 504 Gateway Timeout (upstream too slow)</td></tr></table></div>
+  </section>
+
+  <section class="topic" id="headers" data-nav="Important headers" data-group="3 · HTTP" data-level="b">
+    <h2>Important HTTP headers <span class="badge b">Basic</span></h2>
+    <div class="tblwrap"><table><tr><th>Group</th><th>Headers</th><th>Purpose</th></tr>
+      <tr><td>Content</td><td><code>Content-Type</code>, <code>Content-Length</code>, <code>Content-Encoding</code>, <code>Accept</code>, <code>Accept-Encoding</code></td><td>Format and compression negotiation (<code>gzip</code>, <code>br</code>)</td></tr>
+      <tr><td>Auth</td><td><code>Authorization</code>, <code>WWW-Authenticate</code>, <code>Cookie</code>, <code>Set-Cookie</code></td><td>Identify the caller</td></tr>
+      <tr><td>Caching</td><td><code>Cache-Control</code>, <code>ETag</code>, <code>If-None-Match</code>, <code>Last-Modified</code>, <code>Vary</code>, <code>Age</code></td><td>Reuse responses safely</td></tr>
+      <tr><td>Routing / proxies</td><td><code>Host</code>, <code>X-Forwarded-For</code>, <code>X-Forwarded-Proto</code>, <code>Forwarded</code>, <code>Via</code></td><td>Original client IP/scheme behind proxies</td></tr>
+      <tr><td>CORS</td><td><code>Origin</code>, <code>Access-Control-Allow-*</code></td><td>Cross-origin permission</td></tr>
+      <tr><td>Security</td><td><code>Strict-Transport-Security</code>, <code>Content-Security-Policy</code>, <code>X-Content-Type-Options: nosniff</code>, <code>X-Frame-Options</code> / <code>frame-ancestors</code>, <code>Referrer-Policy</code>, <code>Permissions-Policy</code></td><td>Browser-side protections</td></tr>
+      <tr><td>Misc</td><td><code>Location</code>, <code>Retry-After</code>, <code>Range</code>, <code>Content-Disposition</code>, <code>User-Agent</code></td><td>Redirects, throttling, partial/ download behaviour</td></tr></table></div>
+    <div class="note"><b>Behind a proxy in ASP.NET Core</b>The app sees the proxy's IP and HTTP. Configure <code>ForwardedHeadersOptions</code> (<code>UseForwardedHeaders</code>) to trust <code>X-Forwarded-For</code> and <code>X-Forwarded-Proto</code> from known proxies, otherwise redirects, absolute URLs and rate limits use the wrong values.</div>
+  </section>
+
+  <section class="topic" id="versions" data-nav="HTTP/1.1 vs HTTP/2 vs HTTP/3" data-group="3 · HTTP" data-level="i">
+    <h2>HTTP/1.1, HTTP/2 and HTTP/3 <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th></th><th>HTTP/1.1</th><th>HTTP/2</th><th>HTTP/3</th></tr>
+      <tr><td>Transport</td><td>TCP</td><td>TCP (+TLS)</td><td><b>QUIC over UDP</b> (built-in TLS 1.3)</td></tr>
+      <tr><td>Format</td><td>Text</td><td>Binary frames</td><td>Binary frames</td></tr>
+      <tr><td>Concurrency</td><td>One request per connection at a time (browsers open ~6 connections)</td><td><b>Multiplexed</b> streams on one connection</td><td>Multiplexed streams, independent loss recovery</td></tr>
+      <tr><td>Head-of-line blocking</td><td>At HTTP level</td><td>Solved at HTTP, but a lost TCP packet stalls all streams</td><td>Solved: a lost packet only stalls its own stream</td></tr>
+      <tr><td>Headers</td><td>Repeated as text</td><td>HPACK compression</td><td>QPACK compression</td></tr>
+      <tr><td>Connection setup</td><td>TCP + TLS (2-3 RTT)</td><td>TCP + TLS</td><td>1 RTT, 0-RTT resumption, survives IP changes (connection migration)</td></tr>
+      <tr><td>Notes</td><td>Keep-alive; domain sharding was a workaround</td><td>Server push is deprecated; sharding no longer helps</td><td>Browsers fall back via <code>Alt-Svc</code></td></tr></table></div>
+    <ul><li>ASP.NET Core / Kestrel supports all three; HTTP/3 needs TLS and UDP 443 open. Negotiation uses ALPN (<code>h2</code>) in the TLS handshake.</li><li><b>gRPC</b> uses HTTP/2 streaming with Protobuf; browsers need gRPC-Web.</li></ul>
+  </section>
+
+  <section class="topic" id="cookies" data-nav="Cookies and sessions" data-group="3 · HTTP" data-level="i">
+    <h2>Cookies, sessions and tokens <span class="badge i">Intermediate</span></h2>
+    <p>Because HTTP is stateless, state is carried by the client on each request: a <b>cookie</b> (sent automatically to its domain), an <code>Authorization</code> header, or a URL/body value.</p>
+    <pre data-lang="http" data-file="Set-Cookie">Set-Cookie: sid=9f8e7d; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=3600</pre>
+    <div class="tblwrap"><table><tr><th>Attribute</th><th>Effect</th></tr>
+      <tr><td><code>Secure</code></td><td>Only sent over HTTPS</td></tr>
+      <tr><td><code>HttpOnly</code></td><td>Not readable by JavaScript (blunts XSS token theft)</td></tr>
+      <tr><td><code>SameSite=Strict|Lax|None</code></td><td>Controls cross-site sending; <b>Lax</b> is the sensible default; <b>None</b> requires Secure (cross-site embeds). Main defence against CSRF together with anti-forgery tokens.</td></tr>
+      <tr><td><code>Domain</code> / <code>Path</code></td><td>Scope of where it is sent</td></tr>
+      <tr><td><code>Max-Age</code> / <code>Expires</code></td><td>Lifetime; without it, a session cookie that dies with the browser</td></tr>
+      <tr><td><code>__Host-</code> prefix</td><td>Forces Secure, Path=/ and no Domain: strongest scoping</td></tr></table></div>
+    <div class="tblwrap"><table><tr><th>Approach</th><th>Where state lives</th><th>Notes</th></tr>
+      <tr><td>Server session + session cookie</td><td>Server (memory/Redis)</td><td>Easy revocation; needs shared store when scaled out</td></tr>
+      <tr><td>JWT in HttpOnly cookie</td><td>Client (signed token)</td><td>Stateless; revocation needs short life + refresh</td></tr>
+      <tr><td>JWT in Authorization header</td><td>Client storage</td><td>Immune to CSRF but exposed to XSS if kept in localStorage</td></tr></table></div>
+  </section>
+
+  <div class="part-title">Part 4 &mdash; Caching and cross-origin rules</div>
+
+  <section class="topic" id="caching" data-nav="HTTP caching" data-group="4 · Caching & CORS" data-level="i">
+    <h2>HTTP caching: Cache-Control, ETag and validation <span class="badge i">Intermediate</span></h2>
+    <p>The fastest request is one never sent. Caches live in the browser, CDNs and proxies. The server controls them with response headers; a cached copy is <b>fresh</b> (use it with no network) until it goes <b>stale</b>, then it can be <b>revalidated</b> cheaply.</p>
+    <div class="tblwrap"><table><tr><th>Directive</th><th>Meaning</th></tr>
+      <tr><td><code>max-age=N</code></td><td>Fresh for N seconds in any cache (<code>s-maxage</code> for shared caches only)</td></tr>
+      <tr><td><code>no-cache</code></td><td>May store, but must revalidate with the origin before each use</td></tr>
+      <tr><td><code>no-store</code></td><td>Do not store at all (sensitive data)</td></tr>
+      <tr><td><code>public</code> / <code>private</code></td><td>Shared caches/CDNs allowed / browser only (user-specific data)</td></tr>
+      <tr><td><code>immutable</code></td><td>Never changes during its lifetime: skip revalidation (hashed filenames)</td></tr>
+      <tr><td><code>stale-while-revalidate=N</code></td><td>Serve stale instantly while refreshing in the background</td></tr>
+      <tr><td><code>Vary: Accept-Encoding</code></td><td>The response differs by this request header; caches key on it</td></tr></table></div>
+    <div class="seq" data-title="Conditional request (ETag revalidation)">
+<script type="text/seq">
+participants: Browser | Server
+Browser -> Server : GET /api/products (first time)
+Server --> Browser : 200 + ETag: "v42" + Cache-Control: no-cache
+Browser -> Server : GET /api/products + If-None-Match: "v42"
+Server --> Browser : 304 Not Modified (no body, tiny)
+Browser -> Browser : reuse cached body
+</script>
+    </div>
+    <div class="lab" id="cache-lab"></div>
+    <pre data-lang="csharp" data-file="Program.cs">// Hashed static assets: cache for a year; HTML/API: always validate
+app.UseStaticFiles(new StaticFileOptions {
+    OnPrepareResponse = ctx =&gt; ctx.Context.Response.Headers.CacheControl =
+        ctx.File.Name.Contains('.') &amp;&amp; ctx.Context.Request.Path.StartsWithSegments("/assets")
+            ? "public,max-age=31536000,immutable" : "no-cache"
+});
+app.UseResponseCompression();      // br/gzip   |   [ResponseCache(Duration = 60)] / output caching for endpoints</pre>
+  </section>
+
+  <section class="topic" id="cors" data-nav="Same-origin policy and CORS" data-group="4 · Caching & CORS" data-level="i">
+    <h2>Same-origin policy and CORS <span class="badge i">Intermediate</span></h2>
+    <p>The browser's <b>same-origin policy</b> stops a page from reading responses from a different <b>origin</b> (scheme + host + port). <b>CORS</b> (Cross-Origin Resource Sharing) is how a server opts in to sharing. The restriction is enforced by the browser; Postman and curl ignore it, which is why "it works in Postman".</p>
+    <div class="tblwrap"><table><tr><th>Page</th><th>Request to</th><th>Same origin?</th></tr>
+      <tr><td><code>https://app.shop.com</code></td><td><code>https://app.shop.com/api</code></td><td>Yes</td></tr>
+      <tr><td><code>https://app.shop.com</code></td><td><code>http://app.shop.com/api</code></td><td>No (scheme)</td></tr>
+      <tr><td><code>https://app.shop.com</code></td><td><code>https://api.shop.com</code></td><td>No (host)</td></tr>
+      <tr><td><code>http://localhost:4200</code></td><td><code>http://localhost:5000</code></td><td>No (port)</td></tr></table></div>
+    <div class="seq" data-title="Preflighted cross-origin request">
+<script type="text/seq">
+participants: SPA (localhost 4200) | Browser | API (api.shop.com)
+SPA (localhost 4200) -> Browser : fetch PUT /orders/7 (JSON + Authorization)
+Browser -> API (api.shop.com) : OPTIONS /orders/7 + Origin + Access-Control-Request-Method: PUT + Request-Headers: authorization, content-type
+API (api.shop.com) --> Browser : 204 + Allow-Origin: localhost:4200 + Allow-Methods: PUT + Allow-Headers + Max-Age: 600
+Browser -> API (api.shop.com) : PUT /orders/7 (real request)
+API (api.shop.com) --> Browser : 200 + Access-Control-Allow-Origin
+Browser --> SPA (localhost 4200) : response readable by JavaScript
+</script>
+    </div>
+    <div class="lab" id="cors-lab"></div>
+    <pre data-lang="csharp" data-file="Program.cs">builder.Services.AddCors(o =&gt; o.AddPolicy("spa", p =&gt; p
+    .WithOrigins("http://localhost:4200", "https://app.shop.com")   // exact origins, never "*" with credentials
+    .WithMethods("GET", "POST", "PUT", "DELETE")
+    .WithHeaders("Authorization", "Content-Type")
+    .AllowCredentials()
+    .SetPreflightMaxAge(TimeSpan.FromMinutes(10))));
+
+app.UseCors("spa");          // before UseAuthentication / UseAuthorization</pre>
+    <div class="warn"><b>CORS is not security for your API</b>It only governs which web pages may read responses in a browser. Attackers use curl. You still need authentication, authorisation and CSRF protection (SameSite cookies, anti-forgery tokens) on the server.</div>
+  </section>
+
+  <div class="part-title">Part 5 &mdash; Real-time, proxies and architecture</div>
+
+  <section class="topic" id="realtime" data-nav="Real-time: polling, SSE, WebSockets" data-group="5 · Real-time & infra" data-level="i">
+    <h2>Real-time communication <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th>Technique</th><th>How it works</th><th>Direction</th><th>Use when</th></tr>
+      <tr><td><b>Short polling</b></td><td>Client asks every N seconds</td><td>Client &rarr; server</td><td>Simple, infrequent updates</td></tr>
+      <tr><td><b>Long polling</b></td><td>Request held open until data arrives</td><td>Server push (emulated)</td><td>Fallback, older proxies</td></tr>
+      <tr><td><b>Server-Sent Events (SSE)</b></td><td>One long HTTP response streaming <code>text/event-stream</code>; auto-reconnect</td><td>Server &rarr; client</td><td>Notifications, live feeds, progress</td></tr>
+      <tr><td><b>WebSocket</b></td><td>HTTP <code>Upgrade</code> to a persistent full-duplex TCP channel</td><td>Both ways</td><td>Chat, games, collaboration, trading</td></tr>
+      <tr><td><b>SignalR</b> (ASP.NET Core)</td><td>Abstraction choosing WebSockets, SSE or long polling; hubs, groups, reconnect</td><td>Both ways</td><td>.NET real-time apps (needs Redis/Azure SignalR to scale out)</td></tr>
+      <tr><td><b>Webhooks</b></td><td>Server calls your URL when something happens</td><td>Server &rarr; server</td><td>Integrations; verify signatures, retry idempotently</td></tr></table></div>
+    <pre data-lang="http" data-file="WebSocket upgrade">GET /chat HTTP/1.1
+Host: api.shop.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+Sec-WebSocket-Version: 13
+
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade</pre>
+  </section>
+
+  <section class="topic" id="proxies" data-nav="Proxies, load balancers, CDN, gateways" data-group="5 · Real-time & infra" data-level="i">
+    <h2>Proxies, load balancers, CDNs and API gateways <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th>Component</th><th>Sits</th><th>Does</th></tr>
+      <tr><td><b>Forward proxy</b></td><td>In front of clients</td><td>Corporate filtering, anonymity, egress control</td></tr>
+      <tr><td><b>Reverse proxy</b> (nginx, YARP, IIS ARR)</td><td>In front of servers</td><td>TLS termination, routing, compression, caching, hides back ends</td></tr>
+      <tr><td><b>Load balancer</b></td><td>In front of a server pool</td><td>Distributes traffic (round robin, least connections, hash), health checks, failover; L4 or L7</td></tr>
+      <tr><td><b>CDN</b></td><td>Edge near users</td><td>Caches static (and some dynamic) content, absorbs DDoS, terminates TLS</td></tr>
+      <tr><td><b>API gateway</b></td><td>Single entry to microservices</td><td>Auth, rate limiting, request transformation, versioning, metrics</td></tr>
+      <tr><td><b>WAF</b></td><td>L7 filter</td><td>Blocks SQL injection, XSS patterns, bots</td></tr>
+      <tr><td><b>Service mesh</b></td><td>Beside each service</td><td>mTLS, retries, traffic splitting inside a cluster</td></tr></table></div>
+    <ul>
+      <li><b>Health checks:</b> a load balancer calls <code>/health</code> and removes unhealthy nodes. Use separate liveness (is the process alive?) and readiness (can it serve traffic?) probes (<code>MapHealthChecks</code> in ASP.NET Core).</li>
+      <li><b>Sticky sessions</b> pin a user to one server; avoid by keeping servers stateless.</li>
+      <li><b>Timeouts and retries:</b> each hop has timeouts (LB idle timeout, gateway timeout). A 502/504 usually means the upstream was down or too slow. Retries multiply load: use back-off and only retry idempotent calls.</li>
+      <li><b>Rate limiting:</b> token bucket / fixed window per client or key; return 429 with <code>Retry-After</code> (<code>AddRateLimiter</code> in ASP.NET Core).</li>
+    </ul>
+    <pre data-lang="plain" data-file="nginx.conf (reverse proxy + load balancing)">upstream shop_api {
+    least_conn;
+    server 10.0.1.11:5000;
+    server 10.0.1.12:5000;
+}
+server {
+    listen 443 ssl http2;
+    server_name api.shop.com;
+    ssl_certificate     /etc/ssl/shop.crt;
+    ssl_certificate_key /etc/ssl/shop.key;
+    location / {
+        proxy_pass http://shop_api;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}</pre>
+  </section>
+
+  <section class="topic" id="rest-grpc" data-nav="REST, GraphQL, gRPC and API design" data-group="5 · Real-time & infra" data-level="i">
+    <h2>API styles over the network <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th>Style</th><th>Transport / format</th><th>Strengths</th><th>Trade-offs</th></tr>
+      <tr><td><b>REST</b></td><td>HTTP + JSON, resources and verbs</td><td>Simple, cacheable, universal tooling</td><td>Over/under-fetching, many round trips</td></tr>
+      <tr><td><b>GraphQL</b></td><td>One endpoint, client-specified queries</td><td>Fetch exactly what is needed, one trip</td><td>Caching and rate limiting are harder; query-cost control needed</td></tr>
+      <tr><td><b>gRPC</b></td><td>HTTP/2 + Protobuf, streaming</td><td>Fast, typed contracts, streaming, service-to-service</td><td>Limited browser support (gRPC-Web), binary debugging</td></tr>
+      <tr><td><b>Messaging</b> (queues/events)</td><td>AMQP, Kafka, Service Bus</td><td>Async, decoupled, buffering</td><td>Eventual consistency, ordering, duplicates</td></tr></table></div>
+    <ul><li><b>Pagination, filtering, versioning</b> (URL, header, media type), <b>consistent errors</b> (RFC 9457 Problem Details), <b>idempotency keys</b> for POST, <b>ETags</b> for optimistic concurrency (<code>If-Match</code> &rarr; 412).</li><li><b>Timeouts everywhere:</b> client, gateway and server; set deadlines, not infinite waits.</li><li><b>Fallacies of distributed computing:</b> the network is not reliable, latency is not zero, bandwidth is not infinite, the network is not secure.</li></ul>
+  </section>
+
+  <div class="part-title">Part 6 &mdash; Debugging and security</div>
+
+  <section class="topic" id="debugging" data-nav="Debugging toolkit and common failures" data-group="6 · Debug & secure" data-level="i">
+    <h2>Debugging network problems <span class="badge i">Intermediate</span></h2>
+    <p>Work from the bottom up: is the host reachable (IP), does the name resolve (DNS), can I connect (TCP port), does TLS work, what does HTTP return?</p>
+    <pre data-lang="bash" data-file="terminal">ping shop.com                              # ICMP reachability and RTT (may be blocked)
+tracert shop.com                           # Windows route trace (traceroute on Linux/macOS)
+nslookup shop.com                          # DNS
+Test-NetConnection shop.com -Port 443      # PowerShell: is the TCP port open?
+nc -zv shop.com 443                        # Linux/macOS equivalent
+curl -v https://api.shop.com/health        # full request/response, TLS details
+curl -I https://shop.com                   # headers only
+curl -w "dns:%{time_namelookup} connect:%{time_connect} tls:%{time_appconnect} ttfb:%{time_starttransfer} total:%{time_total}\n" -o /dev/null -s https://shop.com
+netstat -ano | findstr :5000               # who is listening on port 5000? (Windows)
+ss -tulpn                                  # Linux listening sockets</pre>
+    <div class="tblwrap"><table><tr><th>Symptom</th><th>Likely layer / cause</th><th>Check</th></tr>
+      <tr><td>"Could not resolve host"</td><td>DNS</td><td>Typo, missing record, split-horizon DNS, VPN resolver</td></tr>
+      <tr><td>Timeout connecting</td><td>Firewall / security group / route / server down</td><td><code>Test-NetConnection</code>, NSG/SG rules, service listening on the right interface</td></tr>
+      <tr><td>"Connection refused"</td><td>Nothing listening on that port</td><td>Service started? bound to <code>0.0.0.0</code> not only <code>127.0.0.1</code>?</td></tr>
+      <tr><td>Certificate errors</td><td>TLS</td><td><code>openssl s_client</code>, expiry, SAN, chain</td></tr>
+      <tr><td>CORS error in browser console</td><td>Browser policy</td><td>Network tab: OPTIONS response headers; fix server CORS</td></tr>
+      <tr><td>502 / 504</td><td>Proxy to upstream</td><td>Upstream health, timeouts, app crash, wrong port</td></tr>
+      <tr><td>Works locally, fails in cloud</td><td>Environment</td><td>Env vars, firewall, private networking, HTTPS redirect, forwarded headers</td></tr>
+      <tr><td>Slow first byte</td><td>Server or database</td><td>Server-Timing, traces, DB plans; compare with static file time</td></tr>
+      <tr><td>Intermittent resets</td><td>Idle timeouts, port exhaustion, NAT</td><td>Keep-alive settings, connection pooling, <code>IHttpClientFactory</code></td></tr></table></div>
+    <ul><li><b>Browser DevTools &rarr; Network:</b> timing breakdown (DNS, connect, TLS, TTFB, download), headers, initiator, cache status, HAR export.</li><li><b>Fiddler / Charles / mitmproxy / Postman:</b> inspect and replay.</li><li><b>Wireshark / <code>tcpdump</code>:</b> packet-level truth when everything else is ambiguous.</li></ul>
+  </section>
+
+  <section class="topic" id="net-security" data-nav="Web and network security essentials" data-group="6 · Debug & secure" data-level="i">
+    <h2>Security essentials at the network and HTTP level <span class="badge i">Intermediate</span></h2>
+    <div class="tblwrap"><table><tr><th>Threat</th><th>What it is</th><th>Defence</th></tr>
+      <tr><td><b>Man-in-the-middle</b></td><td>Attacker intercepts traffic</td><td>TLS everywhere, HSTS, certificate validation</td></tr>
+      <tr><td><b>XSS</b></td><td>Injected script runs in the victim's page</td><td>Output encoding, CSP, HttpOnly cookies, sanitise HTML</td></tr>
+      <tr><td><b>CSRF</b></td><td>Another site makes the browser send an authenticated request</td><td>SameSite cookies, anti-forgery tokens, custom headers + CORS</td></tr>
+      <tr><td><b>Clickjacking</b></td><td>Your site framed invisibly</td><td><code>frame-ancestors</code> / X-Frame-Options</td></tr>
+      <tr><td><b>SSRF</b></td><td>Server tricked into calling internal URLs (e.g. cloud metadata)</td><td>Allow-list outbound targets, block link-local, IMDSv2</td></tr>
+      <tr><td><b>DDoS</b></td><td>Traffic floods</td><td>CDN/WAF, rate limiting, autoscaling, upstream scrubbing</td></tr>
+      <tr><td><b>DNS spoofing / hijack</b></td><td>Fake DNS answers</td><td>DNSSEC, DoH/DoT, registrar lock, TLS validation</td></tr>
+      <tr><td><b>Open ports</b></td><td>Needless exposure (RDP, SSH, DB)</td><td>Default-deny firewalls, private networking, bastion/VPN, patching</td></tr></table></div>
+    <pre data-lang="csharp" data-file="Program.cs">app.UseHsts();                      // production only
+app.UseHttpsRedirection();
+app.Use(async (ctx, next) =&gt; {
+    ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    ctx.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    ctx.Response.Headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none'";
+    await next();
+});</pre>
+  </section>
+
+  <div class="part-title">Part 7 &mdash; Interview preparation</div>
+
+  <section class="topic" id="quiz" data-nav="Self-test quiz" data-group="7 · Resources" data-level="b">
+    <h2>Self-test quiz <span class="badge b">Practice</span></h2>
+    <p>Ten questions. Pick an answer and read the explanation.</p>
+    <div class="lab quiz" data-title="Networking quiz">
+      <script type="application/json">
+      [
+        {"q":"How many usable host addresses are in 10.0.1.0/24 (traditional networking)?","o":["256","255","254","253"],"a":2,"e":"256 addresses minus the network and broadcast addresses = 254. (Azure and AWS reserve 5 per subnet, leaving 251.)"},
+        {"q":"What is the correct order for a first HTTPS request to a new host?","o":["TLS, DNS, TCP, HTTP","DNS, TCP, TLS, HTTP","TCP, DNS, HTTP, TLS","HTTP, DNS, TLS, TCP"],"a":1,"e":"Resolve the name (DNS), connect (TCP), secure the channel (TLS), then send HTTP."},
+        {"q":"Which status code means 'you are logged in but not allowed'?","o":["401","403","404","405"],"a":1,"e":"401 means unauthenticated (missing/invalid credentials); 403 means authenticated but forbidden."},
+        {"q":"Which HTTP method is idempotent and replaces a resource?","o":["POST","PATCH","PUT","CONNECT"],"a":2,"e":"PUT sets the resource to the given state; repeating it leaves the same result. POST is not idempotent."},
+        {"q":"A browser has a fresh cached copy (age 10 s, max-age 60). What does it do?","o":["Sends a conditional request","Uses the cache without any network request","Re-downloads","Sends HEAD"],"a":1,"e":"While fresh, the cached response is used directly. After it goes stale the browser can revalidate with If-None-Match."},
+        {"q":"Why does 'it works in Postman but not in the browser' often happen?","o":["Postman is faster","CORS is enforced only by browsers","Postman skips DNS","Browsers disable TLS"],"a":1,"e":"The API lacks CORS headers for the page's origin. Postman and curl don't apply the same-origin policy."},
+        {"q":"Which statement about HTTP/3 is correct?","o":["It runs over TCP","It runs over QUIC on UDP and avoids TCP head-of-line blocking","It needs no encryption","It is a text protocol"],"a":1,"e":"QUIC provides multiplexed streams with independent loss recovery and built-in TLS 1.3."},
+        {"q":"What is the main difference between no-cache and no-store?","o":["None","no-cache allows storing but forces revalidation; no-store forbids storing","no-store is for CDNs only","no-cache disables TLS"],"a":1,"e":"Use no-cache + ETag for data that must always be fresh; no-store for sensitive data."},
+        {"q":"A gateway returns 504. What does it mean?","o":["Client sent bad JSON","The gateway did not get a timely response from the upstream","The cert expired","DNS failed"],"a":1,"e":"504 Gateway Timeout: the upstream was too slow or unreachable. 502 means it returned an invalid response."},
+        {"q":"Why create HttpClient through IHttpClientFactory (or reuse one) in .NET?","o":["It compresses data","To pool and reuse connections and refresh DNS, avoiding port exhaustion","To disable TLS","To bypass CORS"],"a":1,"e":"A new HttpClient per call leaves sockets in TIME_WAIT and can exhaust ports; the factory manages handler lifetime."}
+      ]
+      </script>
+    </div>
+  </section>
+
+  <section class="topic" id="interview-qa" data-nav="Interview questions & answers" data-group="7 · Resources" data-level="a">
+    <h2>Networking and HTTP interview questions <span class="badge a">Prep</span></h2>
+    <p>Filter by topic, expand a question and try to answer it aloud first.</p>
+    <div class="qfilter" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
+      <button class="btn primary" data-f="all" type="button">All</button><button class="btn" data-f="stack" type="button">Stack</button><button class="btn" data-f="http" type="button">HTTP</button><button class="btn" data-f="web" type="button">Cache &amp; CORS</button><button class="btn" data-f="sec" type="button">Security</button><button class="btn" data-f="ops" type="button">Operations</button>
+    </div>
+
+    <details class="qa" data-tag="stack"><summary>What happens when you type a URL in the browser? <span class="qtag">stack</span></summary><div class="dbody"><p>Browser checks caches/HSTS &rarr; DNS resolves the name &rarr; TCP handshake &rarr; TLS handshake &rarr; HTTP request (with cookies) &rarr; load balancer/proxy routes to the app &rarr; the app queries data and responds &rarr; browser parses HTML and fetches sub-resources over the same connection, then renders.</p></div></details>
+    <details class="qa" data-tag="stack"><summary>TCP vs UDP? <span class="qtag">stack</span></summary><div class="dbody"><p>TCP: reliable, ordered, connection-oriented with flow and congestion control. UDP: connectionless, no guarantees, low latency. DNS, streaming, gaming and QUIC use UDP; HTTP/1.1 and 2 use TCP.</p></div></details>
+    <details class="qa" data-tag="stack"><summary>What is a subnet mask / CIDR and how do you split 10.0.0.0/16 into subnets? <span class="qtag">stack</span></summary><div class="dbody"><p>The prefix length marks network bits. Adding bits splits it: /16 into /24 gives 256 subnets of 256 addresses each (e.g. 10.0.1.0/24, 10.0.2.0/24). Plan non-overlapping ranges and remember cloud providers reserve 5 addresses per subnet.</p></div></details>
+    <details class="qa" data-tag="stack"><summary>How does DNS work and what is TTL? <span class="qtag">stack</span></summary><div class="dbody"><p>A recursive resolver walks root &rarr; TLD &rarr; authoritative servers and caches the answer for its TTL. Lower the TTL ahead of a migration; propagation delay is just cached answers expiring.</p></div></details>
+    <details class="qa" data-tag="stack"><summary>What is NAT and why is it used? <span class="qtag">stack</span></summary><div class="dbody"><p>Network Address Translation lets many private hosts share one public IP by rewriting addresses/ports at the router, conserving IPv4 space. It also hides internal addressing and blocks unsolicited inbound traffic by default.</p></div></details>
+
+    <details class="qa" data-tag="http"><summary>PUT vs POST vs PATCH? <span class="qtag">http</span></summary><div class="dbody"><p>POST creates or triggers processing (not idempotent). PUT replaces a resource at a known URL (idempotent). PATCH partially updates (may not be idempotent).</p></div></details>
+    <details class="qa" data-tag="http"><summary>401 vs 403 and 404 vs 410? <span class="qtag">http</span></summary><div class="dbody"><p>401: not authenticated. 403: authenticated but not authorised. 404: not found (or deliberately hidden); 410: permanently gone.</p></div></details>
+    <details class="qa" data-tag="http"><summary>HTTP/1.1 vs HTTP/2 vs HTTP/3? <span class="qtag">http</span></summary><div class="dbody"><p>1.1: text, one request at a time per connection. 2: binary, multiplexed streams and header compression on one TCP connection. 3: the same model over QUIC/UDP, fixing TCP head-of-line blocking, faster setup and connection migration.</p></div></details>
+    <details class="qa" data-tag="http"><summary>What is statelessness and how do you keep state? <span class="qtag">http</span></summary><div class="dbody"><p>Each request has all the information needed to process it; the server keeps no per-client memory between requests, which allows horizontal scaling. State travels in cookies, tokens, or is stored in a shared store (Redis/database) keyed by a session id.</p></div></details>
+    <details class="qa" data-tag="http"><summary>What is the difference between cookies, localStorage and sessionStorage? <span class="qtag">http</span></summary><div class="dbody"><p>Cookies are sent automatically with each matching request, can be HttpOnly/Secure/SameSite, ~4 KB. localStorage persists, ~5-10 MB, JavaScript-only, never sent automatically. sessionStorage is per tab and cleared on close.</p></div></details>
+
+    <details class="qa" data-tag="web"><summary>Explain CORS and a preflight request. <span class="qtag">web</span></summary><div class="dbody"><p>Browsers block cross-origin reads unless the server sends permission headers. For non-simple requests (custom headers, JSON content-type, PUT/DELETE) the browser first sends OPTIONS to ask. The server must answer with allowed origin, methods and headers. Fix it on the server, and note it is not an API security mechanism.</p></div></details>
+    <details class="qa" data-tag="web"><summary>How does HTTP caching work (ETag, Cache-Control)? <span class="qtag">web</span></summary><div class="dbody"><p>Cache-Control says how long a response is fresh; once stale the client revalidates with If-None-Match/If-Modified-Since and gets a tiny 304 if unchanged. Use long max-age + immutable for hashed assets, and no-cache + ETag for HTML and API data.</p></div></details>
+    <details class="qa" data-tag="web"><summary>How do you make a website load faster? <span class="qtag">web</span></summary><div class="dbody"><p>Reduce round trips and bytes: CDN, HTTP/2-3, keep-alive, compression, caching headers, minify and code-split, optimise images, preload critical resources, lazy-load, and reduce server time (indexes, caching). Measure with DevTools, Lighthouse and real-user metrics (Core Web Vitals).</p></div></details>
+
+    <details class="qa" data-tag="sec"><summary>How does HTTPS/TLS work at a high level? <span class="qtag">sec</span></summary><div class="dbody"><p>The client validates the server's certificate chain and hostname, both sides agree on session keys using an ephemeral key exchange, then data is encrypted symmetrically with integrity checks. Forward secrecy means recorded traffic cannot be decrypted later.</p></div></details>
+    <details class="qa" data-tag="sec"><summary>XSS vs CSRF and their defences? <span class="qtag">sec</span></summary><div class="dbody"><p>XSS runs attacker script in your page (defend with encoding, CSP, HttpOnly). CSRF makes a victim's browser send an authenticated request from another site (defend with SameSite cookies, anti-forgery tokens). Bearer tokens in headers avoid CSRF but make XSS more damaging if stored in localStorage.</p></div></details>
+    <details class="qa" data-tag="sec"><summary>What is SSRF and how do you prevent it? <span class="qtag">sec</span></summary><div class="dbody"><p>Server-Side Request Forgery: user-supplied URLs make the server call internal resources such as the cloud metadata endpoint. Allow-list destinations, resolve and block private/link-local ranges, disable redirects, and use IMDSv2 / least-privilege roles.</p></div></details>
+
+    <details class="qa" data-tag="ops"><summary>Users report 502s intermittently. How do you investigate? <span class="qtag">ops</span></summary><div class="dbody"><p>Check which hop returns 502 (CDN, LB, gateway, app), upstream health probes and logs for crashes/restarts, timeouts vs upstream latency, connection limits and keep-alive mismatches between proxy and app, recent deployments and scaling events. Correlate with request ids and metrics.</p></div></details>
+    <details class="qa" data-tag="ops"><summary>Layer 4 vs Layer 7 load balancing? <span class="qtag">ops</span></summary><div class="dbody"><p>L4 forwards TCP/UDP connections by IP and port: fast, protocol-agnostic. L7 understands HTTP: routes by path/host/header, terminates TLS, does cookies, rewrites and WAF, at slightly higher cost.</p></div></details>
+    <details class="qa" data-tag="ops"><summary>What is the difference between liveness and readiness probes? <span class="qtag">ops</span></summary><div class="dbody"><p>Liveness answers "should this process be restarted?"; readiness answers "should this instance receive traffic right now?" (dependencies warmed up, DB reachable). Keep liveness simple to avoid restart loops.</p></div></details>
+  </section>
+
+  <section class="topic" id="next" data-nav="Next steps" data-group="7 · Resources" data-level="b">
+    <h2>Practice plan and next steps <span class="badge b">Roadmap</span></h2>
+    <ol class="steps">
+      <li>Run the <code>curl -w</code> timing command against three sites and explain every number.</li>
+      <li>Use <code>dig +trace</code> and <code>openssl s_client</code> on your own domain; find the certificate expiry and the DNS TTL.</li>
+      <li>Open DevTools &rarr; Network on a real app; identify which responses are cached and why.</li>
+      <li>Break CORS on purpose in your Web API, read the browser error, then fix it with the correct policy.</li>
+      <li>Design a VNet with public, app and data subnets using the CIDR lab; then read the <a href="Cloud-Fundamentals-Guide.html">Cloud Fundamentals</a> guide to implement it.</li>
+    </ol>
+    <p><small>Companion guides: <a href="ASP.NET-Core-Web-API-Guide.html">Web API (CORS, auth)</a> &middot; <a href="Cloud-Fundamentals-Guide.html">Cloud Fundamentals</a> &middot; <a href="React-Concepts-Guide.html">React</a> &middot; <a href="AngularJS-Concepts-Guide.html">AngularJS</a></small></p>
+  </section>
+
+</main>
+</div>
+
+<script src="assets/guide.js"></script>
+<script src="assets/concepts.js"></script>
+<script src="assets/network.js"></script>
+</body>
+</html>
