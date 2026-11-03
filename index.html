@@ -43,6 +43,23 @@ h3{margin:34px 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:1.4
 .path span{align-self:center;color:var(--muted);font-size:18px}
 .tip{background:var(--surface2);border-left:4px solid var(--accent);border-radius:6px;padding:10px 14px;font-size:14px;margin-top:22px}
 .kbd{border:1px solid var(--border);border-bottom-width:2px;padding:0 6px;border-radius:4px;font-size:12px;background:var(--surface)}
+@media (max-width:760px){
+  header{padding:0 10px;gap:0}
+  header .logo{order:1;flex:1 1 auto;margin-right:0;padding:9px 0;font-size:14px}
+  header .tools{order:2;gap:6px}
+  header .tools button,header .tools a{padding:3px 8px;font-size:12px}
+  header nav{order:3;flex:0 0 100%;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -10px;padding:0 6px}
+  header nav::-webkit-scrollbar{display:none}
+  header nav button{flex:0 0 auto;white-space:nowrap;padding:10px 12px;font-size:13px}
+  #home{padding:18px 12px 40px}
+  .hero{padding:20px 18px;border-radius:12px;margin-bottom:18px}
+  .hero h1{font-size:23px}
+  .grid{grid-template-columns:1fr}
+  .path{flex-direction:column;align-items:stretch}
+  .path span{transform:rotate(90deg);align-self:center;line-height:1}
+  .tip{font-size:13px}
+  #newtab{display:none!important}
+}
 </style>
 </head>
 <body>
